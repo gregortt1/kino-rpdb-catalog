@@ -8,6 +8,10 @@ Rotten Tomatoes, Metacritic, Trakt, Letterboxd…), gracias a
 
 ## Qué añade a Kino
 
+- **Su propia sección**: en la tele, una entrada en el menú lateral; en el celular, un chip arriba en
+  Inicio. Con dos pestañas, **Películas** y **Series**, un destacado y sus propias filas.
+- **Mosaicos en Categorías**: doce géneros (Acción, Comedia, Drama, Terror, Ciencia ficción, Animación,
+  Documentales…) que se abren como una lista paginada, con el arte de cada mosaico también con nota.
 - **Filas en Inicio**: películas y series en tendencia, mejor valoradas, en cines y al aire.
 - **Búsqueda propia**: busca en todo el catálogo de TMDB, con "Ver más" para seguir mirando.
 - **Fichas completas**: sinopsis, nota, año, temporadas y capítulos.

@@ -29,6 +29,8 @@ Piezas:
 | Pieza | Detalle |
 | --- | --- |
 | `home()` | 6 filas de TMDB (`/trending`, `/movie/top_rated`, `/tv/top_rated`, `/movie/now_playing`, `/tv/on_the_air`). Una fila sin ítems no se devuelve. |
+| `section({ tab })` | La sección propia: dos pestañas (Películas, Series) con sus filas y un destacado. Ver abajo. |
+| `categories()` | Los mosaicos de Categorías: doce géneros como listas `/discover`. Ver abajo. |
 | `browse(ref, cursor)` | Pagina una fila. El `ref` lleva `{ path, kind }` y solo se acepta una ruta de TMDB. |
 | `search(query)` | `/search/multi`, filtrando a `movie`/`tv`, paginado por `cursor`. |
 | `episodes(ref)` | Temporadas 1..N (máximo 10) desde TMDB, con `still`, `airDate` y duración. Los capítulos con `number` 0 se descartan. |
@@ -101,6 +103,28 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
+
+### La sección propia y los mosaicos (1.6.0)
+
+`section()` y `categories()` son las dos formas que da Kino a un plugin de tener su propio sitio. Ninguna
+necesita capacidad nueva: la sección solo necesita el export y `"section"` en el manifiesto (Kino rechaza
+la instalación si declara uno y no lo exporta), y `categories()` se descubre por el export, con `browse`
+ya declarada.
+
+- **`home()` y `section()` comparten `buildRows()`**, para que las dos no se separen nunca: mismas
+  comprobaciones previas (clave, ajuste, fondos), mismas filas, mismo `ref` con "Ver más".
+- El **destacado** de la sección sale del primer título de la primera fila, que ya se pidió: no cuesta
+  ninguna petición.
+- Una pestaña desconocida (o `null`) cae a la primera; nunca es un error.
+- Los **mosaicos de género** son listas `/discover`, así que su `ref` tiene que llevar parámetros. Eso
+  obligó a extender `listRef()`: un ref puede traer un objeto `params`, y `cleanParams()` deja pasar solo
+  nombres (`^[a-z][a-z0-9._]{0,40}$`) y valores simples (texto, número o booleano, hasta 500 caracteres;
+  como mucho 20). En `browse()`, `page` siempre gana sobre lo que venga en el ref.
+- El arte de cada mosaico es el póster del título más popular de esa lista, pasado por `art()`, así que
+  **el mosaico también lleva nota**.
+- `"theme": { "highlight": "#F5C518" }` tiñe solo el título del grupo en Categorías. Es el único color
+  que se declara: los demás tocarían el fondo y las tarjetas de la persona, y Kino tiene reglas de
+  contraste que harían caer alguno en silencio.
 
 ## La pantalla de ajustes: de ocho a tres
 

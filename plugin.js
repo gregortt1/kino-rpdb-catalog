@@ -43,6 +43,10 @@ const TEXT = {
     topShows: "Series mejor valoradas",
     inCinemas: "En cines",
     onAir: "Series al aire",
+    upcoming: "Próximos estrenos",
+    popularShows: "Series populares",
+    movies: "Películas",
+    shows: "Series",
     noSource: "Este catálogo no reproduce títulos: busca dónde verlo en tus otras fuentes.",
   },
   en: {
@@ -52,6 +56,10 @@ const TEXT = {
     topShows: "Top rated shows",
     inCinemas: "In cinemas",
     onAir: "On the air",
+    upcoming: "Coming soon",
+    popularShows: "Popular shows",
+    movies: "Movies",
+    shows: "Shows",
     noSource: "This catalogue plays nothing: use it to find the title in your other sources.",
   },
 };
@@ -64,6 +72,46 @@ const ROWS = [
   { id: "rpdb-top-shows", path: "/tv/top_rated", kind: "tv", genre: "series", title: "topShows" },
   { id: "rpdb-cinema", path: "/movie/now_playing", kind: "movie", genre: "peliculas", title: "inCinemas" },
   { id: "rpdb-on-air", path: "/tv/on_the_air", kind: "tv", genre: "series", title: "onAir" },
+];
+
+// The plugin's own section: two tabs, each with its own rows. Same shape as a Home row, so the same
+// builder is used for both.
+const SECTION_TABS = [
+  { id: "pelis", label: "movies" },
+  { id: "series", label: "shows" },
+];
+
+const SECTION_ROWS = {
+  pelis: [
+    { id: "sec-movies-trend", path: "/trending/movie/week", kind: "movie", genre: "peliculas", title: "trendMovies" },
+    { id: "sec-movies-cinema", path: "/movie/now_playing", kind: "movie", genre: "peliculas", title: "inCinemas" },
+    { id: "sec-movies-soon", path: "/movie/upcoming", kind: "movie", genre: "peliculas", title: "upcoming" },
+    { id: "sec-movies-top", path: "/movie/top_rated", kind: "movie", genre: "peliculas", title: "topMovies" },
+  ],
+  series: [
+    { id: "sec-shows-trend", path: "/trending/tv/week", kind: "tv", genre: "series", title: "trendShows" },
+    { id: "sec-shows-air", path: "/tv/on_the_air", kind: "tv", genre: "series", title: "onAir" },
+    { id: "sec-shows-pop", path: "/tv/popular", kind: "tv", genre: "series", title: "popularShows" },
+    { id: "sec-shows-top", path: "/tv/top_rated", kind: "tv", genre: "series", title: "topShows" },
+  ],
+};
+
+// The tiles of Kino's Categorías tab. TMDB's genre ids are stable and well known; the ones used here are
+// the film and series variants of the same handful of genres. Each tile is a `/discover` list, so the
+// tile's ref has to carry its parameters through browse().
+const GENRE_TILES = [
+  { id: "accion", label: "Acción", kind: "movie", genre: 28 },
+  { id: "accion-series", label: "Acción y aventura", kind: "tv", genre: 10759 },
+  { id: "comedia", label: "Comedia", kind: "movie", genre: 35 },
+  { id: "comedia-series", label: "Comedia (series)", kind: "tv", genre: 35 },
+  { id: "drama", label: "Drama", kind: "movie", genre: 18 },
+  { id: "drama-series", label: "Drama (series)", kind: "tv", genre: 18 },
+  { id: "terror", label: "Terror", kind: "movie", genre: 27 },
+  { id: "misterio-series", label: "Misterio (series)", kind: "tv", genre: 9648 },
+  { id: "ciencia-ficcion", label: "Ciencia ficción", kind: "movie", genre: 878 },
+  { id: "fantasia-series", label: "Ciencia ficción y fantasía", kind: "tv", genre: 10765 },
+  { id: "animacion", label: "Animación", kind: "movie", genre: 16 },
+  { id: "documental", label: "Documentales", kind: "movie", genre: 99 },
 ];
 
 // kino.log must never break the answer it reports on.
@@ -358,11 +406,32 @@ function parseRef(ref) {
   return spec && typeof spec === "object" ? spec : null;
 }
 
-// browse() only ever asks TMDB for a list path; anything else is refused before it leaves.
+// browse() only ever asks TMDB for a list path; anything else is refused before it leaves. A ref may also
+// carry the parameters of a `/discover` list (the genre tiles), so those are filtered to plain values
+// with plain names before they are handed to TMDB.
+const PARAM_NAME_RULE = /^[a-z][a-z0-9._]{0,40}$/;
+
+function cleanParams(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const out = {};
+  let count = 0;
+  for (const name of Object.keys(raw)) {
+    if (count >= 20) break;
+    if (!PARAM_NAME_RULE.test(name)) continue;
+    const value = raw[name];
+    const type = typeof value;
+    if (type !== "string" && type !== "number" && type !== "boolean") continue;
+    if (type === "string" && value.length > 500) continue;
+    out[name] = value;
+    count++;
+  }
+  return Object.keys(out).length ? out : null;
+}
+
 function listRef(spec) {
   if (!spec || typeof spec.path !== "string" || !PATH_RULE.test(spec.path) || spec.path.indexOf("..") !== -1) return null;
   if (spec.kind !== "movie" && spec.kind !== "tv") return null;
-  return { path: spec.path, kind: spec.kind };
+  return { path: spec.path, kind: spec.kind, params: cleanParams(spec.params) };
 }
 
 // episodes() needs the show's TMDB id, not the path it was listed through.
@@ -377,26 +446,32 @@ function nextCursor(data, page) {
   return page < Math.min(total, TMDB_PAGE_CAP) ? String(page + 1) : undefined;
 }
 
+// Runs the checks a rated image needs before anything is built, then turns a list of row specs into
+// Kino rows. Home and the plugin's own section share it, so the two can never drift apart.
+async function buildRows(specs) {
+  await ensureProbe();
+  await ensureTuningProbe();
+  await ensureBackdropProbe();
+  const pages = await Promise.all(specs.map((row) => tmdb(row.path, row.params)));
+  const rows = [];
+  specs.forEach((row, i) => {
+    const items = results(pages[i]).map((m) => item(m, row.kind)).filter(Boolean);
+    if (!items.length) return;
+    rows.push({
+      id: row.id,
+      title: t(row.title),
+      items,
+      // A row with a ref and a browse() gets the "Ver más" card.
+      ref: JSON.stringify({ path: row.path, kind: row.kind, params: row.params, list: true }),
+      genre: row.genre,
+    });
+  });
+  return rows;
+}
+
 export async function home() {
   try {
-    await ensureProbe();
-    await ensureTuningProbe();
-    await ensureBackdropProbe();
-    const pages = await Promise.all(ROWS.map((row) => tmdb(row.path)));
-    const rows = [];
-    ROWS.forEach((row, i) => {
-      const items = results(pages[i]).map((m) => item(m, row.kind)).filter(Boolean);
-      if (!items.length) return;
-      rows.push({
-        id: row.id,
-        title: t(row.title),
-        items,
-        // A row with a ref and a browse() gets the "Ver más" card.
-        ref: JSON.stringify({ path: row.path, kind: row.kind, list: true }),
-        genre: row.genre,
-      });
-    });
-    return rows;
+    return await buildRows(ROWS);
   } catch (e) {
     // No rows instead of an error: a Kino with no kino.tmdb at all, or one whose TMDB key is missing or
     // momentarily out of reach. Home is never blocked by a plugin that contributes nothing.
@@ -408,6 +483,63 @@ export async function home() {
   }
 }
 
+// The plugin's own section: a sidebar entry on a television, a chip in Home on a phone. A tab is chosen
+// by id; anything unrecognised falls back to the first one.
+export async function section(args) {
+  const asked = args && typeof args.tab === "string" ? args.tab : null;
+  const chosen = SECTION_TABS.some((tab) => tab.id === asked) ? asked : SECTION_TABS[0].id;
+  const tabs = SECTION_TABS.map((tab) => ({ id: tab.id, label: t(tab.label) }));
+  const rows = await buildRows(SECTION_ROWS[chosen]);
+  // The hero shows the first title of the tab, which the first row already brought: no extra request.
+  const first = rows.length && rows[0].items.length ? rows[0].items[0] : null;
+  const answer = { tabs, tab: chosen, rows };
+  if (first) {
+    const hero = { title: first.title };
+    if (first.overview) hero.text = String(first.overview).slice(0, 300);
+    const image = first.backdrop || first.poster;
+    if (image) hero.image = image;
+    answer.hero = hero;
+  }
+  return answer;
+}
+
+// The tiles of Kino's Categorías tab. Each one is a `/discover` list, and its artwork is the poster of
+// the most popular title of that list, so the tile carries a note too.
+export async function categories() {
+  try {
+    await ensureProbe();
+    await ensureTuningProbe();
+    await ensureBackdropProbe();
+    const pages = await Promise.all(
+      GENRE_TILES.map((tile) =>
+        tmdb(tile.path || (tile.kind === "tv" ? "/discover/tv" : "/discover/movie"), {
+          with_genres: tile.genre,
+          sort_by: "popularity.desc",
+        }).catch(() => null)
+      )
+    );
+    const tiles = [];
+    GENRE_TILES.forEach((tile, i) => {
+      const params = { with_genres: tile.genre, sort_by: "popularity.desc" };
+      const path = tile.kind === "tv" ? "/discover/tv" : "/discover/movie";
+      const first = results(pages[i])[0];
+      const tileArt = first ? art(first, "poster", tile.kind) : undefined;
+      const out = {
+        id: tile.id,
+        title: String(tile.label).slice(0, 40),
+        ref: JSON.stringify({ path, kind: tile.kind, params, list: true }),
+      };
+      if (tileArt) out.art = tileArt;
+      tiles.push(out);
+    });
+    return tiles;
+  } catch (e) {
+    // A group that fails contributes nothing; Kino is not blocked by it.
+    log("no pude armar las categorías: " + (e && e.message ? e.message : e));
+    return [];
+  }
+}
+
 export async function browse(ref, cursor) {
   const spec = listRef(parseRef(ref));
   if (!spec) return { items: [] };
@@ -415,7 +547,8 @@ export async function browse(ref, cursor) {
   await ensureTuningProbe();
   await ensureBackdropProbe();
   const page = Math.max(1, parseInt(cursor, 10) || 1);
-  const data = await tmdb(spec.path, { page });
+  // The ref's own parameters (a `/discover` genre) go through, but `page` always wins.
+  const data = await tmdb(spec.path, Object.assign({}, spec.params, { page }));
   const items = results(data).map((m) => item(m, spec.kind)).filter(Boolean);
   const next = nextCursor(data, page);
   return next ? { items, next } : { items };
