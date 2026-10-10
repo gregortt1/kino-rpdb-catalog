@@ -129,6 +129,19 @@ function usesRpdb() {
   return setting("posterSource", "rpdb") === "rpdb" && rpdbKey() !== "" && !keyRejected;
 }
 
+// RPDB takes the media type INSIDE the id value for TMDB lookups: `movie-603`, `series-1399`.
+//
+// Without it, a bare number makes RPDB guess between TMDB's film and series namespaces. Those are two
+// separate id lists that collide, and RPDB picks by popularity: a very popular title wins the guess,
+// and everything else is served another title's poster or none at all. That is what produced a 1930s
+// German film poster on a series card and empty cards on other series. IMDb ids need none of this:
+// `tt0944947` names one title unambiguously, so `meta()` leaves them alone.
+function tmdbIdValue(mediaType, id) {
+  const value = String(id);
+  if (setting("idMode", "typed") === "plain") return value;
+  return (mediaType === "tv" || mediaType === "series" ? "series-" : "movie-") + value;
+}
+
 // The poster (or backdrop) of one TMDB result.
 //
 // TMDB picks the image path for the language it was asked for and only then falls back to the
@@ -139,10 +152,10 @@ function usesRpdb() {
 // RPDB is therefore asked for the poster even when this response carries no path: RPDB looks the
 // artwork up on TMDB and Fanart.tv itself, and its own `fallback` decides what to serve when it has
 // no rated variant. Only when RPDB is not in play does the missing path mean there is nothing to show.
-function art(m, kind) {
+function art(m, kind, mediaType) {
   const path = kind === "poster" ? m.poster_path : m.backdrop_path;
   if (usesRpdb() && (kind === "poster" || setting("withBackdrop", false) === true)) {
-    return rpdbUrl(rpdbKey(), "tmdb", kind === "poster" ? posterType() : DEFAULT_BACKDROP, m.id);
+    return rpdbUrl(rpdbKey(), "tmdb", kind === "poster" ? posterType() : DEFAULT_BACKDROP, tmdbIdValue(mediaType, m.id));
   }
   if (!path) return undefined;
   return (kind === "poster" ? TMDB_POSTER : TMDB_BACKDROP) + path;
@@ -183,9 +196,9 @@ function item(m, kind) {
   // Worth a line in the log: it is the case where TMDB returned no image path, so if RPDB also has
   // nothing for this title the card stays empty and this line says which title it was.
   if (!m.poster_path && usesRpdb()) log("TMDB no trajo imagen para «" + title + "»: se le pide a RPDB igual");
-  const poster = art(m, "poster");
+  const poster = art(m, "poster", kind);
   if (poster) out.poster = poster;
-  const backdrop = art(m, "backdrop");
+  const backdrop = art(m, "backdrop", kind);
   if (backdrop) out.backdrop = backdrop;
   if (m.overview) out.overview = String(m.overview).slice(0, 2000);
   if (typeof m.vote_average === "number" && m.vote_average > 0) out.rating = m.vote_average;
@@ -308,7 +321,7 @@ export async function episodes(ref) {
     }
   }
   const series = { title: String(show.name || "").slice(0, 200) || undefined };
-  const poster = art(show, "poster");
+  const poster = art(show, "poster", "tv");
   if (poster) series.poster = poster;
   if (show.overview) series.overview = String(show.overview).slice(0, 2000);
   return { series, episodes };
@@ -323,9 +336,11 @@ export async function meta(query) {
   if (!picked) return null;
   await ensureProbe();
   if (keyRejected) return null;
-  const answer = { poster: rpdbUrl(key, picked.idType, posterType(), picked.id) };
+  // A bare TMDB id would make RPDB guess between films and series; `query.type` says which it is.
+  const idValue = picked.idType === "tmdb" ? tmdbIdValue(query && query.type, picked.id) : picked.id;
+  const answer = { poster: rpdbUrl(key, picked.idType, posterType(), idValue) };
   if (setting("withBackdrop", false) === true) {
-    answer.backdrop = rpdbUrl(key, picked.idType, DEFAULT_BACKDROP, picked.id);
+    answer.backdrop = rpdbUrl(key, picked.idType, DEFAULT_BACKDROP, idValue);
   }
   return answer;
 }

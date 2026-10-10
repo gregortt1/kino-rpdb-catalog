@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "Catálogo con pósters RPDB",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
@@ -42,6 +42,16 @@
       "label": "Póster sin nota si no hay con nota",
       "type": "toggle",
       "default": true
+    },
+    {
+      "key": "idMode",
+      "label": "Tipo de medio en el id",
+      "type": "select",
+      "default": "typed",
+      "options": [
+        { "value": "typed", "label": "Incluirlo (recomendado)" },
+        { "value": "plain", "label": "No incluirlo (si algo falla)" }
+      ]
     },
     {
       "key": "withBackdrop",
