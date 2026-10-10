@@ -260,12 +260,14 @@ const probedKinds = {};
 // One probe per runtime, for the key itself. Only a definite 401/403 is a verdict: a 404, a 5xx, a
 // timeout or a HEAD the server does not answer say nothing about the key, and the answers go out anyway.
 // Checked against the real API: RPDB answers HEAD with 403 and no body.
-async function ensureProbe() {
+//
+// The settings form calls the same probes with a shorter patience, because Kino gives it 10 s in total.
+async function ensureProbe(timeoutMs) {
   const key = rpdbKey();
   if (!key || probed) return;
   probed = true;
   try {
-    const r = await kino.fetch(artUrl(key, "imdb", posterType(), PROBE_ID, "none"), { method: "HEAD", timeoutMs: 10000 });
+    const r = await kino.fetch(artUrl(key, "imdb", posterType(), PROBE_ID, "none"), { method: "HEAD", timeoutMs: timeoutMs || 10000 });
     if (r.status === 401 || r.status === 403) {
       keyRejected = true;
       log("El servidor rechazó la clave (" + r.status + "): se usan las imágenes de TMDB");
@@ -279,11 +281,11 @@ function serverReady() {
   return rpdbKey() !== "" && !keyRejected;
 }
 
-async function probeKind(kind, url, what, blame) {
+async function probeKind(kind, url, what, blame, timeoutMs) {
   if (probedKinds[kind] !== undefined) return probedKinds[kind];
   let ok = false;
   try {
-    const r = await kino.fetch(url, { method: "HEAD", timeoutMs: 10000 });
+    const r = await kino.fetch(url, { method: "HEAD", timeoutMs: timeoutMs || 10000 });
     ok = r.status >= 200 && r.status < 300;
   } catch (e) {
     log("no pude comprobar " + what + ": " + (e && e.message ? e.message : e));
@@ -293,31 +295,42 @@ async function probeKind(kind, url, what, blame) {
   return ok;
 }
 
+// Forgets every verdict, so the "probar el servidor" button really tests what was just chosen.
+function resetProbes() {
+  probed = false;
+  keyRejected = false;
+  backdropsOn = false;
+  stillsOn = false;
+  tuningOff = false;
+  for (const kind of Object.keys(probedKinds)) delete probedKinds[kind];
+}
+
 // Rated backdrops are one of RPDB's paid tiers, so this is the probe that matters: with a free key it
 // fails and every backdrop falls back to TMDB, which is free and always available.
-async function ensureBackdropProbe() {
+async function ensureBackdropProbe(timeoutMs) {
   if (!serverReady()) return;
-  backdropsOn = await probeKind("backdrop", artUrl(rpdbKey(), "imdb", "backdrop-default", PROBE_ID, "none"), "fondos con nota");
+  backdropsOn = await probeKind("backdrop", artUrl(rpdbKey(), "imdb", "backdrop-default", PROBE_ID, "none"), "fondos con nota", null, timeoutMs);
 }
 
 // The tuning list of rating keys is the free server's. A key it does not know makes it answer 400 and
 // the whole image is lost, so the tuned URL is probed once per runtime too, and a failure drops the
 // tuning (leaving the plain image) instead of leaving holes everywhere.
-async function ensureTuningProbe() {
+async function ensureTuningProbe(timeoutMs) {
   if (!tuningWanted() || probedKinds.tuning !== undefined) return;
   const ok = await probeKind(
     "tuning",
     artUrl(rpdbKey(), "imdb", posterType(), PROBE_ID, "force"),
     "el ajuste de las notas",
-    "el servidor no acepta el ajuste de las notas: se usan las notas por defecto"
+    "el servidor no acepta el ajuste de las notas: se usan las notas por defecto",
+    timeoutMs
   );
   tuningOff = !ok;
 }
 
-async function ensureStillProbe() {
+async function ensureStillProbe(timeoutMs) {
   if (!serverReady()) return;
   const id = "episode-" + STILL_PROBE.id + "-S" + STILL_PROBE.season + "E" + STILL_PROBE.episode;
-  stillsOn = await probeKind("still", artUrl(rpdbKey(), "tmdb", "episode-default", id, "none"), "fotogramas con nota");
+  stillsOn = await probeKind("still", artUrl(rpdbKey(), "tmdb", "episode-default", id, "none"), "fotogramas con nota", null, timeoutMs);
 }
 
 // RPDB takes the media type INSIDE the id value for TMDB lookups: `movie-603`, `series-1399`.
@@ -646,4 +659,48 @@ function pickId(ids) {
 export async function resolve(ref) {
   // apiVersion 6 means Kino 0.9.50 or newer, where a throw before the first await is caught normally.
   throw kino.error("not_found", "catalog only", { userMessage: t("noSource") });
+}
+
+// ---- Lo que el formulario de ajustes cuenta (apiVersion 6) ----------------------------------------
+//
+// Kino llama a settingsStatus() al abrir el formulario y a action(key) al pulsar un botón, y vuelve a
+// pedir el estado después de cada acción. Los dos comparten las mismas sondas que usan las imágenes, así
+// que lo que dicen es lo que de verdad va a pasar: si la clave vale, y qué clases de imagen sirve el
+// servidor. Es la respuesta a "¿por qué no se ven las notas?", en la propia pantalla.
+const STATUS_KEY = "serverStatus";
+const ACTION_KEY = "testServer";
+
+async function probeEverything(timeoutMs) {
+  await ensureProbe(timeoutMs);
+  if (!rpdbKey()) return ["Sin clave: se usan las imágenes de TMDB"];
+  if (keyRejected) return ["El servidor rechazó la clave: revisa que sea la de ese servidor"];
+  const notes = ["clave ✓"];
+  await Promise.all([ensureTuningProbe(timeoutMs), ensureBackdropProbe(timeoutMs), ensureStillProbe(timeoutMs)]);
+  notes.push(backdropsOn ? "fondos con nota ✓" : "fondos: los pone TMDB");
+  notes.push(stillsOn ? "fotogramas ✓" : "fotogramas: los pone TMDB");
+  if (tuningWanted()) notes.push(tuningOff ? "ajuste de notas: no lo acepta" : "ajuste de notas ✓");
+  else if (isTv()) notes.push("ajuste de notas: solo con otro servidor");
+  return notes;
+}
+
+export async function settingsStatus() {
+  // Kino da 10 s al formulario, así que aquí las sondas van con menos paciencia que en una llamada normal.
+  try {
+    const notes = await probeEverything(2500);
+    return { [STATUS_KEY]: notes.join(" · ").slice(0, 200) };
+  } catch (e) {
+    log("no pude armar el estado: " + (e && e.message ? e.message : e));
+    return { [STATUS_KEY]: "No se pudo consultar el servidor" };
+  }
+}
+
+export async function action(key) {
+  if (key !== ACTION_KEY) return { message: "Acción desconocida" };
+  resetProbes();
+  try {
+    const notes = await probeEverything(8000);
+    return { message: notes.join(" · ").slice(0, 300) };
+  } catch (e) {
+    return { message: "No se pudo consultar el servidor: " + (e && e.message ? e.message : e) };
+  }
 }

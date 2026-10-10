@@ -104,6 +104,28 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### El diagnóstico en el formulario (1.7.0)
+
+Esta es la función que habría ahorrado los tres primeros ida y vuelta de este plugin. El síntoma era
+"algunas imágenes no salen" y no había forma de saber si era la clave, el plan, un parámetro o el host:
+había que activar el modo debug, leer el Registro y mandarlo. Kino tiene desde apiVersion 6 dos cosas
+hechas para esto, y ahora las usa:
+
+- **`settingsStatus()`** — Kino lo llama al abrir el formulario (10 s de límite) y muestra el texto que
+  devuelva bajo el ajuste `status`. Devuelve una línea como
+  `clave ✓ · fondos con nota ✓ · fotogramas ✓ · ajuste de notas ✓` (máximo 200 caracteres).
+- **`action("testServer")`** — el botón "Probar el servidor" (30 s). Llama a `resetProbes()` y vuelve a
+  comprobar **de cero**, para que sirva justo después de cambiar la clave. Devuelve un `message` (máximo
+  300 caracteres). Kino vuelve a pedir el estado después de cada acción, así que la línea se actualiza.
+
+Los dos comparten `probeEverything()`, que son **las mismas sondas que deciden las imágenes**: lo que dice
+el formulario es lo que va a pasar de verdad, no una comprobación aparte que podría mentir.
+
+Detalle que importa: al formulario Kino le da 10 s, así que `settingsStatus()` llama a las sondas con
+**2,5 s de paciencia** en vez de 10, y las tres de capacidad (fondos, fotogramas y ajuste) van **en
+paralelo** (`Promise.all`, y Kino permite 6 a la vez). Peor caso: ~5 s. El botón usa 8 s, que con el
+límite de 30 va sobrado.
+
 ### La sección propia y los mosaicos (1.6.0)
 
 `section()` y `categories()` son las dos formas que da Kino a un plugin de tener su propio sitio. Ninguna

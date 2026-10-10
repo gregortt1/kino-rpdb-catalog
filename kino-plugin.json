@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "Catálogo con notas",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
@@ -63,6 +63,22 @@
         { "value": "max", "label": "Muy grandes (imagen 4K, pesada)" },
         { "value": "normal", "label": "Medianas (como al principio)" }
       ]
+    },
+    {
+      "key": "diag",
+      "label": "Diagnóstico",
+      "type": "section",
+      "hint": "Comprueba qué imágenes sirve tu servidor"
+    },
+    {
+      "key": "serverStatus",
+      "label": "Qué funciona",
+      "type": "status"
+    },
+    {
+      "key": "testServer",
+      "label": "Probar el servidor",
+      "type": "action"
     }
   ]
 }

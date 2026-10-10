@@ -47,6 +47,23 @@ Hay **cinco ajustes**, y **ya vienen puestos para funcionar**: no tienes que esc
 | **Tipo de póster** | `poster-default`, o el tipo con nota que incluya tu plan (por ejemplo `poster-imdb-rated`). |
 | **En la tele: qué notas** | `Solo IMDb (estricto)`, `IMDb y TMDB si no hay`, o `Automático (varias notas)`. |
 | **En la tele: tamaño** | `Grandes` (recomendado), `Muy grandes (imagen 4K)` o `Medianas`. |
+| **Diagnóstico** | Una línea con **qué está funcionando** y un botón **"Probar el servidor"**. |
+
+### El diagnóstico: por qué no se ven las notas
+
+Al final de la configuración hay una línea que te lo dice sin rodeos, y se actualiza sola cada vez que
+abres esa pantalla:
+
+> `clave ✓ · fondos con nota ✓ · fotogramas ✓ · ajuste de notas ✓`
+
+Si algo falla, lo dice con sus palabras: *"El servidor rechazó la clave: revisa que sea la de ese
+servidor"*, *"fondos: los pone TMDB"*, *"ajuste de notas: no lo acepta"*… Y si no has puesto clave:
+*"Sin clave: se usan las imágenes de TMDB"*.
+
+El botón **"Probar el servidor"** hace la misma comprobación **de cero**, en el momento, y te responde
+con el resultado. Sirve justo después de cambiar la clave o el servidor, para no tener que adivinar si
+quedó bien. Las dos cosas usan **las mismas comprobaciones que usan las imágenes**, así que lo que dicen
+es lo que de verdad va a pasar.
 
 Instalas, y ya está: póster, fondo y fotogramas con nota, gratis, sin registrarte en ningún sitio y sin
 tocar la configuración. Los dos servidores que ofrece la lista van declarados en el plugin, así que Kino
