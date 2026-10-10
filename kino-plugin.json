@@ -1,12 +1,12 @@
 {
   "id": "rpdb-catalog",
   "name": "Catálogo con pósters RPDB",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
   "discoverable": false,
-  "description": "Catálogo de TMDB (tendencias, mejor valoradas, en cines y búsqueda) con los pósters de RatingPosterDB, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la de RPDB es tuya y es opcional.",
+  "description": "Catálogo de TMDB (tendencias, mejor valoradas, en cines y búsqueda) con pósters y fondos que llevan la nota incrustada, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la del servidor de pósters es tuya y es opcional.",
   "author": "gregorysteventt-source",
   "homepage": "https://github.com/gregorysteventt-source/kino-rpdb-catalog",
   "hosts": ["api.themoviedb.org", "api.ratingposterdb.com"],
@@ -15,8 +15,14 @@
   "icon": "icon.png",
   "settings": [
     {
+      "key": "server",
+      "label": "Servidor de pósters",
+      "type": "url",
+      "hint": "Vacío = RatingPosterDB. Ej: https://openposterdb.com"
+    },
+    {
       "key": "key",
-      "label": "Clave de RPDB",
+      "label": "Clave del servidor",
       "type": "password",
       "hint": "Opcional: sin ella se usa el póster original de TMDB"
     },
@@ -26,7 +32,7 @@
       "type": "select",
       "default": "rpdb",
       "options": [
-        { "value": "rpdb", "label": "RatingPosterDB (con nota)" },
+        { "value": "rpdb", "label": "Con nota (el servidor)" },
         { "value": "tmdb", "label": "TMDB (los originales)" }
       ]
     },
@@ -44,6 +50,12 @@
       "default": true
     },
     {
+      "key": "withBackdrop",
+      "label": "Usar fondos con nota",
+      "type": "toggle",
+      "default": false
+    },
+    {
       "key": "idMode",
       "label": "Tipo de medio en el id",
       "type": "select",
@@ -52,12 +64,6 @@
         { "value": "typed", "label": "Incluirlo (recomendado)" },
         { "value": "plain", "label": "No incluirlo (si algo falla)" }
       ]
-    },
-    {
-      "key": "withBackdrop",
-      "label": "Usar fondos con nota",
-      "type": "toggle",
-      "default": false
     },
     {
       "key": "tmdbKey",

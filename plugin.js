@@ -15,8 +15,11 @@
 const TMDB_POSTER = "https://image.tmdb.org/t/p/w500";
 const TMDB_BACKDROP = "https://image.tmdb.org/t/p/w780";
 const TMDB_STILL = "https://image.tmdb.org/t/p/w300";
-const RPDB = "https://api.ratingposterdb.com";
-const PROBE_ID = "tt0133093";                 // The Matrix: an id RPDB has always known
+// RatingPosterDB by default. The person can point this at any RPDB-shaped server instead: a free
+// hosted one such as openposterdb.com, or their own instance at home. A `url` setting is what makes
+// that server reachable, both for kino.fetch and for the images, with no extra host to declare.
+const DEFAULT_SERVER = "https://api.ratingposterdb.com";
+const PROBE_ID = "tt0133093";                 // The Matrix: an id these services have always known
 const DEFAULT_POSTER = "poster-default";
 const DEFAULT_BACKDROP = "backdrop-default";
 const ID_RULES = { imdb: /^tt\d{5,10}$/, tmdb: /^[1-9]\d{0,9}$/ };
@@ -96,10 +99,17 @@ function posterType() {
   return TYPE_RULE.test(value) ? value : DEFAULT_POSTER;
 }
 
-function rpdbUrl(key, idType, type, id) {
+// The base URL of the poster server: the person's own if they set one, RatingPosterDB otherwise.
+// Trailing slashes are dropped so a pasted address cannot produce a double slash.
+function posterServer() {
+  const configured = String(setting("server", "")).trim().replace(/\/+$/, "");
+  return configured === "" ? DEFAULT_SERVER : configured;
+}
+
+function imageUrl(key, idType, type, id) {
   // fallback=true asks RPDB for the plain poster when it cannot build the rated one.
   const suffix = setting("fallback", true) === false ? "" : "?fallback=true";
-  return RPDB + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg" + suffix;
+  return posterServer() + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg" + suffix;
 }
 
 let probed = false;
@@ -114,18 +124,18 @@ async function ensureProbe() {
   if (!key || probed) return;
   probed = true;
   try {
-    const r = await kino.fetch(rpdbUrl(key, "imdb", posterType(), PROBE_ID), { method: "HEAD", timeoutMs: 10000 });
+    const r = await kino.fetch(imageUrl(key, "imdb", posterType(), PROBE_ID), { method: "HEAD", timeoutMs: 10000 });
     if (r.status === 401 || r.status === 403) {
       keyRejected = true;
-      log("RPDB rechazó la clave (" + r.status + "): se usan los pósters de TMDB");
+      log("El servidor de pósters rechazó la clave (" + r.status + "): se usan los pósters de TMDB");
     }
   } catch (e) {
-    log("no pude comprobar la clave de RPDB: " + (e && e.message ? e.message : e));
+    log("no pude comprobar la clave del servidor de pósters: " + (e && e.message ? e.message : e));
   }
 }
 
-// RPDB only when it is asked for, a key is set, and that key was not rejected.
-function usesRpdb() {
+// The poster server only when it is asked for, a key is set, and that key was not rejected.
+function usesServer() {
   return setting("posterSource", "rpdb") === "rpdb" && rpdbKey() !== "" && !keyRejected;
 }
 
@@ -154,8 +164,8 @@ function tmdbIdValue(mediaType, id) {
 // no rated variant. Only when RPDB is not in play does the missing path mean there is nothing to show.
 function art(m, kind, mediaType) {
   const path = kind === "poster" ? m.poster_path : m.backdrop_path;
-  if (usesRpdb() && (kind === "poster" || setting("withBackdrop", false) === true)) {
-    return rpdbUrl(rpdbKey(), "tmdb", kind === "poster" ? posterType() : DEFAULT_BACKDROP, tmdbIdValue(mediaType, m.id));
+  if (usesServer() && (kind === "poster" || setting("withBackdrop", false) === true)) {
+    return imageUrl(rpdbKey(), "tmdb", kind === "poster" ? posterType() : DEFAULT_BACKDROP, tmdbIdValue(mediaType, m.id));
   }
   if (!path) return undefined;
   return (kind === "poster" ? TMDB_POSTER : TMDB_BACKDROP) + path;
@@ -195,7 +205,7 @@ function item(m, kind) {
   if (/^\d{4}/.test(date)) out.year = date.slice(0, 4);
   // Worth a line in the log: it is the case where TMDB returned no image path, so if RPDB also has
   // nothing for this title the card stays empty and this line says which title it was.
-  if (!m.poster_path && usesRpdb()) log("TMDB no trajo imagen para «" + title + "»: se le pide a RPDB igual");
+  if (!m.poster_path && usesServer()) log("TMDB no trajo imagen para «" + title + "»: se le pide al servidor de pósters igual");
   const poster = art(m, "poster", kind);
   if (poster) out.poster = poster;
   const backdrop = art(m, "backdrop", kind);
@@ -338,9 +348,9 @@ export async function meta(query) {
   if (keyRejected) return null;
   // A bare TMDB id would make RPDB guess between films and series; `query.type` says which it is.
   const idValue = picked.idType === "tmdb" ? tmdbIdValue(query && query.type, picked.id) : picked.id;
-  const answer = { poster: rpdbUrl(key, picked.idType, posterType(), idValue) };
+  const answer = { poster: imageUrl(key, picked.idType, posterType(), idValue) };
   if (setting("withBackdrop", false) === true) {
-    answer.backdrop = rpdbUrl(key, picked.idType, DEFAULT_BACKDROP, idValue);
+    answer.backdrop = imageUrl(key, picked.idType, DEFAULT_BACKDROP, idValue);
   }
   return answer;
 }
