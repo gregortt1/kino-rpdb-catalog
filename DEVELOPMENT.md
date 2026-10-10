@@ -126,6 +126,25 @@ ajuste mal puesto. Es mejor que el plugin lo compruebe y que el ajuste desaparez
 Efecto secundario bueno: el manifiesto declara **un solo host**, así que la hoja de consentimiento es más
 corta y más fácil de leer.
 
+### El `id` no se toca, aunque el nombre sí
+
+El plugin se llamaba "Catálogo con pósters RPDB" y se renombró a **"Catálogo con notas"** en 1.3.1, porque
+en 1.2.0 pasó a poder usar cualquier servidor del mismo tipo (OpenPosterDB incluido) y el nombre ya
+prometía una fuente concreta que no era la única.
+
+El campo **`id` sigue siendo `rpdb-catalog`** y no se cambia: la guía de Kino es explícita en que el `id`
+es la identidad del plugin y no debe cambiarse cuando ya hay gente que lo instaló. Cambiarlo haría que
+Kino lo tratara como un plugin distinto y dejaría dos instalaciones. Lo mismo vale para el nombre del
+repositorio: renombrarlo rompería la dirección con la que está instalado.
+
+### Los hosts aprobados se acumulan en Kino
+
+Vale la pena saberlo al leer la hoja del plugin: **Kino no olvida un host que la persona ya aprobó**,
+aunque una versión posterior del manifiesto deje de declararlo. La 1.0.x declaraba `api.themoviedb.org`
+para el respaldo de TMDB de los Kinos anteriores a la 0.9.53; desde la 1.1.0 no se declara, pero sigue
+apareciendo en "Se conectará a" de una instalación que viene de antes. No se puede limpiar desde el
+manifiesto: hay que **desinstalar y volver a instalar** para que Kino pida el consentimiento de cero.
+
 ## Lo que no está verificado
 
 Conviene tenerlo presente antes de tocar nada:
@@ -161,12 +180,31 @@ tenerlo a mano si algún día se quiere afinar la imagen sin tocar el código de
   TMDB as a fallback source instead of returning a 1x1 pixel placeholder"*. Ojo al detalle: significa que
   **RPDB sí devuelve un píxel de 1×1** cuando no puede construir la imagen. Eso explica alguno de los
   recuadros vacíos que se vieron, y es un buen motivo para no fiarse solo de un `200`.
-- Parámetros de acabado que se podrían exponer como ajustes si alguien los pide: `ratings_limit`,
-  `ratings_order`, `ratings_exclude`, `badge_style`, `badge_size`, `badge_shape`, `badge_background`,
-  `position`, `label_style`, `imageSize` (`small` solo en fondos), `textless`, `fit`, `split`, y `blur`
-  para no destripar un capítulo.
-- **`imageSize=large` no compensa**: el fondo por defecto ya sale a 1920×1081 (222 KB) y el `large` son
-  3840×2160 (1,3 MB) para una tele que casi siempre es 1080p.
+- Parámetros de acabado: `ratings_limit`, `ratings_order`, `ratings_exclude`, `badge_style`, `badge_size`
+  (`xs`, `s`, `m`, `l`, `xl`), `badge_shape`, `badge_background`, `position`, `label_style`, `imageSize`
+  (`small` solo en fondos), `textless`, `fit`, `split`, y `blur` para no destripar un capítulo.
+
+### Lo que se midió, no se supuso
+
+Los tres ajustes de acabado salieron de medir contra el servicio real, no de leer el spec y confiar:
+
+| Medición | Resultado |
+| --- | --- |
+| ¿Se respetan los parámetros? | Sí: `badge_size`, `imageSize`, `ratings_order` y `ratings_limit` dan bytes distintos cada uno. |
+| Tamaños del fondo | `small` 1280×720 (129 KB) · por defecto **1920×1081 (222 KB)** · `large` 3840×2160 (1338 KB). |
+| ¿Tiene IMDb nota por capítulo? | **Sí.** Comparando "sin ninguna nota" (`ratings_limit=0`) contra "solo IMDb": los seis capítulos probados difieren, así que se dibuja una nota de IMDb. |
+| Notas por defecto | La clave gratuita trae `ratings_limit: 5` en fondos, así que salían cinco o seis apiladas. |
+| Tamaño real de las notas | Se descargó el mismo fondo con `badge_size` `xs`/`s`/`m`/`l`/`xl`, se redujo cada uno a **ancho de tarjeta de tele (470 px)** y se miró: con el `m` por defecto es una tira ilegible; con `l` y una sola nota se lee sin esfuerzo. |
+
+De ahí los valores por defecto: `badge_size=l`, `ratings_order=imdb`, `ratings_limit=1`.
+
+**Por qué el ajuste fino NO se le manda a RatingPosterDB.** Son parámetros del servidor gratuito. Con RPDB
+la dirección se queda exactamente como la que funciona, sin ningún parámetro nuevo: un parámetro
+desconocido que RPDB rechazara tumbaría **todas** las imágenes, y ya van dos fallos de ese tipo. La regla
+está en `tuningQuery()` y `test/plugin.test.mjs` la fija.
+
+**`imageSize=large` no compensa por defecto**: son 1,3 MB por imagen contra 222 KB, para una tele que casi
+siempre es 1080p. Va detrás de la opción "Muy grandes", que lo dice en la etiqueta.
 
 ## Publicar y actualizar
 

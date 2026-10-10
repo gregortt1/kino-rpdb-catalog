@@ -1,4 +1,4 @@
-# Catálogo con pósters RPDB
+# Catálogo con notas
 
 Un catálogo de películas y series para **Kino** cuyas imágenes llevan la **nota incrustada** (IMDb,
 Rotten Tomatoes, Metacritic, Trakt, Letterboxd…), gracias a
@@ -34,13 +34,44 @@ servidor de imágenes, que se guarda cifrada en tu aparato y nunca sale de él.
 
 ## Configurarlo
 
-Solo hay **tres ajustes**:
+Hay **cinco ajustes**:
 
 | Ajuste | Qué hace |
 | --- | --- |
 | **Servidor de imágenes** | Déjalo **vacío** para RatingPosterDB, o pega `https://openposterdb.com` para el servicio gratuito. |
 | **Clave del servidor** | Tu clave de ese servidor. **Opcional**: sin ella el catálogo usa las imágenes de TMDB. |
 | **Tipo de póster** | `poster-default`, o el tipo con nota que incluya tu plan (por ejemplo `poster-imdb-rated`). |
+| **Tamaño de las notas** | `Grandes` (recomendado), `Muy grandes` o `Medianas`. |
+| **Qué notas mostrar** | `Solo IMDb` (una sola nota, siempre la misma) o `Automático` (las que haya). |
+
+### Por qué esos dos últimos
+
+En una **tele**, las tarjetas son horizontales y el fondo se encoge a unos 470 píxeles de ancho. Con el
+tamaño de nota por defecto, las notas quedaban como una **tira ilegible**, y encima eran **cinco o seis
+apiladas** (IMDb, Rotten Tomatoes, Metacritic, TMDB…). Medido a tamaño real de tarjeta:
+
+| | Qué se ve |
+| --- | --- |
+| Por defecto | 5-6 notas diminutas, ilegibles |
+| **Solo IMDb + notas grandes** | **una sola nota, legible** |
+
+Por eso el plugin pide **una sola fuente** (`imdb`) y **una sola nota**, con el tamaño subido. Además
+arregla otra cosa que se veía rara: antes el capítulo 1 salía con nota de IMDb y los siguientes con nota
+de TMDB, porque cada capítulo cogía la primera fuente que tuviera dato. Ahora todos salen de IMDb.
+
+Si algún título no tiene nota en IMDb, **se queda sin nota** — es lo que significa "solo IMDb". Si
+prefieres que siempre haya alguna, pon **Automático**.
+
+**Estos dos ajustes solo se aplican con un servidor propio** (OpenPosterDB). Con RatingPosterDB la
+dirección se queda exactamente como está y no se le manda ningún parámetro que no conozca: es una
+precaución deliberada, porque un parámetro rechazado dejaría todas las imágenes rotas.
+
+### Si el fondo se ve suave
+
+El fondo que sirve OpenPosterDB es de **1920×1081**: perfecto para una tele 1080p y para las tarjetas. Si
+tu televisor es **4K** y lo notas blando a pantalla completa, pon **Tamaño de las notas ▸ Muy grandes**:
+además de notas mayores, pide la imagen a 3840×2160. Ojo, esas imágenes pesan **1,3 MB** cada una en vez
+de 220 KB, así que solo vale la pena si de verdad tienes 4K.
 
 **No necesitas llave de TMDB.** En Kino 0.9.53 o superior, Kino pone la suya a través de su propia
 puerta a TMDB, con su caché y sus límites: de ahí salen las fichas, las sinopsis y cualquier imagen que

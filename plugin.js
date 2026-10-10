@@ -109,16 +109,46 @@ function posterServer() {
   return configured === "" ? SERVER : configured;
 }
 
-// fallback=true asks the server for the plain image when it cannot build the rated one, so a title with
-// no rated variant still gets art instead of a hole.
+// The free server accepts tuning parameters RPDB does not. Measured against the live service: each of
+// them changes the output (so it is honoured), while an unknown parameter is a risk that has already
+// broken things twice. So they are applied ONLY when a custom server is configured: with RatingPosterDB
+// the URL stays exactly the one known to work.
+//
+// Badge sizes were measured at television card width (~470 px), which is where the default `m` came out
+// as an unreadable strip of five or six badges.
+const QUALITY = {
+  normal: { badge: "m", size: "" },
+  sharp: { badge: "l", size: "" },
+  max: { badge: "xl", size: "large" },
+};
+
+function quality() {
+  const value = String(setting("imageQuality", "sharp")).trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(QUALITY, value) ? value : "sharp";
+}
+
+// fallback=true asks RPDB for the plain image when it cannot build the rated one. On the free server it
+// is accepted and ignored: it falls back to TMDB artwork instead of a 1x1 pixel placeholder.
+function tuningQuery() {
+  if (posterServer() === SERVER) return "?fallback=true";
+  const q = QUALITY[quality()];
+  const parts = ["badge_size=" + q.badge];
+  if (q.size) parts.push("imageSize=" + q.size);
+  // One rating, always the same source: five stacked badges are unreadable on a card, and mixing IMDb
+  // with TMDB made episode 1 differ from the rest.
+  if (String(setting("ratingsMode", "imdb")) !== "auto") parts.push("ratings_order=imdb", "ratings_limit=1");
+  parts.push("fallback=true");
+  return "?" + parts.join("&");
+}
+
 function imageUrl(key, idType, type, id) {
-  return posterServer() + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg?fallback=true";
+  return posterServer() + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg" + tuningQuery();
 }
 
 // Episode stills use their own documented id shape: `episode-{series id}-S{season}E{episode}`.
 function stillUrl(key, seriesId, season, episode) {
   const id = "episode-" + encodeURIComponent(seriesId) + "-S" + season + "E" + episode;
-  return posterServer() + "/" + encodeURIComponent(key) + "/tmdb/episode-default/" + id + ".jpg?fallback=true";
+  return posterServer() + "/" + encodeURIComponent(key) + "/tmdb/episode-default/" + id + ".jpg" + tuningQuery();
 }
 
 let probed = false;
