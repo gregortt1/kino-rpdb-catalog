@@ -35,10 +35,12 @@ Piezas:
 | `meta(query)` | El relleno de huecos para títulos de OTRAS fuentes. |
 | `resolve(ref)` | Siempre falla con `not_found` y una frase en el idioma de la persona. `catalogOnly` hace que Kino 0.9.54+ nunca lo llame. |
 | `kino.tmdb` | La puerta de Kino a TMDB (Kino 0.9.53+). **El plugin no lleva ninguna llave de TMDB** y no declara `api.themoviedb.org`: sin esa puerta no hay catálogo, y el plugin no finge lo contrario. |
-| `imageUrl()` | La dirección en RPDB, con el tipo de medio dentro del id y `?fallback=true`. Ver más abajo. |
+| `posterServer()` | La base de las imágenes: el servidor que escriba la persona, o RatingPosterDB. Ver más abajo. |
+| `imageUrl()` | La dirección de un póster o un fondo, con el tipo de medio dentro del id y `?fallback=true`. |
+| `stillUrl()` | La de un fotograma de capítulo, con su propia forma de id: `episode-{serie}-S{temporada}E{capítulo}`. |
 
-El manifiesto declara **un solo host** (`api.ratingposterdb.com`) y **dos ajustes** (`key`, `posterType`).
-Todo lo demás son valores fijos a propósito: ver "Lo que se simplificó".
+El manifiesto declara **un solo host** (`api.ratingposterdb.com`) y **tres ajustes** (`server`, `key`,
+`posterType`). Todo lo demás son valores fijos y sondas a propósito: ver "Lo que se simplificó".
 
 ## Probarlo en local
 
@@ -67,12 +69,15 @@ devolver falso y todo el catálogo cae a los pósters de TMDB.
 `poster_path` es uno que RPDB puede servir. Aun así a RPDB se le pide el póster sin mirar esa ruta,
 porque resuelve el arte por su cuenta y su `fallback` decide qué servir.
 
-**Los fondos NUNCA se le piden a RPDB.** Esto costó un fallo entero y merece un aviso: los fondos con
-nota son uno de los **planes de pago** de RPDB. Con una clave que no los incluye, RPDB no sirve la
-imagen, y en un **televisor** Kino dibuja las tarjetas con el `backdrop`, así que la pantalla entera se
-llenó de tarjetas vacías mientras en el móvil todo se veía bien (ahí las tarjetas usan el `poster`).
-Como el plugin no puede saber qué plan tiene la persona, el `backdrop` sale siempre de TMDB —gratis y
-siempre disponible— y solo el `poster` sale de RPDB. `test/plugin.test.mjs` lo fija.
+**Los fondos y los fotogramas se comprueban antes de usarlos.** Los fondos con nota son uno de los
+**planes de pago** de RPDB, y esto costó un fallo entero: con una clave que no los incluye, RPDB no sirve
+la imagen, y en un **televisor** Kino dibuja las tarjetas con el `backdrop`, así que la pantalla entera
+se llenó de tarjetas vacías mientras en el móvil todo se veía bien (ahí las tarjetas usan el `poster`).
+Como el plugin no puede saber qué plan tiene la persona, **pregunta**: antes de usar una sola imagen de
+esos tipos hace un `HEAD` de prueba, una vez por sesión, y guarda el veredicto en `backdropsOn` /
+`stillsOn`. La decisión **falla en cerrado**: solo un 2xx confirmado activa el tipo, porque el daño de
+equivocarse (una tele en blanco) es mucho peor que el de no usarlo (una imagen sin nota). Si falla, lo
+dice en el Registro y esa imagen la pone TMDB. Una comprobación por tipo y sesión, no por título.
 
 **El tipo de medio va dentro del id (`movie-603`, `series-1399`).** Este fue otro fallo real. Los ids de
 TMDB de película y de serie son **listas distintas que colisionan**: el número 1399 existe como serie
@@ -87,26 +92,36 @@ documentación de la API de `openposterdb` —reemplazo *drop-in* de RPDB, mismo
 explícitamente: para `id_type: tmdb`, `id_value` es del tipo `movie-123` o `series-456`. IMDb no lo
 necesita: `tt0944947` es inequívoco, así que `meta()` los manda sin prefijo.
 
+**Los logos no se pueden usar.** Kino solo admite `logo` en un `LiveChannel`; un `Item` de catálogo tiene
+`poster`, `backdrop` y (en un capítulo) `still`, y nada más. Un servicio que sepa dibujar logos con nota
+no sirve de nada aquí: no hay campo donde devolverlos.
+
 **Idioma.** TMDB no tiene `es-CO`, así que en español se pide `es-MX` y en inglés `en-US`. Los textos que
 arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en Kino es `es-CO` o `en-US`.
 
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
-## Lo que se simplificó (1.1.0)
+## La pantalla de ajustes: de ocho a tres
 
 La primera versión llegó a tener **ocho ajustes**: servidor, clave, fuente del póster, tipo, respaldo,
-tipo de medio, fondos y llave de TMDB. Quien lo usa dijo, con razón, que parecía complicado. Se quedó en
-**dos**: `key` y `posterType`. Lo demás pasó a ser valor fijo, y esto es lo que se quitó y por qué:
+tipo de medio, fondos y llave de TMDB. Quien lo usa dijo, con razón, que parecía complicado. Hoy son
+**tres**: `server`, `key` y `posterType`. Dos se quitaron del todo y dos volvieron, pero ya no como
+interruptores que la persona tenga que entender:
 
-| Se quitó | Por qué, y cómo volver |
+| Ajuste | Estado |
 | --- | --- |
-| `server` (servidor propio) | Añadía un ajuste `url` para apuntar a un servidor tipo OpenPosterDB. Se quitó por simplicidad. Para volver: `SERVER` es una constante; hazla salir de `setting("server", "")` con las barras finales recortadas. |
-| `posterSource` (RPDB / TMDB) | Redundante: si la clave falla, el plugin **ya** cae solo a los pósters de TMDB. |
-| `fallback` | Siempre `?fallback=true`, que es lo que se quiere el 99 % de las veces. |
-| `idMode` | El prefijo `movie-`/`series-` es la forma correcta y está probada en la app. Si alguna vez hubiera que volver atrás, es una línea en `tmdbIdValue()`. |
-| `withBackdrop` | Ver arriba: era **la causa** de que la tele se quedara en blanco. Los fondos ahora son siempre de TMDB, sin ajuste. |
-| `tmdbKey` + `hosts: api.themoviedb.org` | Solo servían para Kino 0.9.52 y anteriores, que no tienen `kino.tmdb`. El plugin necesita la 0.9.53+ para el catálogo; sin esa puerta, `home()` no aporta filas y `search()` falla con `unavailable`. |
+| `server` | **Volvió** en 1.2.0. Es la vía para usar OpenPosterDB, cuyos fondos y fotogramas con nota son gratis: sin él, la única forma de tenerlos es pagar el plan de RPDB. |
+| `key` | Se queda. |
+| `posterType` | Se queda. |
+| `posterSource` | **Quitado.** Redundante: si la clave falla, el plugin ya cae solo a las imágenes de TMDB. |
+| `fallback` | **Quitado.** Siempre `?fallback=true`, que es lo que se quiere el 99 % de las veces. |
+| `idMode` | **Quitado.** El prefijo `movie-`/`series-` es la forma correcta y está probada en la app. Si hubiera que volver atrás, es una línea en `tmdbIdValue()`. |
+| `withBackdrop` | **Quitado**, y sustituido por la sonda de fondos. Era **la causa** de que la tele se quedara en blanco: un interruptor que la persona no podía saber si su plan soportaba. Ahora el plugin lo comprueba él. |
+| `tmdbKey` + `hosts: api.themoviedb.org` | **Quitados.** Solo servían para Kino 0.9.52 y anteriores, que no tienen `kino.tmdb`. Sin esa puerta, `home()` no aporta filas y `search()` falla con `unavailable`. |
+
+La lección de fondo: un ajuste que la persona **no puede evaluar** ("¿mi plan incluye fondos?") es un
+ajuste mal puesto. Es mejor que el plugin lo compruebe y que el ajuste desaparezca.
 
 Efecto secundario bueno: el manifiesto declara **un solo host**, así que la hoja de consentimiento es más
 corta y más fácil de leer.
@@ -119,14 +134,39 @@ Conviene tenerlo presente antes de tocar nada:
    plugin sí la usa a diario). Lo verificado contra la API real es la sonda (`HEAD` → `403` sin cuerpo;
    ninguna redirección, por eso basta declarar un host) y que la dirección que arma el plugin es la que
    RPDB entiende. El camino con clave válida lo estrenó el autor y funciona: pósters con nota en móvil.
-2. **El prefijo `movie-`/`series-` sale de la documentación de la API de `openposterdb`**, el reemplazo
-   *drop-in* que usa el mismo esquema de URL que RPDB. No se pudo probar contra la API real de RPDB con
-   una clave inválida (la comprobación de la clave ocurre **antes** que la del id, así que todas las
-   formas responden `403`), pero **sí está confirmado en la app**: con él, las series que salían mal o
-   vacías salen bien.
-3. `episodes()` pide las temporadas en paralelo (11 llamadas para una serie de 10 temporadas). El límite
+2. **El prefijo `movie-`/`series-` y la forma del fotograma están confirmados.** El prefijo salió de la
+   documentación de `openposterdb`, el reemplazo *drop-in* de RPDB, y su **especificación OpenAPI**
+   (`openposterdb.com/api/openapi.json`) lo dice con estas palabras: *"For TMDB prefix with `movie-`,
+   `series-`, or `episode-` (e.g. `movie-550`, `series-1399`, `episode-1396-S1E1`)"*. Además está
+   **probado en vivo**: con esa forma, la clave pública gratuita devuelve JPEG reales de póster
+   (580×870), fondo (1920×1081) y fotograma (780×439). Y en la app, con RPDB, arregló las series que
+   salían mal o vacías.
+3. **La sonda de imágenes funciona en los dos servicios.** Comprobado en vivo contra OpenPosterDB: `HEAD`
+   responde `302` con una clave válida y `401` con una inválida, y **la redirección se queda en el mismo
+   host** (`openposterdb.com/... → openposterdb.com/c/{hash}/...`), así que la regla de hosts de
+   `kino.fetch` no la bloquea. RPDB contesta `403` sin cuerpo. Por eso una sola forma de sonda sirve para
+   ambos.
+4. `episodes()` pide las temporadas en paralelo (11 llamadas para una serie de 10 temporadas). El límite
    es de 40 llamadas cada 10 s por plugin, así que va sobrado, pero si se añaden más temporadas habrá
    que mirarlo.
+
+## Lo que descubrió la especificación de OpenPosterDB
+
+Su OpenAPI (`openposterdb.com/api/openapi.json`, 23 KB) documenta más de lo que el plugin usa, y conviene
+tenerlo a mano si algún día se quiere afinar la imagen sin tocar el código de Kino:
+
+- **Una clave pública gratuita**: `t0-free-rpdb`, y un endpoint `GET /{api_key}/isValid` que responde
+  `{"valid":true}`. Con ella no hace falta registrarse para nada.
+- **`fallback` no hace nada ahí**: *"Accepted for RPDB compatibility but has no effect. OpenPosterDB uses
+  TMDB as a fallback source instead of returning a 1x1 pixel placeholder"*. Ojo al detalle: significa que
+  **RPDB sí devuelve un píxel de 1×1** cuando no puede construir la imagen. Eso explica alguno de los
+  recuadros vacíos que se vieron, y es un buen motivo para no fiarse solo de un `200`.
+- Parámetros de acabado que se podrían exponer como ajustes si alguien los pide: `ratings_limit`,
+  `ratings_order`, `ratings_exclude`, `badge_style`, `badge_size`, `badge_shape`, `badge_background`,
+  `position`, `label_style`, `imageSize` (`small` solo en fondos), `textless`, `fit`, `split`, y `blur`
+  para no destripar un capítulo.
+- **`imageSize=large` no compensa**: el fondo por defecto ya sale a 1920×1081 (222 KB) y el `large` son
+  3840×2160 (1,3 MB) para una tele que casi siempre es 1080p.
 
 ## Publicar y actualizar
 

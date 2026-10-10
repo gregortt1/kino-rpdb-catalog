@@ -20,7 +20,9 @@ const TMDB_BACKDROP = "https://image.tmdb.org/t/p/w780";
 const TMDB_STILL = "https://image.tmdb.org/t/p/w300";
 const SERVER = "https://api.ratingposterdb.com";
 const PROBE_ID = "tt0133093";                 // The Matrix: an id RPDB has always known
+const STILL_PROBE = { id: 1399, season: 1, episode: 1 };   // Game of Thrones, S1E1
 const DEFAULT_POSTER = "poster-default";
+const DEFAULT_BACKDROP = "backdrop-default";
 const ID_RULES = { imdb: /^tt\d{5,10}$/, tmdb: /^[1-9]\d{0,9}$/ };
 const TYPE_RULE = /^[a-z][a-z0-9-]{2,40}$/;
 const PATH_RULE = /^\/[A-Za-z0-9/_-]{0,120}$/;
@@ -98,19 +100,39 @@ function posterType() {
   return TYPE_RULE.test(value) ? value : DEFAULT_POSTER;
 }
 
+// The server that draws the rated images. RatingPosterDB by default; the person may point it at any
+// RPDB-shaped service instead — the free hosted OpenPosterDB (openposterdb.com), which does serve rated
+// backdrops and episode stills, or their own instance at home. A `url` setting is what makes that
+// server reachable for both kino.fetch and the images, with no extra host to declare.
+function posterServer() {
+  const configured = String(setting("server", "")).trim().replace(/\/+$/, "");
+  return configured === "" ? SERVER : configured;
+}
+
+// fallback=true asks the server for the plain image when it cannot build the rated one, so a title with
+// no rated variant still gets art instead of a hole.
 function imageUrl(key, idType, type, id) {
-  // fallback=true asks RPDB for the plain poster when it cannot build the rated one, so a title with
-  // no rated variant still gets art instead of a hole.
-  return SERVER + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg?fallback=true";
+  return posterServer() + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg?fallback=true";
+}
+
+// Episode stills use their own documented id shape: `episode-{series id}-S{season}E{episode}`.
+function stillUrl(key, seriesId, season, episode) {
+  const id = "episode-" + encodeURIComponent(seriesId) + "-S" + season + "E" + episode;
+  return posterServer() + "/" + encodeURIComponent(key) + "/tmdb/episode-default/" + id + ".jpg?fallback=true";
 }
 
 let probed = false;
 let keyRejected = false;
+// Set by the probes below and read synchronously by art()/episodes(). They fail CLOSED: only a confirmed
+// 2xx turns a rated kind on. Asking a key for an image it cannot serve is what emptied every card on a
+// television, where Kino draws its cards with the backdrop.
+let backdropsOn = false;
+let stillsOn = false;
+const probedKinds = {};
 
-// A rejected key would leave a broken image on every title, so it is worth one probe per runtime.
-// Only a definite 401/403 is a verdict: a 404, a 5xx, a timeout or a HEAD RPDB does not answer say
-// nothing about the key, and the answers go out anyway. Checked against the real API: RPDB answers
-// HEAD with 403 and no body.
+// One probe per runtime, for the key itself. Only a definite 401/403 is a verdict: a 404, a 5xx, a
+// timeout or a HEAD the server does not answer say nothing about the key, and the answers go out anyway.
+// Checked against the real API: RPDB answers HEAD with 403 and no body.
 async function ensureProbe() {
   const key = rpdbKey();
   if (!key || probed) return;
@@ -119,17 +141,41 @@ async function ensureProbe() {
     const r = await kino.fetch(imageUrl(key, "imdb", posterType(), PROBE_ID), { method: "HEAD", timeoutMs: 10000 });
     if (r.status === 401 || r.status === 403) {
       keyRejected = true;
-      log("El servidor de pósters rechazó la clave (" + r.status + "): se usan los pósters de TMDB");
+      log("El servidor rechazó la clave (" + r.status + "): se usan las imágenes de TMDB");
     }
   } catch (e) {
-    log("no pude comprobar la clave del servidor de pósters: " + (e && e.message ? e.message : e));
+    log("no pude comprobar la clave del servidor: " + (e && e.message ? e.message : e));
   }
 }
 
-// Rated art only while a key is set and it has not been rejected. Otherwise the plugin falls back to
-// TMDB's own images, so a missing or wrong key never leaves broken pictures behind.
 function serverReady() {
   return rpdbKey() !== "" && !keyRejected;
+}
+
+async function probeKind(kind, url, what) {
+  if (probedKinds[kind] !== undefined) return probedKinds[kind];
+  let ok = false;
+  try {
+    const r = await kino.fetch(url, { method: "HEAD", timeoutMs: 10000 });
+    ok = r.status >= 200 && r.status < 300;
+  } catch (e) {
+    log("no pude comprobar " + what + ": " + (e && e.message ? e.message : e));
+  }
+  probedKinds[kind] = ok;
+  if (!ok) log("el servidor no sirve " + what + ": esa imagen la pone TMDB");
+  return ok;
+}
+
+// Rated backdrops are one of RPDB's paid tiers, so this is the probe that matters: with a free key it
+// fails and every backdrop falls back to TMDB, which is free and always available.
+async function ensureBackdropProbe() {
+  if (!serverReady()) return;
+  backdropsOn = await probeKind("backdrop", imageUrl(rpdbKey(), "imdb", "backdrop-default", PROBE_ID), "fondos con nota");
+}
+
+async function ensureStillProbe() {
+  if (!serverReady()) return;
+  stillsOn = await probeKind("still", stillUrl(rpdbKey(), STILL_PROBE.id, STILL_PROBE.season, STILL_PROBE.episode), "fotogramas con nota");
 }
 
 // RPDB takes the media type INSIDE the id value for TMDB lookups: `movie-603`, `series-1399`.
@@ -145,18 +191,21 @@ function tmdbIdValue(mediaType, id) {
 
 // The poster (or backdrop) of one TMDB result.
 //
-// The rated poster comes from RPDB. The backdrop NEVER does: rated backdrops are one of RPDB's paid
-// tiers, and asking for one a free key cannot serve empties every card on a television, where Kino
-// draws its cards with the backdrop. So backdrops are always TMDB's, which are free and always there.
+// The rated poster comes from the server. The rated backdrop only does when the probe confirmed the key
+// can serve one: it is a paid tier, and asking anyway empties every card on a television. Otherwise both
+// fall back to TMDB's own images, which are free and always there.
 //
 // TMDB picks the image path for the language it was asked for and only then falls back to the original
 // language, then to the best rated one: that fallback is documented but does not always happen, and
-// `es-MX` is looked up as plain `es` because TMDB does not support regional variants for images. That
-// is why RPDB is asked for the poster even when this response carries no path: RPDB looks the artwork
+// `es-MX` is looked up as plain `es` because TMDB does not support regional variants for images. That is
+// why the server is asked for the poster even when this response carries no path: it looks the artwork
 // up on TMDB and Fanart.tv itself, and its own `fallback` decides what to serve.
 function art(m, kind, mediaType) {
   if (kind === "poster" && serverReady()) {
     return imageUrl(rpdbKey(), "tmdb", posterType(), tmdbIdValue(mediaType, m.id));
+  }
+  if (kind === "backdrop" && backdropsOn) {
+    return imageUrl(rpdbKey(), "tmdb", DEFAULT_BACKDROP, tmdbIdValue(mediaType, m.id));
   }
   const path = kind === "poster" ? m.poster_path : m.backdrop_path;
   if (!path) return undefined;
@@ -237,6 +286,7 @@ function nextCursor(data, page) {
 export async function home() {
   try {
     await ensureProbe();
+    await ensureBackdropProbe();
     const pages = await Promise.all(ROWS.map((row) => tmdb(row.path)));
     const rows = [];
     ROWS.forEach((row, i) => {
@@ -267,6 +317,7 @@ export async function browse(ref, cursor) {
   const spec = listRef(parseRef(ref));
   if (!spec) return { items: [] };
   await ensureProbe();
+  await ensureBackdropProbe();
   const page = Math.max(1, parseInt(cursor, 10) || 1);
   const data = await tmdb(spec.path, { page });
   const items = results(data).map((m) => item(m, spec.kind)).filter(Boolean);
@@ -278,6 +329,7 @@ export async function search(query) {
   const q = query && query.q ? String(query.q).trim() : "";
   if (!q) return [];
   await ensureProbe();
+  await ensureBackdropProbe();
   const page = Math.max(1, parseInt(query && query.cursor, 10) || 1);
   const data = await tmdb("/search/multi", { query: q, include_adult: false, page });
   const items = results(data)
@@ -293,6 +345,8 @@ export async function episodes(ref) {
   if (!id) return { episodes: [] };
   const path = "/tv/" + id;
   const show = await tmdb(path);
+  await ensureProbe();
+  await ensureStillProbe();
   const seasons = (Array.isArray(show.seasons) ? show.seasons : [])
     .filter((s) => Number(s.season_number) > 0)
     .slice(0, 10);
@@ -312,7 +366,9 @@ export async function episodes(ref) {
       };
       if (e.name) episode.title = String(e.name).slice(0, 200);
       if (e.overview) episode.overview = String(e.overview).slice(0, 2000);
-      if (e.still_path) episode.still = TMDB_STILL + e.still_path;
+      // The still comes from the server only when its probe confirmed the key can serve one.
+      if (stillsOn) episode.still = stillUrl(rpdbKey(), id, episode.season, number);
+      else if (e.still_path) episode.still = TMDB_STILL + e.still_path;
       if (typeof e.air_date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(e.air_date)) episode.airDate = e.air_date;
       if (typeof e.runtime === "number" && e.runtime >= 1 && e.runtime <= 1000) episode.runtimeMinutes = e.runtime;
       episodes.push(episode);

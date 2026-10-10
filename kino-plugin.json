@@ -1,12 +1,12 @@
 {
   "id": "rpdb-catalog",
   "name": "Catálogo con pósters RPDB",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
   "discoverable": false,
-  "description": "Catálogo de TMDB (tendencias, mejor valoradas, en cines y búsqueda) con los pósters de RatingPosterDB, que llevan la nota incrustada, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la de RPDB es tuya y es opcional.",
+  "description": "Catálogo de TMDB (tendencias, mejor valoradas, en cines y búsqueda) con los pósters, los fondos y los fotogramas de capítulo con la nota incrustada, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la del servidor de imágenes es tuya y es opcional.",
   "author": "gregorysteventt-source",
   "homepage": "https://github.com/gregorysteventt-source/kino-rpdb-catalog",
   "hosts": ["api.ratingposterdb.com"],
@@ -15,10 +15,16 @@
   "icon": "icon.png",
   "settings": [
     {
+      "key": "server",
+      "label": "Servidor de imágenes",
+      "type": "url",
+      "hint": "Vacío = RatingPosterDB. Ej: https://openposterdb.com"
+    },
+    {
       "key": "key",
-      "label": "Clave de RPDB",
+      "label": "Clave del servidor",
       "type": "password",
-      "hint": "Opcional: sin ella se usa el póster original de TMDB"
+      "hint": "Opcional: sin ella se usan las imágenes de TMDB"
     },
     {
       "key": "posterType",
