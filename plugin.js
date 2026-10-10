@@ -194,6 +194,16 @@ const IMDB_EXCLUDE = RATING_KEYS.join(",");
 
 let tuningOff = false;
 
+// Where the badge sits on the image. The server takes eight anchors; measured on the live service, all
+// eight give a different image, and NOT asking for one leaves backdrops at the top-right corner (which is
+// what this plugin did until now). "auto" therefore means "do not send the parameter".
+const POSITIONS = ["bc", "tc", "l", "r", "tl", "tr", "bl", "br"];
+
+function badgePosition() {
+  const stored = String(setting("tvBadgePosition", "auto")).trim().toLowerCase();
+  return POSITIONS.indexOf(stored) === -1 ? "" : stored;
+}
+
 function quality() {
   const value = String(setting("tvBadgeSize", "sharp")).trim().toLowerCase();
   return Object.prototype.hasOwnProperty.call(QUALITY, value) ? value : "sharp";
@@ -216,6 +226,8 @@ function tuningQuery(mode) {
   const q = QUALITY[quality()];
   const parts = ["badge_size=" + q.badge];
   if (q.size) parts.push("imageSize=" + q.size);
+  const position = badgePosition();
+  if (position) parts.push("position=" + position);
   // One rating, and strictly IMDb when asked: five stacked badges are unreadable on a card, and an
   // episode that fell through to TMDB made the list look inconsistent. `ratings_order` alone only sorts
   // (measured: it does fall through), so the strict mode also excludes every other source.

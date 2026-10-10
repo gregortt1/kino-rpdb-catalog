@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "Catálogo con notas",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
@@ -62,6 +62,24 @@
         { "value": "sharp", "label": "Grandes (recomendado)" },
         { "value": "max", "label": "Muy grandes (imagen 4K, pesada)" },
         { "value": "normal", "label": "Medianas (como al principio)" }
+      ]
+    },
+    {
+      "key": "tvBadgePosition",
+      "label": "En la tele: dónde va la nota",
+      "type": "select",
+      "default": "auto",
+      "hint": "Solo en la tele, no en el celular",
+      "options": [
+        { "value": "auto", "label": "Como está (esquina arriba derecha)" },
+        { "value": "bc", "label": "Abajo, centrada" },
+        { "value": "tc", "label": "Arriba, centrada" },
+        { "value": "l", "label": "A la izquierda" },
+        { "value": "r", "label": "A la derecha" },
+        { "value": "bl", "label": "Esquina abajo izquierda" },
+        { "value": "br", "label": "Esquina abajo derecha" },
+        { "value": "tl", "label": "Esquina arriba izquierda" },
+        { "value": "tr", "label": "Esquina arriba derecha" }
       ]
     },
     {

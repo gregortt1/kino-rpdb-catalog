@@ -104,6 +104,24 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### Dónde va la nota (1.8.0)
+
+El servidor acepta ocho anclas en `position`: `bc`, `tc`, `l`, `r`, `tl`, `tr`, `bl`, `br`. Medido contra
+el servicio real: **las ocho devuelven una imagen distinta** (póster y fondo), así que el parámetro se
+respeta de verdad.
+
+Y un detalle que no era obvio y que fija el valor por defecto: **sin `position`, el fondo sale con la nota
+en `tr`** (esquina superior derecha) — la firma de bytes de una petición sin el parámetro es idéntica a la
+de `position=tr`. Por eso `tvBadgePosition` trae `auto`, que significa "no mandes el parámetro": cambiar el
+aspecto de quien no ha pedido nada es justo lo que se ha criticado en este plugin.
+
+Con las ocho posiciones se descargó el fondo, se redujo a **ancho de tarjeta de tele (470 px)** y se miró
+antes de ofrecerlas. Conclusión anotada también en el README: las esquinas quedan muy al borde (pueden
+rozar el redondeo de la tarjeta o el cartel de "Ver más"); las centradas son las más limpias.
+
+Un valor que no sea una de las ocho no inventa nada: `badgePosition()` devuelve cadena vacía y la
+dirección sale igual que con `auto`.
+
 ### El diagnóstico en el formulario (1.7.0)
 
 Esta es la función que habría ahorrado los tres primeros ida y vuelta de este plugin. El síntoma era

@@ -47,7 +47,26 @@ Hay **cinco ajustes**, y **ya vienen puestos para funcionar**: no tienes que esc
 | **Tipo de póster** | `poster-default`, o el tipo con nota que incluya tu plan (por ejemplo `poster-imdb-rated`). |
 | **En la tele: qué notas** | `Solo IMDb (estricto)`, `IMDb y TMDB si no hay`, o `Automático (varias notas)`. |
 | **En la tele: tamaño** | `Grandes` (recomendado), `Muy grandes (imagen 4K)` o `Medianas`. |
+| **En la tele: dónde va la nota** | Nueve sitios: centrada abajo o arriba, a un lado, o en cualquiera de las cuatro esquinas. |
 | **Diagnóstico** | Una línea con **qué está funcionando** y un botón **"Probar el servidor"**. |
+
+### Dónde va la nota
+
+En una tele las tarjetas son horizontales, y la nota puede ir en **nueve sitios**. Cuando el servidor no
+recibe ninguna indicación la pone en la **esquina de arriba a la derecha**, así que esa es la opción
+`Como está`, la que viene por defecto: **si no tocas nada, no cambia nada**.
+
+| Opción | Dónde queda |
+| --- | --- |
+| `Como está` | Esquina de arriba a la derecha (lo de siempre) |
+| `Abajo, centrada` | Centro del borde inferior |
+| `Arriba, centrada` | Centro del borde superior |
+| `A la izquierda` / `A la derecha` | Centro de cada lado |
+| `Esquina …` | Las cuatro esquinas (arriba/abajo, izquierda/derecha) |
+
+Las cuatro esquinas quedan muy pegadas al borde, así que en una tarjeta pueden rozar el redondeo o el
+"Ver más". Las centradas son las más limpias. Pruébalas y quédate con la que te guste: se cambia en dos
+toques y no hace falta reinstalar nada.
 
 ### El diagnóstico: por qué no se ven las notas
 
