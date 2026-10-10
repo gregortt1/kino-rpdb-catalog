@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "Catálogo con notas",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
@@ -34,26 +34,27 @@
       "hint": "poster-default, poster-imdb-rated, poster-rt-rated…"
     },
     {
-      "key": "imageQuality",
-      "label": "Tamaño de las notas",
+      "key": "tvRatings",
+      "label": "En la tele: qué notas",
       "type": "select",
-      "default": "sharp",
-      "hint": "Solo con un servidor propio; con RPDB no se aplica",
+      "default": "imdb",
+      "hint": "Solo en la tele, no en el celular",
       "options": [
-        { "value": "sharp", "label": "Grandes (recomendado en tele)" },
-        { "value": "max", "label": "Muy grandes (imagen 4K, pesada)" },
-        { "value": "normal", "label": "Medianas (como antes)" }
+        { "value": "imdb", "label": "Solo IMDb (estricto)" },
+        { "value": "imdbFallback", "label": "IMDb y TMDB si no hay" },
+        { "value": "auto", "label": "Automático (varias notas)" }
       ]
     },
     {
-      "key": "ratingsMode",
-      "label": "Qué notas mostrar",
+      "key": "tvBadgeSize",
+      "label": "En la tele: tamaño",
       "type": "select",
-      "default": "imdb",
-      "hint": "Solo con un servidor propio; con RPDB no se aplica",
+      "default": "sharp",
+      "hint": "Solo en la tele, no en el celular",
       "options": [
-        { "value": "imdb", "label": "Solo IMDb" },
-        { "value": "auto", "label": "Automático (las que haya)" }
+        { "value": "sharp", "label": "Grandes (recomendado)" },
+        { "value": "max", "label": "Muy grandes (imagen 4K, pesada)" },
+        { "value": "normal", "label": "Medianas (como al principio)" }
       ]
     }
   ]

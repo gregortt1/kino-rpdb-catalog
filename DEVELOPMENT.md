@@ -186,22 +186,54 @@ tenerlo a mano si algún día se quiere afinar la imagen sin tocar el código de
 
 ### Lo que se midió, no se supuso
 
-Los tres ajustes de acabado salieron de medir contra el servicio real, no de leer el spec y confiar:
+Los ajustes de acabado salieron de medir contra el servicio real, no de leer el spec y confiar:
 
 | Medición | Resultado |
 | --- | --- |
 | ¿Se respetan los parámetros? | Sí: `badge_size`, `imageSize`, `ratings_order` y `ratings_limit` dan bytes distintos cada uno. |
-| Tamaños del fondo | `small` 1280×720 (129 KB) · por defecto **1920×1081 (222 KB)** · `large` 3840×2160 (1338 KB). |
-| ¿Tiene IMDb nota por capítulo? | **Sí.** Comparando "sin ninguna nota" (`ratings_limit=0`) contra "solo IMDb": los seis capítulos probados difieren, así que se dibuja una nota de IMDb. |
+| Tamaños del fondo | `small` 1280×720 (129 KB) · por defecto **1920×1081 (172-222 KB)** · `large` 3840×2160 (1,25-1,34 MB). |
 | Notas por defecto | La clave gratuita trae `ratings_limit: 5` en fondos, así que salían cinco o seis apiladas. |
 | Tamaño real de las notas | Se descargó el mismo fondo con `badge_size` `xs`/`s`/`m`/`l`/`xl`, se redujo cada uno a **ancho de tarjeta de tele (470 px)** y se miró: con el `m` por defecto es una tira ilegible; con `l` y una sola nota se lee sin esfuerzo. |
 
-De ahí los valores por defecto: `badge_size=l`, `ratings_order=imdb`, `ratings_limit=1`.
+### `ratings_order` NO restringe: hay que excluir
 
-**Por qué el ajuste fino NO se le manda a RatingPosterDB.** Son parámetros del servidor gratuito. Con RPDB
-la dirección se queda exactamente como la que funciona, sin ningún parámetro nuevo: un parámetro
-desconocido que RPDB rechazara tumbaría **todas** las imágenes, y ya van dos fallos de ese tipo. La regla
-está en `tuningQuery()` y `test/plugin.test.mjs` la fija.
+Este fue un error de apreciación que costó un ida y vuelta, y conviene no repetirlo. `ratings_order`
+**solo ordena**: cuando la primera fuente no tiene dato, **cae a otra**. Pedir
+`ratings_order=imdb&ratings_limit=1` no da "solo IMDb", da "IMDb si lo hay, y si no lo que sea".
+
+Se comprobó con la serie del usuario, *Lanterns* (**TMDB 95350**, IMDb `tt26545992`), comparando tres
+direcciones por capítulo: sin notas (`ratings_limit=0`), solo por orden, y con exclusión. Resultado:
+
+| Capítulo | por orden | con exclusión | De dónde venía |
+| --- | --- | --- | --- |
+| S1E1 | nota | nota | **IMDb** |
+| S1E2…S1E6 | nota | **sin nota** | otra fuente |
+
+O sea: en esa serie **IMDb solo tiene nota para el capítulo 1**, y con exclusión estricta los otros cinco
+se quedan sin ninguna. Eso no es un fallo: es lo que significa "solo IMDb", y por eso la interfaz ofrece
+también `IMDb y TMDB si no hay` y `Automático`.
+
+La exclusión se hace listando **todas** las claves del servidor menos `imdb`
+(`mal,lb,rt,mc,rta,tmdb,trakt,mdblist,ebert`, tomadas de su propio `/api/free-key/settings`).
+
+⚠️ **Y aquí está la trampa**: una clave que el servidor **no** conozca en `ratings_exclude` hace que
+responda **`400`** y la imagen se pierde entera (comprobado: `?ratings_exclude=no-existe,imdb` → 400).
+Como esa lista es del servidor y podría cambiar, el ajuste se prueba antes con una sonda propia
+(`ensureTuningProbe`) y **si falla se suelta el ajuste, no las imágenes**: la dirección vuelve a la del
+servidor con sus notas por defecto. Las tres sondas van separadas a propósito: la de la clave y las de
+capacidad usan `mode: "none"` (sin ajuste), para que un parámetro rechazado nunca se confunda con "este
+servidor no sirve fondos" ni con "la clave es mala".
+
+### El ajuste es de la tele, y por qué
+
+Los ajustes de un plugin **viajan con la cuenta**, así que un ajuste pensado para la tele cambiaba
+también el celular — que es exactamente lo que pasó y de lo que se quejó el usuario. La solución es
+`kino.device`, que es para esto: `isTv()` es `kino.device === "tv"` y **todo lo demás se trata como
+celular** (es `undefined` antes de Kino 0.9.55). En el celular no se manda ningún ajuste, así que ve los
+valores por defecto del servidor, que es la vista que ya le gustaba.
+
+`test/plugin.test.mjs` fija las dos cosas: que con servidor propio y `device: "tv"` la dirección lleva el
+ajuste, y que sin `device` (celular) **no** lo lleva.
 
 **`imageSize=large` no compensa por defecto**: son 1,3 MB por imagen contra 222 KB, para una tele que casi
 siempre es 1080p. Va detrás de la opción "Muy grandes", que lo dice en la etiqueta.

@@ -41,37 +41,56 @@ Hay **cinco ajustes**:
 | **Servidor de imágenes** | Déjalo **vacío** para RatingPosterDB, o pega `https://openposterdb.com` para el servicio gratuito. |
 | **Clave del servidor** | Tu clave de ese servidor. **Opcional**: sin ella el catálogo usa las imágenes de TMDB. |
 | **Tipo de póster** | `poster-default`, o el tipo con nota que incluya tu plan (por ejemplo `poster-imdb-rated`). |
-| **Tamaño de las notas** | `Grandes` (recomendado), `Muy grandes` o `Medianas`. |
-| **Qué notas mostrar** | `Solo IMDb` (una sola nota, siempre la misma) o `Automático` (las que haya). |
+| **En la tele: qué notas** | `Solo IMDb (estricto)`, `IMDb y TMDB si no hay`, o `Automático (varias notas)`. |
+| **En la tele: tamaño** | `Grandes` (recomendado), `Muy grandes (imagen 4K)` o `Medianas`. |
 
-### Por qué esos dos últimos
+### Por qué esos dos son solo para la tele
 
-En una **tele**, las tarjetas son horizontales y el fondo se encoge a unos 470 píxeles de ancho. Con el
-tamaño de nota por defecto, las notas quedaban como una **tira ilegible**, y encima eran **cinco o seis
-apiladas** (IMDb, Rotten Tomatoes, Metacritic, TMDB…). Medido a tamaño real de tarjeta:
+Los ajustes de un plugin viajan con tu cuenta, así que lo que elijas para el televisor **también lo
+vería el celular** — y no quieres lo mismo en los dos: en la tele las tarjetas son horizontales y el
+fondo se encoge a unos 470 píxeles, mientras que en el celular el póster se ve grande y las tarjetas son
+estrechas. Por eso el plugin **mira en qué aparato está** y solo aplica estos dos ajustes en la tele. En
+el celular deja la vista de siempre, con varias notas.
 
-| | Qué se ve |
+Y en la tele, dos razones para subir el tamaño y bajar el número de notas:
+
+| | Qué se veía |
 | --- | --- |
-| Por defecto | 5-6 notas diminutas, ilegibles |
-| **Solo IMDb + notas grandes** | **una sola nota, legible** |
+| Por defecto | **5-6 notas diminutas**, ilegibles a tamaño de tarjeta |
+| **Una sola nota, más grande** | **legible** |
 
-Por eso el plugin pide **una sola fuente** (`imdb`) y **una sola nota**, con el tamaño subido. Además
-arregla otra cosa que se veía rara: antes el capítulo 1 salía con nota de IMDb y los siguientes con nota
-de TMDB, porque cada capítulo cogía la primera fuente que tuviera dato. Ahora todos salen de IMDb.
+Medido de verdad: se descargó el mismo fondo con cada tamaño de nota, se redujo a ancho real de tarjeta y
+se comparó.
 
-Si algún título no tiene nota en IMDb, **se queda sin nota** — es lo que significa "solo IMDb". Si
-prefieres que siempre haya alguna, pon **Automático**.
+### Sobre "Solo IMDb"
 
-**Estos dos ajustes solo se aplican con un servidor propio** (OpenPosterDB). Con RatingPosterDB la
+Hay un detalle que conviene saber, porque no es culpa del plugin. El servidor recorre sus fuentes en
+orden y **cae a la siguiente cuando la primera no tiene dato**, así que pedir "solo IMDb" por orden no
+basta: hay que **excluir** las demás fuentes. Eso es lo que hace **Solo IMDb (estricto)**.
+
+La consecuencia, con datos reales de *Linternas* (la serie que probaste):
+
+| Capítulo | IMDb | Con "Solo IMDb (estricto)" |
+| --- | --- | --- |
+| S1E1 | tiene nota | muestra la nota |
+| S1E2 a S1E6 | **no tiene nota** | **se quedan sin ninguna nota** |
+
+O sea: en esa serie, cinco de seis capítulos se quedan sin nota. Es exactamente lo que significa "solo
+IMDb". Si prefieres que **siempre haya una nota** aunque a veces sea de TMDB, pon:
+
+- **IMDb y TMDB si no hay** — una nota siempre, IMDb cuando existe.
+- **Automático (varias notas)** — lo que decida el servidor, como al principio.
+
+**Los dos ajustes solo se aplican con un servidor propio** (OpenPosterDB). Con RatingPosterDB la
 dirección se queda exactamente como está y no se le manda ningún parámetro que no conozca: es una
 precaución deliberada, porque un parámetro rechazado dejaría todas las imágenes rotas.
 
 ### Si el fondo se ve suave
 
 El fondo que sirve OpenPosterDB es de **1920×1081**: perfecto para una tele 1080p y para las tarjetas. Si
-tu televisor es **4K** y lo notas blando a pantalla completa, pon **Tamaño de las notas ▸ Muy grandes**:
-además de notas mayores, pide la imagen a 3840×2160. Ojo, esas imágenes pesan **1,3 MB** cada una en vez
-de 220 KB, así que solo vale la pena si de verdad tienes 4K.
+tu televisor es **4K** y lo notas blando a pantalla completa, pon **En la tele: tamaño ▸ Muy grandes**:
+además de notas mayores, pide la imagen a 3840×2160. Ojo, esas imágenes pesan **1,25 MB** cada una en vez
+de 172 KB, así que solo vale la pena si de verdad tienes 4K.
 
 **No necesitas llave de TMDB.** En Kino 0.9.53 o superior, Kino pone la suya a través de su propia
 puerta a TMDB, con su caché y sus límites: de ahí salen las fichas, las sinopsis y cualquier imagen que

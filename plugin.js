@@ -109,46 +109,85 @@ function posterServer() {
   return configured === "" ? SERVER : configured;
 }
 
-// The free server accepts tuning parameters RPDB does not. Measured against the live service: each of
-// them changes the output (so it is honoured), while an unknown parameter is a risk that has already
-// broken things twice. So they are applied ONLY when a custom server is configured: with RatingPosterDB
-// the URL stays exactly the one known to work.
+// The tuning parameters below are the free server's, and they are for a TELEVISION only.
 //
-// Badge sizes were measured at television card width (~470 px), which is where the default `m` came out
-// as an unreadable strip of five or six badges.
+// Why only there: the settings of a plugin are the same on every device of the person's account, so a
+// phone would inherit whatever is chosen for the television. A phone shows the poster big and the cards
+// narrow, so it does not want the same thing. `kino.device` is exactly for this, and anything that is
+// not "tv" is treated as a phone (it is undefined before Kino 0.9.55).
+//
+// Why only with a custom server: they are measured to work on the free one, and RPDB gets the plain URL
+// that is known to work, so an unknown parameter cannot break every image.
+//
+// The badge sizes were measured at television card width (~470 px), where the default `m` came out as an
+// unreadable strip of five or six stacked badges.
 const QUALITY = {
   normal: { badge: "m", size: "" },
   sharp: { badge: "l", size: "" },
   max: { badge: "xl", size: "large" },
 };
 
+// Every key the free server knows. `ratings_exclude` is the only parameter that really restricts the
+// source: `ratings_order` only sorts, and it falls through to another source (measured on Lanterns,
+// where IMDb has a rating for episode 1 only). A key here that the server does NOT know makes it answer
+// 400 and the whole image is lost, which is why the list is probed before it is used.
+const RATING_KEYS = ["mal", "lb", "rt", "mc", "rta", "tmdb", "trakt", "mdblist", "ebert"];
+const IMDB_EXCLUDE = RATING_KEYS.join(",");
+
+let tuningOff = false;
+
 function quality() {
-  const value = String(setting("imageQuality", "sharp")).trim().toLowerCase();
+  const value = String(setting("tvBadgeSize", "sharp")).trim().toLowerCase();
   return Object.prototype.hasOwnProperty.call(QUALITY, value) ? value : "sharp";
 }
 
-// fallback=true asks RPDB for the plain image when it cannot build the rated one. On the free server it
-// is accepted and ignored: it falls back to TMDB artwork instead of a 1x1 pixel placeholder.
-function tuningQuery() {
-  if (posterServer() === SERVER) return "?fallback=true";
+function isTv() {
+  return kino.device === "tv";
+}
+
+function tuningWanted() {
+  return isTv() && posterServer() !== SERVER;
+}
+
+// `mode`: "none" for a URL that only tests the server (no tuning at all), "force" for the probe of the
+// tuning itself, and "auto" for the real images.
+function tuningQuery(mode) {
+  // fallback=true asks RPDB for the plain image when it cannot build the rated one. On the free server
+  // it is accepted and ignored: it falls back to TMDB artwork instead of a 1x1 pixel placeholder.
+  if (mode === "none" || !tuningWanted() || (mode !== "force" && tuningOff)) return "?fallback=true";
   const q = QUALITY[quality()];
   const parts = ["badge_size=" + q.badge];
   if (q.size) parts.push("imageSize=" + q.size);
-  // One rating, always the same source: five stacked badges are unreadable on a card, and mixing IMDb
-  // with TMDB made episode 1 differ from the rest.
-  if (String(setting("ratingsMode", "imdb")) !== "auto") parts.push("ratings_order=imdb", "ratings_limit=1");
+  // One rating, and strictly IMDb when asked: five stacked badges are unreadable on a card, and an
+  // episode that fell through to TMDB made the list look inconsistent. `ratings_order` alone only sorts
+  // (measured: it does fall through), so the strict mode also excludes every other source.
+  const stored = String(setting("tvRatings", "imdb")).trim().toLowerCase();
+  // Anything unrecognised falls back to the manifest's default, not to "no tuning at all".
+  const ratings = stored === "auto" || stored === "imdbfallback" ? stored : "imdb";
+  if (ratings === "imdb") {
+    parts.push("ratings_order=imdb", "ratings_limit=1", "ratings_exclude=" + IMDB_EXCLUDE);
+  } else if (ratings === "imdbfallback") {
+    parts.push("ratings_order=imdb,tmdb", "ratings_limit=1");
+  }
   parts.push("fallback=true");
   return "?" + parts.join("&");
 }
 
 function imageUrl(key, idType, type, id) {
-  return posterServer() + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg" + tuningQuery();
+  return posterServer() + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg" + tuningQuery("auto");
 }
 
 // Episode stills use their own documented id shape: `episode-{series id}-S{season}E{episode}`.
 function stillUrl(key, seriesId, season, episode) {
   const id = "episode-" + encodeURIComponent(seriesId) + "-S" + season + "E" + episode;
-  return posterServer() + "/" + encodeURIComponent(key) + "/tmdb/episode-default/" + id + ".jpg" + tuningQuery();
+  return artUrl(key, "tmdb", "episode-default", id, "auto");
+}
+
+// `mode` decides how much of the tuning goes into a URL: "none" for the probes that test the SERVER
+// itself (so a rejected tuning parameter can never be mistaken for "this server has no backdrops"),
+// "force" for the probe of the tuning, and "auto" for the real images.
+function artUrl(key, idType, type, id, mode) {
+  return posterServer() + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg" + tuningQuery(mode);
 }
 
 let probed = false;
@@ -168,7 +207,7 @@ async function ensureProbe() {
   if (!key || probed) return;
   probed = true;
   try {
-    const r = await kino.fetch(imageUrl(key, "imdb", posterType(), PROBE_ID), { method: "HEAD", timeoutMs: 10000 });
+    const r = await kino.fetch(artUrl(key, "imdb", posterType(), PROBE_ID, "none"), { method: "HEAD", timeoutMs: 10000 });
     if (r.status === 401 || r.status === 403) {
       keyRejected = true;
       log("El servidor rechazó la clave (" + r.status + "): se usan las imágenes de TMDB");
@@ -182,7 +221,7 @@ function serverReady() {
   return rpdbKey() !== "" && !keyRejected;
 }
 
-async function probeKind(kind, url, what) {
+async function probeKind(kind, url, what, blame) {
   if (probedKinds[kind] !== undefined) return probedKinds[kind];
   let ok = false;
   try {
@@ -192,7 +231,7 @@ async function probeKind(kind, url, what) {
     log("no pude comprobar " + what + ": " + (e && e.message ? e.message : e));
   }
   probedKinds[kind] = ok;
-  if (!ok) log("el servidor no sirve " + what + ": esa imagen la pone TMDB");
+  if (!ok) log(blame || "el servidor no sirve " + what + ": esa imagen la pone TMDB");
   return ok;
 }
 
@@ -200,12 +239,27 @@ async function probeKind(kind, url, what) {
 // fails and every backdrop falls back to TMDB, which is free and always available.
 async function ensureBackdropProbe() {
   if (!serverReady()) return;
-  backdropsOn = await probeKind("backdrop", imageUrl(rpdbKey(), "imdb", "backdrop-default", PROBE_ID), "fondos con nota");
+  backdropsOn = await probeKind("backdrop", artUrl(rpdbKey(), "imdb", "backdrop-default", PROBE_ID, "none"), "fondos con nota");
+}
+
+// The tuning list of rating keys is the free server's. A key it does not know makes it answer 400 and
+// the whole image is lost, so the tuned URL is probed once per runtime too, and a failure drops the
+// tuning (leaving the plain image) instead of leaving holes everywhere.
+async function ensureTuningProbe() {
+  if (!tuningWanted() || probedKinds.tuning !== undefined) return;
+  const ok = await probeKind(
+    "tuning",
+    artUrl(rpdbKey(), "imdb", posterType(), PROBE_ID, "force"),
+    "el ajuste de las notas",
+    "el servidor no acepta el ajuste de las notas: se usan las notas por defecto"
+  );
+  tuningOff = !ok;
 }
 
 async function ensureStillProbe() {
   if (!serverReady()) return;
-  stillsOn = await probeKind("still", stillUrl(rpdbKey(), STILL_PROBE.id, STILL_PROBE.season, STILL_PROBE.episode), "fotogramas con nota");
+  const id = "episode-" + STILL_PROBE.id + "-S" + STILL_PROBE.season + "E" + STILL_PROBE.episode;
+  stillsOn = await probeKind("still", artUrl(rpdbKey(), "tmdb", "episode-default", id, "none"), "fotogramas con nota");
 }
 
 // RPDB takes the media type INSIDE the id value for TMDB lookups: `movie-603`, `series-1399`.
@@ -316,6 +370,7 @@ function nextCursor(data, page) {
 export async function home() {
   try {
     await ensureProbe();
+    await ensureTuningProbe();
     await ensureBackdropProbe();
     const pages = await Promise.all(ROWS.map((row) => tmdb(row.path)));
     const rows = [];
@@ -347,6 +402,7 @@ export async function browse(ref, cursor) {
   const spec = listRef(parseRef(ref));
   if (!spec) return { items: [] };
   await ensureProbe();
+  await ensureTuningProbe();
   await ensureBackdropProbe();
   const page = Math.max(1, parseInt(cursor, 10) || 1);
   const data = await tmdb(spec.path, { page });
@@ -359,6 +415,7 @@ export async function search(query) {
   const q = query && query.q ? String(query.q).trim() : "";
   if (!q) return [];
   await ensureProbe();
+  await ensureTuningProbe();
   await ensureBackdropProbe();
   const page = Math.max(1, parseInt(query && query.cursor, 10) || 1);
   const data = await tmdb("/search/multi", { query: q, include_adult: false, page });
@@ -376,6 +433,7 @@ export async function episodes(ref) {
   const path = "/tv/" + id;
   const show = await tmdb(path);
   await ensureProbe();
+  await ensureTuningProbe();
   await ensureStillProbe();
   const seasons = (Array.isArray(show.seasons) ? show.seasons : [])
     .filter((s) => Number(s.season_number) > 0)
