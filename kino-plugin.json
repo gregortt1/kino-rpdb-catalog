@@ -1,0 +1,58 @@
+{
+  "id": "rpdb-catalog",
+  "name": "Catálogo con pósters RPDB",
+  "version": "1.0.0",
+  "apiVersion": 6,
+  "entry": "plugin.js",
+  "catalogOnly": true,
+  "description": "Catálogo de TMDB (tendencias, mejor valoradas, en cines y búsqueda) con los pósters de RatingPosterDB, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la de RPDB es tuya y es opcional.",
+  "author": "gregorysteventt",
+  "homepage": "https://github.com/gregorysteventt/kino-rpdb-catalog",
+  "hosts": ["api.themoviedb.org", "api.ratingposterdb.com"],
+  "capabilities": ["home", "browse", "search", "episodes", "meta", "resolve"],
+  "color": "#F5C518",
+  "icon": "icon.png",
+  "settings": [
+    {
+      "key": "key",
+      "label": "Clave de RPDB",
+      "type": "password",
+      "hint": "Opcional: sin ella se usa el póster original de TMDB"
+    },
+    {
+      "key": "posterSource",
+      "label": "Fuente del póster",
+      "type": "select",
+      "default": "rpdb",
+      "options": [
+        { "value": "rpdb", "label": "RatingPosterDB (con nota)" },
+        { "value": "tmdb", "label": "TMDB (los originales)" }
+      ]
+    },
+    {
+      "key": "posterType",
+      "label": "Tipo de póster",
+      "type": "text",
+      "default": "poster-default",
+      "hint": "poster-default, poster-imdb-rated, poster-rt-rated…"
+    },
+    {
+      "key": "fallback",
+      "label": "Póster sin nota si no hay con nota",
+      "type": "toggle",
+      "default": true
+    },
+    {
+      "key": "withBackdrop",
+      "label": "Usar fondos con nota",
+      "type": "toggle",
+      "default": false
+    },
+    {
+      "key": "tmdbKey",
+      "label": "Llave de TMDB (Kino 0.9.52 o antes)",
+      "type": "password",
+      "hint": "Solo la necesitan versiones viejas de Kino"
+    }
+  ]
+}
