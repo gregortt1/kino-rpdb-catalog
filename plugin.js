@@ -18,7 +18,14 @@
 const TMDB_POSTER = "https://image.tmdb.org/t/p/w500";
 const TMDB_BACKDROP = "https://image.tmdb.org/t/p/w780";
 const TMDB_STILL = "https://image.tmdb.org/t/p/w300";
-const SERVER = "https://api.ratingposterdb.com";
+// The two servers this plugin knows, both declared in `hosts`. The person picks one from a list instead
+// of typing an address: a mistyped address was a whole class of support question, and Kino lists every
+// declared host in the consent sheet either way.
+const RPDB = "https://api.ratingposterdb.com";
+const SERVERS = {
+  rpdb: RPDB,
+  openposterdb: "https://openposterdb.com",
+};
 const PROBE_ID = "tt0133093";                 // The Matrix: an id RPDB has always known
 const STILL_PROBE = { id: 1399, season: 1, episode: 1 };   // Game of Thrones, S1E1
 const DEFAULT_POSTER = "poster-default";
@@ -100,13 +107,16 @@ function posterType() {
   return TYPE_RULE.test(value) ? value : DEFAULT_POSTER;
 }
 
-// The server that draws the rated images. RatingPosterDB by default; the person may point it at any
-// RPDB-shaped service instead — the free hosted OpenPosterDB (openposterdb.com), which does serve rated
-// backdrops and episode stills, or their own instance at home. A `url` setting is what makes that
-// server reachable for both kino.fetch and the images, with no extra host to declare.
+// The server that draws the rated images, chosen from a list: RatingPosterDB or the free hosted
+// OpenPosterDB. Both are declared in `hosts`, so no `url` setting is needed to make either reachable.
 function posterServer() {
-  const configured = String(setting("server", "")).trim().replace(/\/+$/, "");
-  return configured === "" ? SERVER : configured;
+  const chosen = String(setting("service", "openposterdb")).trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(SERVERS, chosen) ? SERVERS[chosen] : SERVERS.openposterdb;
+}
+
+// Whether the server is RatingPosterDB, which decides if the server-specific tuning applies at all.
+function usesRpdb() {
+  return posterServer() === RPDB;
 }
 
 // The tuning parameters below are the free server's, and they are for a TELEVISION only.
@@ -146,7 +156,7 @@ function isTv() {
 }
 
 function tuningWanted() {
-  return isTv() && posterServer() !== SERVER;
+  return isTv() && !usesRpdb();
 }
 
 // `mode`: "none" for a URL that only tests the server (no tuning at all), "force" for the probe of the

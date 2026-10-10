@@ -106,14 +106,14 @@ Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plu
 
 La primera versión llegó a tener **ocho ajustes**: servidor, clave, fuente del póster, tipo, respaldo,
 tipo de medio, fondos y llave de TMDB. Quien lo usa dijo, con razón, que parecía complicado. Hoy son
-**tres**: `server`, `key` y `posterType`. Dos se quitaron del todo y dos volvieron, pero ya no como
-interruptores que la persona tenga que entender:
+**cinco**, y dos de ellos solo actúan en la tele:
 
 | Ajuste | Estado |
 | --- | --- |
-| `server` | **Volvió** en 1.2.0. Es la vía para usar OpenPosterDB, cuyos fondos y fotogramas con nota son gratis: sin él, la única forma de tenerlos es pagar el plan de RPDB. |
-| `key` | Se queda. |
+| `service` | **Elegido de una lista** desde 1.5.0 (antes había que escribir la dirección). Ver abajo. |
+| `key` | Se queda, y desde 1.5.0 trae `default: "t0-free-rpdb"`. |
 | `posterType` | Se queda. |
+| `tvRatings`, `tvBadgeSize` | Se quedan, y solo se aplican con `kino.device === "tv"`. |
 | `posterSource` | **Quitado.** Redundante: si la clave falla, el plugin ya cae solo a las imágenes de TMDB. |
 | `fallback` | **Quitado.** Siempre `?fallback=true`, que es lo que se quiere el 99 % de las veces. |
 | `idMode` | **Quitado.** El prefijo `movie-`/`series-` es la forma correcta y está probada en la app. Si hubiera que volver atrás, es una línea en `tmdbIdValue()`. |
@@ -123,8 +123,24 @@ interruptores que la persona tenga que entender:
 La lección de fondo: un ajuste que la persona **no puede evaluar** ("¿mi plan incluye fondos?") es un
 ajuste mal puesto. Es mejor que el plugin lo compruebe y que el ajuste desaparezca.
 
-Efecto secundario bueno: el manifiesto declara **un solo host**, así que la hoja de consentimiento es más
-corta y más fácil de leer.
+### Escribir la dirección del servidor, fuera
+
+La 1.2.0 pedía la dirección en un ajuste `url`, pensando en admitir un OpenPosterDB casero. Quien lo usa
+propuso algo mejor: **una lista con los servidores ya puestos, para elegir en vez de escribir**. Y tiene
+una ventaja de fondo: una dirección escrita a mano solo servía para que Kino convirtiera ese host en
+alcanzable, y eso se consigue igual declarándolo.
+
+Desde 1.5.0:
+
+- `service` es un `select` (`rpdb`, `openposterdb`) y **los dos van declarados en `hosts`**, así que Kino
+  los lista en la hoja de consentimiento y `kino.fetch` llega a ambos sin ningún ajuste `url`. De paso,
+  `usesRpdb()` decide con eso si el ajuste de la tele aplica.
+- La clave trae `default: "t0-free-rpdb"`, así que **una instalación nueva funciona sin tocar nada**.
+- El "servidor propio en casa" queda fuera a propósito (necesita el ajuste `url`). Volver a admitirlo es:
+  reponer el ajuste `url`, leerlo en `posterServer()` cuando `service === "own"`, y dejar de declarar
+  hosts fijos. Anotado por si se pide.
+- Efecto secundario: la hoja de consentimiento pasa de tres entradas (una de ellas fantasma) a dos
+  exactas.
 
 ### El `id` no se toca, aunque el nombre sí
 

@@ -34,15 +34,19 @@ servidor de imágenes, que se guarda cifrada en tu aparato y nunca sale de él.
 
 ## Configurarlo
 
-Hay **cinco ajustes**:
+Hay **cinco ajustes**, y **ya vienen puestos para funcionar**: no tienes que escribir nada.
 
 | Ajuste | Qué hace |
 | --- | --- |
-| **Servidor de imágenes** | Déjalo **vacío** para RatingPosterDB, o pega `https://openposterdb.com` para el servicio gratuito. |
-| **Clave del servidor** | Tu clave de ese servidor. **Opcional**: sin ella el catálogo usa las imágenes de TMDB. |
+| **Servidor de imágenes** | Una lista con dos: **OpenPosterDB (gratis)** y **RatingPosterDB**. Nada de escribir direcciones. |
+| **Clave del servidor** | Viene puesta `t0-free-rpdb`, la clave pública gratuita de OpenPosterDB. Cámbiala solo si usas otro servidor o sacas la tuya. |
 | **Tipo de póster** | `poster-default`, o el tipo con nota que incluya tu plan (por ejemplo `poster-imdb-rated`). |
 | **En la tele: qué notas** | `Solo IMDb (estricto)`, `IMDb y TMDB si no hay`, o `Automático (varias notas)`. |
 | **En la tele: tamaño** | `Grandes` (recomendado), `Muy grandes (imagen 4K)` o `Medianas`. |
+
+Instalas, y ya está: póster, fondo y fotogramas con nota, gratis, sin registrarte en ningún sitio y sin
+tocar la configuración. Los dos servidores que ofrece la lista van declarados en el plugin, así que Kino
+los muestra en la hoja de consentimiento y los apruebas una vez al instalar.
 
 ### Por qué esos dos son solo para la tele
 
@@ -126,31 +130,29 @@ Así que no hay nada que ajustar: enchufa el servidor que quieras y el plugin se
 | **Fondos** con nota | Solo en su plan de pago | **Sí, gratis** |
 | **Fotogramas** con nota | Solo en su plan de pago | **Sí, gratis** |
 | **Clave** | La tuya, desde su web | **`t0-free-rpdb`**, una clave pública gratuita |
-| **Cómo se usa** | Deja el servidor **vacío** | Servidor `https://openposterdb.com` + esa clave |
+| **En la lista de ajustes** | `RatingPosterDB` | `OpenPosterDB (gratis)` — **viene elegido** |
 
-**Con OpenPosterDB no hace falta registrarse ni pagar nada.** Su clave pública gratuita es
-`t0-free-rpdb` y sirve las tres clases de imagen. Para dejarlo funcionando:
+**El plugin ya viene configurado con el gratis**: el servidor elegido es OpenPosterDB y la clave pública
+`t0-free-rpdb` viene puesta. Instalas y funciona, sin registrarte y sin escribir nada.
 
-| Ajuste | Valor |
-| --- | --- |
-| **Servidor de imágenes** | `https://openposterdb.com` |
-| **Clave del servidor** | `t0-free-rpdb` |
+**Con OpenPosterDB no hace falta registrarse ni pagar nada.** Su clave pública gratuita sirve las tres
+clases de imagen. Si algún día quieres la tuya propia (porque la pública va compartida y puede ir más
+lenta), la sacas en su web y cambias solo el campo de la clave.
 
-Y ya está: póster, fondo y fotogramas con nota, gratis. Los dos servicios usan exactamente las mismas
-direcciones, así que cambiar de uno a otro es rellenar esos dos campos. OpenPosterDB agrega notas de
-nueve fuentes: IMDb, Rotten Tomatoes (crítica y audiencia), Metacritic, Trakt, Letterboxd, MyAnimeList,
-Roger Ebert y MDBList.
+**Si prefieres RatingPosterDB**: elige `RatingPosterDB` en la lista y pega tu clave personal. Los dos
+servidores usan exactamente las mismas direcciones, así que cambiar de uno a otro son dos toques.
 
-Los tamaños que sirve son los correctos para Kino: póster de 580×870, **fondo de 1920×1081** (exacto
-para una tele 1080p) y fotograma de 780×439.
+OpenPosterDB agrega notas de nueve fuentes: IMDb, Rotten Tomatoes (crítica y audiencia), Metacritic,
+Trakt, Letterboxd, MyAnimeList, Roger Ebert y MDBList. Y los tamaños que sirve son los correctos para
+Kino: póster de 580×870, **fondo de 1920×1081** (exacto para una tele 1080p) y fotograma de 780×439.
 
-También puedes montar OpenPosterDB **en tu casa** con Docker
-([instrucciones](https://github.com/PNRxA/openposterdb)) y pegar ahí la dirección de tu equipo: Kino
-admite imágenes de un servidor que escribas tú en los ajustes, incluso en la red local y por `http`.
+Si te equivocas al escribir una clave, el plugin lo detecta y **vuelve a las imágenes de TMDB** en vez de
+dejarte cientos de imágenes rotas.
 
-Si usas RatingPosterDB, tu clave es personal y va dentro de la dirección de cada imagen. Si te equivocas
-al escribirla, el plugin lo detecta y **vuelve a las imágenes de TMDB** en vez de dejarte cientos de
-imágenes rotas.
+> **¿Y si quiero montar OpenPosterDB en mi casa?** La lista solo trae los dos servidores públicos, que son
+> los que van declarados en el plugin. Un servidor propio en la red de casa necesitaría un ajuste de tipo
+> `url` para que Kino lo permita, y eso es justo lo que quitamos para no tener que escribir direcciones.
+> Si algún día lo montas, dímelo y te lo añado.
 
 ## Lo que este plugin NO hace
 

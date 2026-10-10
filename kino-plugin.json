@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "Catálogo con notas",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
@@ -9,22 +9,27 @@
   "description": "Catálogo de TMDB (tendencias, mejor valoradas, en cines y búsqueda) con los pósters, los fondos y los fotogramas de capítulo con la nota incrustada, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la del servidor de imágenes es tuya y es opcional.",
   "author": "gregorysteventt-source",
   "homepage": "https://github.com/gregorysteventt-source/kino-rpdb-catalog",
-  "hosts": ["api.ratingposterdb.com"],
+  "hosts": ["api.ratingposterdb.com", "openposterdb.com"],
   "capabilities": ["home", "browse", "search", "episodes", "meta", "resolve"],
   "color": "#F5C518",
   "icon": "icon.png",
   "settings": [
     {
-      "key": "server",
+      "key": "service",
       "label": "Servidor de imágenes",
-      "type": "url",
-      "hint": "Vacío = RatingPosterDB. Ej: https://openposterdb.com"
+      "type": "select",
+      "default": "openposterdb",
+      "options": [
+        { "value": "openposterdb", "label": "OpenPosterDB (gratis)" },
+        { "value": "rpdb", "label": "RatingPosterDB" }
+      ]
     },
     {
       "key": "key",
       "label": "Clave del servidor",
       "type": "password",
-      "hint": "Opcional: sin ella se usan las imágenes de TMDB"
+      "default": "t0-free-rpdb",
+      "hint": "Viene puesta la clave pública gratuita de OpenPosterDB"
     },
     {
       "key": "posterType",
