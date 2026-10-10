@@ -1,10 +1,11 @@
 {
   "id": "rpdb-catalog",
   "name": "Catálogo con pósters RPDB",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
+  "discoverable": false,
   "description": "Catálogo de TMDB (tendencias, mejor valoradas, en cines y búsqueda) con los pósters de RatingPosterDB, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la de RPDB es tuya y es opcional.",
   "author": "gregorysteventt-source",
   "homepage": "https://github.com/gregorysteventt-source/kino-rpdb-catalog",
