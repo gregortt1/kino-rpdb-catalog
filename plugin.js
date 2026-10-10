@@ -9,19 +9,18 @@
 // person needs no TMDB key at all. The RPDB key is the person's own and is optional: without it the
 // catalogue still works, with TMDB's own posters.
 //
+// Rated posters come from RPDB; backdrops always come from TMDB, because rated backdrops are one of
+// RPDB's paid tiers and asking for one a free key cannot serve empties every card on a television.
+//
 // catalogOnly: the plugin lists and describes titles but plays none, so Kino 0.9.54+ sends its titles
 // to "Buscar dónde verlo", where the person's other sources find them.
 
 const TMDB_POSTER = "https://image.tmdb.org/t/p/w500";
 const TMDB_BACKDROP = "https://image.tmdb.org/t/p/w780";
 const TMDB_STILL = "https://image.tmdb.org/t/p/w300";
-// RatingPosterDB by default. The person can point this at any RPDB-shaped server instead: a free
-// hosted one such as openposterdb.com, or their own instance at home. A `url` setting is what makes
-// that server reachable, both for kino.fetch and for the images, with no extra host to declare.
-const DEFAULT_SERVER = "https://api.ratingposterdb.com";
-const PROBE_ID = "tt0133093";                 // The Matrix: an id these services have always known
+const SERVER = "https://api.ratingposterdb.com";
+const PROBE_ID = "tt0133093";                 // The Matrix: an id RPDB has always known
 const DEFAULT_POSTER = "poster-default";
-const DEFAULT_BACKDROP = "backdrop-default";
 const ID_RULES = { imdb: /^tt\d{5,10}$/, tmdb: /^[1-9]\d{0,9}$/ };
 const TYPE_RULE = /^[a-z][a-z0-9-]{2,40}$/;
 const PATH_RULE = /^\/[A-Za-z0-9/_-]{0,120}$/;
@@ -99,17 +98,10 @@ function posterType() {
   return TYPE_RULE.test(value) ? value : DEFAULT_POSTER;
 }
 
-// The base URL of the poster server: the person's own if they set one, RatingPosterDB otherwise.
-// Trailing slashes are dropped so a pasted address cannot produce a double slash.
-function posterServer() {
-  const configured = String(setting("server", "")).trim().replace(/\/+$/, "");
-  return configured === "" ? DEFAULT_SERVER : configured;
-}
-
 function imageUrl(key, idType, type, id) {
-  // fallback=true asks RPDB for the plain poster when it cannot build the rated one.
-  const suffix = setting("fallback", true) === false ? "" : "?fallback=true";
-  return posterServer() + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg" + suffix;
+  // fallback=true asks RPDB for the plain poster when it cannot build the rated one, so a title with
+  // no rated variant still gets art instead of a hole.
+  return SERVER + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg?fallback=true";
 }
 
 let probed = false;
@@ -134,9 +126,10 @@ async function ensureProbe() {
   }
 }
 
-// The poster server only when it is asked for, a key is set, and that key was not rejected.
-function usesServer() {
-  return setting("posterSource", "rpdb") === "rpdb" && rpdbKey() !== "" && !keyRejected;
+// Rated art only while a key is set and it has not been rejected. Otherwise the plugin falls back to
+// TMDB's own images, so a missing or wrong key never leaves broken pictures behind.
+function serverReady() {
+  return rpdbKey() !== "" && !keyRejected;
 }
 
 // RPDB takes the media type INSIDE the id value for TMDB lookups: `movie-603`, `series-1399`.
@@ -147,41 +140,35 @@ function usesServer() {
 // German film poster on a series card and empty cards on other series. IMDb ids need none of this:
 // `tt0944947` names one title unambiguously, so `meta()` leaves them alone.
 function tmdbIdValue(mediaType, id) {
-  const value = String(id);
-  if (setting("idMode", "typed") === "plain") return value;
-  return (mediaType === "tv" || mediaType === "series" ? "series-" : "movie-") + value;
+  return (mediaType === "tv" || mediaType === "series" ? "series-" : "movie-") + String(id);
 }
 
 // The poster (or backdrop) of one TMDB result.
 //
-// TMDB picks the image path for the language it was asked for and only then falls back to the
-// original language, then to the best rated one: that fallback is documented but does not always
-// happen, and `es-MX` is looked up as plain `es` because TMDB does not support regional variants for
-// images. So a result can arrive with no image path even though artwork exists.
+// The rated poster comes from RPDB. The backdrop NEVER does: rated backdrops are one of RPDB's paid
+// tiers, and asking for one a free key cannot serve empties every card on a television, where Kino
+// draws its cards with the backdrop. So backdrops are always TMDB's, which are free and always there.
 //
-// RPDB is therefore asked for the poster even when this response carries no path: RPDB looks the
-// artwork up on TMDB and Fanart.tv itself, and its own `fallback` decides what to serve when it has
-// no rated variant. Only when RPDB is not in play does the missing path mean there is nothing to show.
+// TMDB picks the image path for the language it was asked for and only then falls back to the original
+// language, then to the best rated one: that fallback is documented but does not always happen, and
+// `es-MX` is looked up as plain `es` because TMDB does not support regional variants for images. That
+// is why RPDB is asked for the poster even when this response carries no path: RPDB looks the artwork
+// up on TMDB and Fanart.tv itself, and its own `fallback` decides what to serve.
 function art(m, kind, mediaType) {
-  const path = kind === "poster" ? m.poster_path : m.backdrop_path;
-  if (usesServer() && (kind === "poster" || setting("withBackdrop", false) === true)) {
-    return imageUrl(rpdbKey(), "tmdb", kind === "poster" ? posterType() : DEFAULT_BACKDROP, tmdbIdValue(mediaType, m.id));
+  if (kind === "poster" && serverReady()) {
+    return imageUrl(rpdbKey(), "tmdb", posterType(), tmdbIdValue(mediaType, m.id));
   }
+  const path = kind === "poster" ? m.poster_path : m.backdrop_path;
   if (!path) return undefined;
   return (kind === "poster" ? TMDB_POSTER : TMDB_BACKDROP) + path;
 }
 
-// TMDB is asked through Kino, which puts its own key and its own cache in front: the plugin carries
-// no key and does not declare api.themoviedb.org for it. The kino.fetch path is the fallback for
-// Kino 0.9.52 and older, and then the key is the person's.
+// TMDB is asked through Kino, which puts its own key and its own cache in front: the plugin carries no
+// key of its own and does not declare api.themoviedb.org. Older Kino has no such door, and this plugin
+// has nothing to offer it.
 async function tmdb(path, params) {
-  const full = Object.assign({ language: tmdbLang() }, params || {});
-  if (typeof kino.tmdb === "function") return kino.tmdb(path, full);
-  const key = String(setting("tmdbKey", "")).trim();
-  if (!key) throw kino.error("auth_required", "falta la llave de TMDB");
-  const r = await kino.fetch("https://api.themoviedb.org/3" + path + "?" + new URLSearchParams(Object.assign({}, full, { api_key: key })));
-  if (!r.ok) throw kino.error(r.status === 404 ? "not_found" : "unavailable", "TMDB respondió " + r.status);
-  return r.json();
+  if (typeof kino.tmdb !== "function") throw kino.error("unavailable", "este Kino no tiene kino.tmdb");
+  return kino.tmdb(path, Object.assign({ language: tmdbLang() }, params || {}));
 }
 
 function results(data) {
@@ -205,7 +192,7 @@ function item(m, kind) {
   if (/^\d{4}/.test(date)) out.year = date.slice(0, 4);
   // Worth a line in the log: it is the case where TMDB returned no image path, so if RPDB also has
   // nothing for this title the card stays empty and this line says which title it was.
-  if (!m.poster_path && usesServer()) log("TMDB no trajo imagen para «" + title + "»: se le pide al servidor de pósters igual");
+  if (!m.poster_path && serverReady()) log("TMDB no trajo imagen para «" + title + "»: se le pide a RPDB igual");
   const poster = art(m, "poster", kind);
   if (poster) out.poster = poster;
   const backdrop = art(m, "backdrop", kind);
@@ -266,9 +253,10 @@ export async function home() {
     });
     return rows;
   } catch (e) {
-    // A Kino with no key of its own and a person with none either: no rows instead of an error.
-    if (e && e.code === "no_tmdb_key") {
-      log("TMDB sin llave disponible: el Inicio no aporta filas");
+    // No rows instead of an error: a Kino with no kino.tmdb at all, or one whose TMDB key is missing or
+    // momentarily out of reach. Home is never blocked by a plugin that contributes nothing.
+    if (e && (e.code === "no_tmdb_key" || e.code === "unavailable")) {
+      log("TMDB no disponible (" + e.code + "): el Inicio no aporta filas");
       return [];
     }
     throw e;
@@ -341,18 +329,16 @@ export async function episodes(ref) {
 // Kino merges meta last, so this only ever fills a gap; it never replaces what a source gave.
 export async function meta(query) {
   const key = rpdbKey();
-  if (!key || setting("posterSource", "rpdb") !== "rpdb") return null;
+  if (!key) return null;
   const picked = pickId(query && query.ids);
   if (!picked) return null;
   await ensureProbe();
   if (keyRejected) return null;
   // A bare TMDB id would make RPDB guess between films and series; `query.type` says which it is.
   const idValue = picked.idType === "tmdb" ? tmdbIdValue(query && query.type, picked.id) : picked.id;
-  const answer = { poster: imageUrl(key, picked.idType, posterType(), idValue) };
-  if (setting("withBackdrop", false) === true) {
-    answer.backdrop = imageUrl(key, picked.idType, DEFAULT_BACKDROP, idValue);
-  }
-  return answer;
+  // Only the poster: the backdrop of a title from another source is that source's to give, and this
+  // plugin never asks RPDB for a backdrop anyway.
+  return { poster: imageUrl(key, picked.idType, posterType(), idValue) };
 }
 
 // IMDb first: it names a film and a series without RPDB having to guess which namespace a bare TMDB

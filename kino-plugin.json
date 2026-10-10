@@ -1,40 +1,24 @@
 {
   "id": "rpdb-catalog",
   "name": "Catálogo con pósters RPDB",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
   "discoverable": false,
-  "description": "Catálogo de TMDB (tendencias, mejor valoradas, en cines y búsqueda) con pósters y fondos que llevan la nota incrustada, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la del servidor de pósters es tuya y es opcional.",
+  "description": "Catálogo de TMDB (tendencias, mejor valoradas, en cines y búsqueda) con los pósters de RatingPosterDB, que llevan la nota incrustada, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la de RPDB es tuya y es opcional.",
   "author": "gregorysteventt-source",
   "homepage": "https://github.com/gregorysteventt-source/kino-rpdb-catalog",
-  "hosts": ["api.themoviedb.org", "api.ratingposterdb.com"],
+  "hosts": ["api.ratingposterdb.com"],
   "capabilities": ["home", "browse", "search", "episodes", "meta", "resolve"],
   "color": "#F5C518",
   "icon": "icon.png",
   "settings": [
     {
-      "key": "server",
-      "label": "Servidor de pósters",
-      "type": "url",
-      "hint": "Vacío = RatingPosterDB. Ej: https://openposterdb.com"
-    },
-    {
       "key": "key",
-      "label": "Clave del servidor",
+      "label": "Clave de RPDB",
       "type": "password",
       "hint": "Opcional: sin ella se usa el póster original de TMDB"
-    },
-    {
-      "key": "posterSource",
-      "label": "Fuente del póster",
-      "type": "select",
-      "default": "rpdb",
-      "options": [
-        { "value": "rpdb", "label": "Con nota (el servidor)" },
-        { "value": "tmdb", "label": "TMDB (los originales)" }
-      ]
     },
     {
       "key": "posterType",
@@ -42,34 +26,6 @@
       "type": "text",
       "default": "poster-default",
       "hint": "poster-default, poster-imdb-rated, poster-rt-rated…"
-    },
-    {
-      "key": "fallback",
-      "label": "Póster sin nota si no hay con nota",
-      "type": "toggle",
-      "default": true
-    },
-    {
-      "key": "withBackdrop",
-      "label": "Usar fondos con nota",
-      "type": "toggle",
-      "default": false
-    },
-    {
-      "key": "idMode",
-      "label": "Tipo de medio en el id",
-      "type": "select",
-      "default": "typed",
-      "options": [
-        { "value": "typed", "label": "Incluirlo (recomendado)" },
-        { "value": "plain", "label": "No incluirlo (si algo falla)" }
-      ]
-    },
-    {
-      "key": "tmdbKey",
-      "label": "Llave de TMDB (Kino 0.9.52 o antes)",
-      "type": "password",
-      "hint": "Solo la necesitan versiones viejas de Kino"
     }
   ]
 }
