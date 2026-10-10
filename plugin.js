@@ -129,14 +129,22 @@ function usesRpdb() {
   return setting("posterSource", "rpdb") === "rpdb" && rpdbKey() !== "" && !keyRejected;
 }
 
-// The poster (or backdrop) of one TMDB result. RPDB builds its posters from TMDB artwork, so a title
-// with a poster_path is one RPDB can serve. A title with no artwork of its own is left blank.
+// The poster (or backdrop) of one TMDB result.
+//
+// TMDB picks the image path for the language it was asked for and only then falls back to the
+// original language, then to the best rated one: that fallback is documented but does not always
+// happen, and `es-MX` is looked up as plain `es` because TMDB does not support regional variants for
+// images. So a result can arrive with no image path even though artwork exists.
+//
+// RPDB is therefore asked for the poster even when this response carries no path: RPDB looks the
+// artwork up on TMDB and Fanart.tv itself, and its own `fallback` decides what to serve when it has
+// no rated variant. Only when RPDB is not in play does the missing path mean there is nothing to show.
 function art(m, kind) {
   const path = kind === "poster" ? m.poster_path : m.backdrop_path;
-  if (!path) return undefined;
   if (usesRpdb() && (kind === "poster" || setting("withBackdrop", false) === true)) {
     return rpdbUrl(rpdbKey(), "tmdb", kind === "poster" ? posterType() : DEFAULT_BACKDROP, m.id);
   }
+  if (!path) return undefined;
   return (kind === "poster" ? TMDB_POSTER : TMDB_BACKDROP) + path;
 }
 
@@ -172,6 +180,9 @@ function item(m, kind) {
     ids: { tmdb: m.id },
   };
   if (/^\d{4}/.test(date)) out.year = date.slice(0, 4);
+  // Worth a line in the log: it is the case where TMDB returned no image path, so if RPDB also has
+  // nothing for this title the card stays empty and this line says which title it was.
+  if (!m.poster_path && usesRpdb()) log("TMDB no trajo imagen para «" + title + "»: se le pide a RPDB igual");
   const poster = art(m, "poster");
   if (poster) out.poster = poster;
   const backdrop = art(m, "backdrop");
