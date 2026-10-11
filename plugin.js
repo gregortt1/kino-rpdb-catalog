@@ -195,13 +195,22 @@ const IMDB_EXCLUDE = RATING_KEYS.join(",");
 let tuningOff = false;
 
 // Where the badge sits on the image. The server takes eight anchors; measured on the live service, all
-// eight give a different image, and NOT asking for one leaves backdrops at the top-right corner (which is
-// what this plugin did until now). "auto" therefore means "do not send the parameter".
+// eight give a different image, and NOT asking for one leaves backdrops at the top-right corner.
+//
+// Only the BACKDROP is the person's to choose. A poster is vertical and its badge has always been at the
+// bottom centre, and an episode tile is 16:9 with the badge top-right: mixing one setting across the three
+// changed the posters and the episode tiles too, which is not what was asked for. Those two are fixed.
 const POSITIONS = ["bc", "tc", "l", "r", "tl", "tr", "bl", "br"];
+const FIXED_POSITION = { poster: "bc", still: "tr" };
 
 function badgePosition() {
   const stored = String(setting("tvBadgePosition", "auto")).trim().toLowerCase();
   return POSITIONS.indexOf(stored) === -1 ? "" : stored;
+}
+
+function positionFor(kind) {
+  if (kind === "backdrop") return badgePosition();
+  return FIXED_POSITION[kind] || "";
 }
 
 function quality() {
@@ -218,15 +227,16 @@ function tuningWanted() {
 }
 
 // `mode`: "none" for a URL that only tests the server (no tuning at all), "force" for the probe of the
-// tuning itself, and "auto" for the real images.
-function tuningQuery(mode) {
+// tuning itself, and "auto" for the real images. `kind` is which of the three images this is, because the
+// position of the badge is decided per image: only the backdrop is the person's to choose.
+function tuningQuery(mode, kind) {
   // fallback=true asks RPDB for the plain image when it cannot build the rated one. On the free server
   // it is accepted and ignored: it falls back to TMDB artwork instead of a 1x1 pixel placeholder.
   if (mode === "none" || !tuningWanted() || (mode !== "force" && tuningOff)) return "?fallback=true";
   const q = QUALITY[quality()];
   const parts = ["badge_size=" + q.badge];
   if (q.size) parts.push("imageSize=" + q.size);
-  const position = badgePosition();
+  const position = positionFor(kind);
   if (position) parts.push("position=" + position);
   // One rating, and strictly IMDb when asked: five stacked badges are unreadable on a card, and an
   // episode that fell through to TMDB made the list look inconsistent. `ratings_order` alone only sorts
@@ -243,21 +253,18 @@ function tuningQuery(mode) {
   return "?" + parts.join("&");
 }
 
-function imageUrl(key, idType, type, id) {
-  return posterServer() + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg" + tuningQuery("auto");
+function artUrl(key, idType, type, id, mode, kind) {
+  return posterServer() + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg" + tuningQuery(mode, kind);
+}
+
+function imageUrl(key, idType, type, id, kind) {
+  return artUrl(key, idType, type, id, "auto", kind);
 }
 
 // Episode stills use their own documented id shape: `episode-{series id}-S{season}E{episode}`.
 function stillUrl(key, seriesId, season, episode) {
   const id = "episode-" + encodeURIComponent(seriesId) + "-S" + season + "E" + episode;
-  return artUrl(key, "tmdb", "episode-default", id, "auto");
-}
-
-// `mode` decides how much of the tuning goes into a URL: "none" for the probes that test the SERVER
-// itself (so a rejected tuning parameter can never be mistaken for "this server has no backdrops"),
-// "force" for the probe of the tuning, and "auto" for the real images.
-function artUrl(key, idType, type, id, mode) {
-  return posterServer() + "/" + encodeURIComponent(key) + "/" + idType + "/" + type + "/" + encodeURIComponent(id) + ".jpg" + tuningQuery(mode);
+  return artUrl(key, "tmdb", "episode-default", id, "auto", "still");
 }
 
 let probed = false;
@@ -279,7 +286,7 @@ async function ensureProbe(timeoutMs) {
   if (!key || probed) return;
   probed = true;
   try {
-    const r = await kino.fetch(artUrl(key, "imdb", posterType(), PROBE_ID, "none"), { method: "HEAD", timeoutMs: timeoutMs || 10000 });
+    const r = await kino.fetch(artUrl(key, "imdb", posterType(), PROBE_ID, "none", "poster"), { method: "HEAD", timeoutMs: timeoutMs || 10000 });
     if (r.status === 401 || r.status === 403) {
       keyRejected = true;
       log("El servidor rechazó la clave (" + r.status + "): se usan las imágenes de TMDB");
@@ -321,7 +328,7 @@ function resetProbes() {
 // fails and every backdrop falls back to TMDB, which is free and always available.
 async function ensureBackdropProbe(timeoutMs) {
   if (!serverReady()) return;
-  backdropsOn = await probeKind("backdrop", artUrl(rpdbKey(), "imdb", "backdrop-default", PROBE_ID, "none"), "fondos con nota", null, timeoutMs);
+  backdropsOn = await probeKind("backdrop", artUrl(rpdbKey(), "imdb", "backdrop-default", PROBE_ID, "none", "backdrop"), "fondos con nota", null, timeoutMs);
 }
 
 // The tuning list of rating keys is the free server's. A key it does not know makes it answer 400 and
@@ -331,7 +338,7 @@ async function ensureTuningProbe(timeoutMs) {
   if (!tuningWanted() || probedKinds.tuning !== undefined) return;
   const ok = await probeKind(
     "tuning",
-    artUrl(rpdbKey(), "imdb", posterType(), PROBE_ID, "force"),
+    artUrl(rpdbKey(), "imdb", posterType(), PROBE_ID, "force", "poster"),
     "el ajuste de las notas",
     "el servidor no acepta el ajuste de las notas: se usan las notas por defecto",
     timeoutMs
@@ -342,7 +349,7 @@ async function ensureTuningProbe(timeoutMs) {
 async function ensureStillProbe(timeoutMs) {
   if (!serverReady()) return;
   const id = "episode-" + STILL_PROBE.id + "-S" + STILL_PROBE.season + "E" + STILL_PROBE.episode;
-  stillsOn = await probeKind("still", artUrl(rpdbKey(), "tmdb", "episode-default", id, "none"), "fotogramas con nota", null, timeoutMs);
+  stillsOn = await probeKind("still", artUrl(rpdbKey(), "tmdb", "episode-default", id, "none", "still"), "fotogramas con nota", null, timeoutMs);
 }
 
 // RPDB takes the media type INSIDE the id value for TMDB lookups: `movie-603`, `series-1399`.
@@ -369,10 +376,10 @@ function tmdbIdValue(mediaType, id) {
 // up on TMDB and Fanart.tv itself, and its own `fallback` decides what to serve.
 function art(m, kind, mediaType) {
   if (kind === "poster" && serverReady()) {
-    return imageUrl(rpdbKey(), "tmdb", posterType(), tmdbIdValue(mediaType, m.id));
+    return imageUrl(rpdbKey(), "tmdb", posterType(), tmdbIdValue(mediaType, m.id), "poster");
   }
   if (kind === "backdrop" && backdropsOn) {
-    return imageUrl(rpdbKey(), "tmdb", DEFAULT_BACKDROP, tmdbIdValue(mediaType, m.id));
+    return imageUrl(rpdbKey(), "tmdb", DEFAULT_BACKDROP, tmdbIdValue(mediaType, m.id), "backdrop");
   }
   const path = kind === "poster" ? m.poster_path : m.backdrop_path;
   if (!path) return undefined;
@@ -479,13 +486,22 @@ async function buildRows(specs) {
   await ensureBackdropProbe();
   const pages = await Promise.all(specs.map((row) => tmdb(row.path, row.params)));
   const rows = [];
+  const seen = {};
   specs.forEach((row, i) => {
     const items = results(pages[i]).map((m) => item(m, row.kind)).filter(Boolean);
-    if (!items.length) return;
+    // A title only appears in the first row that brought it. Without this, the same film showed up in
+    // "Tendencias", "Mejor valoradas" and "En cines" of the same Home: the lists overlap by nature, and
+    // Kino only checks for repeats WITHIN a row.
+    const fresh = items.filter((one) => {
+      if (!one || seen[one.id]) return false;
+      seen[one.id] = true;
+      return true;
+    });
+    if (!fresh.length) return;
     rows.push({
       id: row.id,
       title: t(row.title),
-      items,
+      items: fresh,
       // A row with a ref and a browse() gets the "Ver más" card.
       ref: JSON.stringify({ path: row.path, kind: row.kind, params: row.params, list: true }),
       genre: row.genre,
@@ -650,7 +666,7 @@ export async function meta(query) {
   const idValue = picked.idType === "tmdb" ? tmdbIdValue(query && query.type, picked.id) : picked.id;
   // Only the poster: the backdrop of a title from another source is that source's to give, and this
   // plugin never asks RPDB for a backdrop anyway.
-  return { poster: imageUrl(key, picked.idType, posterType(), idValue) };
+  return { poster: imageUrl(key, picked.idType, posterType(), idValue, "poster") };
 }
 
 // IMDb first: it names a film and a series without RPDB having to guess which namespace a bare TMDB

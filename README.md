@@ -12,7 +12,8 @@ Rotten Tomatoes, Metacritic, Trakt, Letterboxd…), gracias a
   Inicio. Con dos pestañas, **Películas** y **Series**, un destacado y sus propias filas.
 - **Mosaicos en Categorías**: doce géneros (Acción, Comedia, Drama, Terror, Ciencia ficción, Animación,
   Documentales…) que se abren como una lista paginada, con el arte de cada mosaico también con nota.
-- **Filas en Inicio**: películas y series en tendencia, mejor valoradas, en cines y al aire.
+- **Filas en Inicio**: películas y series en tendencia, mejor valoradas, en cines y al aire, **sin repetir
+  títulos entre filas** (las listas de TMDB se solapan, y el mismo título salía varias veces en el mismo Inicio).
 - **Búsqueda propia**: busca en todo el catálogo de TMDB, con "Ver más" para seguir mirando.
 - **Fichas completas**: sinopsis, nota, año, temporadas y capítulos.
 - **Imágenes con nota**: el póster, el fondo y los fotogramas de capítulo.
@@ -47,14 +48,24 @@ Hay **cinco ajustes**, y **ya vienen puestos para funcionar**: no tienes que esc
 | **Tipo de póster** | `poster-default`, o el tipo con nota que incluya tu plan (por ejemplo `poster-imdb-rated`). |
 | **En la tele: qué notas** | `Solo IMDb (estricto)`, `IMDb y TMDB si no hay`, o `Automático (varias notas)`. |
 | **En la tele: tamaño** | `Grandes` (recomendado), `Muy grandes (imagen 4K)` o `Medianas`. |
-| **En la tele: dónde va la nota** | Nueve sitios: centrada abajo o arriba, a un lado, o en cualquiera de las cuatro esquinas. |
+| **En la tele: la nota del fondo** | Nueve sitios para el fondo: centrada abajo o arriba, a un lado, o en una esquina. |
 | **Diagnóstico** | Una línea con **qué está funcionando** y un botón **"Probar el servidor"**. |
 
 ### Dónde va la nota
 
-En una tele las tarjetas son horizontales, y la nota puede ir en **nueve sitios**. Cuando el servidor no
-recibe ninguna indicación la pone en la **esquina de arriba a la derecha**, así que esa es la opción
-`Como está`, la que viene por defecto: **si no tocas nada, no cambia nada**.
+Cada imagen tiene su sitio, y **no se mezclan**:
+
+| Imagen | Dónde va la nota | ¿Se elige? |
+| --- | --- | --- |
+| **Póster** (vertical) | Abajo, centrada | No, fija |
+| **Fotograma** de capítulo | Arriba a la derecha | No, fija |
+| **Fondo** (las tarjetas de la tele) | Donde tú digas | **Sí** |
+
+Tiene sentido que solo el fondo se elija: es el único que Kino recorta a lo ancho en una tele, y el póster
+y el fotograma ya tienen su encuadre natural. Antes un solo ajuste movía las tres cosas a la vez, que no
+es lo que quiere nadie.
+
+Las opciones del fondo:
 
 | Opción | Dónde queda |
 | --- | --- |
@@ -62,11 +73,10 @@ recibe ninguna indicación la pone en la **esquina de arriba a la derecha**, as�
 | `Abajo, centrada` | Centro del borde inferior |
 | `Arriba, centrada` | Centro del borde superior |
 | `A la izquierda` / `A la derecha` | Centro de cada lado |
-| `Esquina …` | Las cuatro esquinas (arriba/abajo, izquierda/derecha) |
+| `Esquina …` | Las cuatro esquinas |
 
-Las cuatro esquinas quedan muy pegadas al borde, así que en una tarjeta pueden rozar el redondeo o el
-"Ver más". Las centradas son las más limpias. Pruébalas y quédate con la que te guste: se cambia en dos
-toques y no hace falta reinstalar nada.
+Las esquinas quedan muy al borde, así que en una tarjeta pueden rozar el redondeo o el "Ver más". Las
+centradas son las más limpias.
 
 ### El diagnóstico: por qué no se ven las notas
 

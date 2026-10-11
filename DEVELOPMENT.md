@@ -104,6 +104,36 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### La posición es por imagen, y no se repiten títulos (1.9.0)
+
+Dos correcciones que salieron de usar el plugin de verdad:
+
+**La posición, por tipo de imagen.** La 1.8.0 tenía una sola `tvBadgePosition` que se aplicaba a las tres
+imágenes. Quien lo usa lo dijo claro: *"en los pósters siempre tiene que estar abajo centrado, en los
+episodes tiene que estar arriba a la derecha y solo en los backdrops que me dé la libertad"*. Así que
+`tuningQuery(mode, kind)` recibe ahora el tipo, y `positionFor(kind)` decide:
+
+| kind | posición | Por qué |
+| --- | --- | --- |
+| `poster` | `bc` fija | Es vertical y su nota siempre ha ido abajo, centrada. |
+| `still` | `tr` fija | La tarjeta de capítulo es 16:9 y la nota va arriba a la derecha. |
+| `backdrop` | la que elija la persona | Es el único que Kino recorta a lo ancho en una tele. |
+
+`artUrl()` y `imageUrl()` llevan el `kind` por parámetro, y las sondas también (la de la clave y la del
+ajuste usan `poster`, la de fondos `backdrop` y la de fotogramas `still`). **Ojo con un detalle que casi se
+cuela**: al añadir el parámetro quedaron *dos definiciones de `artUrl`* en el archivo, y en JavaScript la
+última gana — habría ignorado el `kind` en silencio, sin fallar ninguna prueba. Se detectó con un `grep`
+buscando funciones repetidas, y merece la pena repetir esa comprobación antes de dar por bueno un cambio.
+
+**No repetir títulos entre filas.** Las listas de TMDB se solapan por naturaleza, y **Kino solo comprueba
+repeticiones dentro de una fila**: la misma película salía en Tendencias, Mejor valoradas y En cines del
+mismo Inicio. `buildRows()` lleva ahora un registro de ids ya usados y un título solo aparece en la
+primera fila que lo trae. Es una regla por llamada, así que la sección y el Inicio no se estorban.
+
+El fixture de las pruebas tuvo que rehacerse a raíz de esto: reutilizaba los mismos dos títulos en todas
+las listas, así que al cruzar filas se quedaban vacías. Ahora cada lista trae títulos distintos **y uno
+compartido a propósito** (el id `mv-607`), que es lo que comprueba el test nuevo.
+
 ### Dónde va la nota (1.8.0)
 
 El servidor acepta ocho anclas en `position`: `bc`, `tc`, `l`, `r`, `tl`, `tr`, `bl`, `br`. Medido contra

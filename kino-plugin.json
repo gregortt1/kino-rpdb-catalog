@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "Catálogo con notas",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
@@ -66,10 +66,10 @@
     },
     {
       "key": "tvBadgePosition",
-      "label": "En la tele: dónde va la nota",
+      "label": "En la tele: la nota del fondo",
       "type": "select",
       "default": "auto",
-      "hint": "Solo en la tele, no en el celular",
+      "hint": "Solo los fondos; el póster y los capítulos van fijos",
       "options": [
         { "value": "auto", "label": "Como está (esquina arriba derecha)" },
         { "value": "bc", "label": "Abajo, centrada" },
