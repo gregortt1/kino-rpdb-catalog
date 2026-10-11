@@ -104,6 +104,37 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### El mojibake real: mi comando de PowerShell (1.19.0)
+
+La 1.18.0 se publicó con los escapes `\uXXXX` puestos… **escapando texto corrompido**. El manifiesto
+publicado resolvía a `PÃ³ster`, `TamaÃ±o`, `AutomÃ¡tico`: exactamente el síntoma que se quería arreglar, y el
+guardia de la 1.18.0 no lo cazó porque **un mojibake escapado sigue siendo ASCII puro**.
+
+La cadena de causas, entera:
+
+1. Para subir el número de versión usé, en PowerShell:
+   `Get-Content -Raw` + `Set-Content -Encoding utf8`.
+2. `Get-Content` **sin `-Encoding`** en Windows PowerShell 5.1 lee el archivo con la página de códigos del
+   sistema (Windows-1252), así que "Póster" llegó a memoria como "PÃ³ster".
+3. `Set-Content -Encoding utf8` lo escribió de vuelta: el archivo quedó con los caracteres del mojibake
+   como texto legítimo, y con BOM de regalo.
+4. `escape-unicode.mjs` hizo lo que dice: escapó «Ã³» a `\u00c3\u00b3`. Fiel, y equivocado: **un
+   conversor automático no distingue un dato de un error**.
+5. El test de la 1.18.0 solo preguntaba «¿hay caracteres no-ASCII?». La respuesta era no, y pasó.
+
+Arreglado con `repair-mojibake.mjs`, que aplica la vuelta atrás (leer como Latin-1 y decodificar como
+UTF-8) **solo a las cadenas que contienen «Ã» o «Â»**, y después se volvió a escapar. 18 cadenas
+reparadas. `plugin.js` no estaba afectado (nunca pasó por `Set-Content`): sus escapes eran correctos.
+
+**La regla, y esta vez con un test detrás**:
+
+- **Nunca** editar `kino-plugin.json` ni `plugin.js` con `Get-Content`/`Set-Content` de PowerShell. Para
+  eso están las herramientas de archivo, o `[System.IO.File]::ReadAllText` / `WriteAllText` con
+  `UTF8Encoding($false)` si de verdad hace falta PowerShell.
+- Y **dos guardias** en las pruebas, porque uno solo no bastaba: el de la 1.18.0 (nada de tildes literales)
+  **y** uno nuevo sobre el **texto ya interpretado** (`JSON.stringify(manifest)` no puede contener «Ã» ni
+  «Â»). El segundo es el que habría cazado esto.
+
 ### Las tildes en el celular: escapes `\uXXXX` (1.18.0)
 
 Reportado desde el celular: *«las palabras con tilde y con la letra ñ no se ven bien»* — `TamaÃ±o`,

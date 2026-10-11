@@ -108,6 +108,19 @@ ayuda bajo los campos donde de verdad aporta algo.
 
 **Diagnóstico** — una línea con **qué está funcionando** y un botón **"Probar el servidor"**.
 
+### Los pósters, en tu idioma
+
+Los pósters vienen **en el idioma de Kino**, y no hay nada que configurar: si usas Kino en español, llegan
+en **español de Latinoamérica** (`JUEGO DE TRONOS`); si lo usas en inglés, en inglés (`GAME OF THRONES`).
+Se pide al servidor con cada imagen, así que **vale para la tele y para el celular**.
+
+Esto **solo afecta al póster**: medido contra el servicio, en el fondo y en el fotograma de capítulo el
+idioma devuelve exactamente la misma imagen, así que ahí no se manda.
+
+Y el interruptor **`Póster sin el título`** también funciona en los dos aparatos. Antes solo se aplicaba en
+la tele (junto con el tamaño y la posición de la nota, que siguen siendo cosa de la tele), y en el celular
+no hacía nada — que es justo lo que se reportó.
+
 ### Todas las notas en el fondo
 
 El fondo es apaisado y **aguanta muchas más notas que un póster**: medido contra el servicio, caben
@@ -167,7 +180,6 @@ En el **fondo** no hace falta: es ancho, y las tres caben en una fila en tamaño
 tienen su propio ajuste de tamaño y de notas.
 
 ### Qué notas salen
-
 En *Qué notas*, dentro de cada bloque (**Póster** y **Fondo y capítulos**), eliges **cuáles** y, de paso,
 **cuántas**:
 

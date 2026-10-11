@@ -376,8 +376,22 @@ function isTv() {
   return kino.device === "tv";
 }
 
+// The tuning is split in two groups, and the split is deliberate:
+//
+//   - TELEVISION ONLY (`tuningWanted`): the size, the position and which notes. A television draws its
+//     cards wide and its badges shrink to ~470 px, so these are choices about THAT shape; the person asked
+//     for them not to change the phone.
+//   - EVERY DEVICE: the language of the artwork and "no title on the poster". Neither depends on the
+//     shape of a card, and both are things the person wants everywhere: English posters on the phone were
+//     a bug report, and a toggle that does nothing on the phone is worse than no toggle.
+//
+// Both groups are only sent to the free server: RPDB has its own language handling and its own types.
 function tuningWanted() {
   return isTv() && !usesRpdb();
+}
+
+function globalTuningWanted() {
+  return !usesRpdb();
 }
 
 // `mode`: "none" for a URL that only tests the server (no tuning at all), "force" for the probe of the
@@ -386,16 +400,30 @@ function tuningWanted() {
 function tuningQuery(mode, kind) {
   // fallback=true asks RPDB for the plain image when it cannot build the rated one. On the free server
   // it is accepted and ignored: it falls back to TMDB artwork instead of a 1x1 pixel placeholder.
-  if (mode === "none" || !tuningWanted() || (mode !== "force" && tuningOff)) return "?fallback=true";
+  if (mode === "none") return "?fallback=true";
+  const parts = [];
+
+  if (globalTuningWanted()) {
+    // The artwork's language, on the poster only (measured: on a backdrop or a still, `lang` returns the
+    // very same file). Without it the server serves English — that was the bug report. Measured too that
+    // an unknown language answers 200 and not 400, so it needs no probe.
+    if (kind === "poster") parts.push("lang=" + tmdbLang());
+    // The textless artwork. It matters because the badge row sits at the bottom, right where the poster
+    // prints its own title: without the text, the notes stop fighting with it. Verified against the live
+    // service (a documented boolean): when there is no textless version it serves the normal one.
+    if (kind === "poster" && isOn("posterTextless")) parts.push("textless=true");
+  }
+
+  // From here on, only a television, and only while the server accepts the tuning.
+  if (!tuningWanted() || (mode !== "force" && tuningOff)) {
+    parts.push("fallback=true");
+    return "?" + parts.join("&");
+  }
+
   const q = QUALITY[quality(kind)];
-  const parts = ["badge_size=" + badgeSize(kind, q.badge)];
+  parts.push("badge_size=" + badgeSize(kind, q.badge));
   // imageSize only means something on a wide image; a poster is not scaled by it.
   if (q.size && kind !== "poster") parts.push("imageSize=" + q.size);
-  // The textless artwork. It matters because the badge row sits at the bottom, right where the poster
-  // prints its own title: without the text, the notes stop fighting with it. Verified against the live
-  // service (a documented boolean): when there is no textless version it serves the normal one, so it is
-  // safe to ask for. Only posters, where the clash happens.
-  if (kind === "poster" && isOn("posterTextless")) parts.push("textless=true");
   const position = positionFor(kind);
   if (position) parts.push("position=" + position);
   // Which notes, and how many. `ratings_order` alone only sorts and falls through to another source

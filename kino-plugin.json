@@ -1,19 +1,36 @@
 {
   "id": "rpdb-catalog",
   "name": "OpenPoster",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
   "discoverable": false,
-  "categories": ["movies", "series"],
-  "section": { "label": "OpenPoster" },
-  "theme": { "highlight": "#F5C518" },
-  "description": "Cat\u00c3\u00a1logo de TMDB (tendencias, populares, mejor valoradas, anime, documentales y g\u00c3\u00a9neros) con los p\u00c3\u00b3sters, los fondos y los fotogramas de cap\u00c3\u00adtulo con la nota incrustada. Rellena el p\u00c3\u00b3ster de los t\u00c3\u00adtulos de tus otras fuentes y no reproduce nada.",
+  "categories": [
+    "movies",
+    "series"
+  ],
+  "section": {
+    "label": "OpenPoster"
+  },
+  "theme": {
+    "highlight": "#F5C518"
+  },
+  "description": "Cat\u00e1logo de TMDB (tendencias, populares, mejor valoradas, anime, documentales y g\u00e9neros) con los p\u00f3sters, los fondos y los fotogramas de cap\u00edtulo con la nota incrustada. Rellena el p\u00f3ster de los t\u00edtulos de tus otras fuentes y no reproduce nada.",
   "author": "gregorysteventt-source",
   "homepage": "https://github.com/gregorysteventt-source/kino-rpdb-catalog",
-  "hosts": ["api.ratingposterdb.com", "openposterdb.com"],
-  "capabilities": ["home", "browse", "search", "episodes", "meta", "resolve"],
+  "hosts": [
+    "api.ratingposterdb.com",
+    "openposterdb.com"
+  ],
+  "capabilities": [
+    "home",
+    "browse",
+    "search",
+    "episodes",
+    "meta",
+    "resolve"
+  ],
   "color": "#F5C518",
   "icon": "icon.png",
   "settings": [
@@ -24,12 +41,18 @@
     },
     {
       "key": "service",
-      "label": "Servidor de im\u00c3\u00a1genes",
+      "label": "Servidor de im\u00e1genes",
       "type": "select",
       "default": "openposterdb",
       "options": [
-        { "value": "openposterdb", "label": "OpenPosterDB (gratis)" },
-        { "value": "rpdb", "label": "RatingPosterDB" }
+        {
+          "value": "openposterdb",
+          "label": "OpenPosterDB (gratis)"
+        },
+        {
+          "value": "rpdb",
+          "label": "RatingPosterDB"
+        }
       ]
     },
     {
@@ -37,110 +60,194 @@
       "label": "Clave del servidor",
       "type": "password",
       "default": "t0-free-rpdb",
-      "hint": "La clave p\u00c3\u00bablica gratuita, ya puesta"
+      "hint": "La clave p\u00fablica gratuita, ya puesta"
     },
     {
       "key": "posterSec",
-      "label": "P\u00c3\u00b3ster (en la tele)",
+      "label": "P\u00f3ster (en la tele)",
       "type": "section"
     },
     {
       "key": "posterRatings",
-      "label": "Qu\u00c3\u00a9 notas",
+      "label": "Qu\u00e9 notas",
       "type": "select",
       "default": "imdbRtMc",
       "options": [
-        { "value": "imdb", "label": "Solo IMDb (estricto)" },
-        { "value": "imdbRt", "label": "IMDb y Rotten Tomatoes" },
-        { "value": "imdbRtMal", "label": "IMDb y RT (+ MAL en anime)" },
-        { "value": "imdbRtMc", "label": "IMDb, RT y Metacritic" },
-        { "value": "imdbFallback", "label": "IMDb y si no hay, TMDB" },
-        { "value": "auto", "label": "Autom\u00c3\u00a1tico (hasta 3)" }
+        {
+          "value": "imdb",
+          "label": "Solo IMDb (estricto)"
+        },
+        {
+          "value": "imdbRt",
+          "label": "IMDb y Rotten Tomatoes"
+        },
+        {
+          "value": "imdbRtMal",
+          "label": "IMDb y RT (+ MAL en anime)"
+        },
+        {
+          "value": "imdbRtMc",
+          "label": "IMDb, RT y Metacritic"
+        },
+        {
+          "value": "imdbFallback",
+          "label": "IMDb y si no hay, TMDB"
+        },
+        {
+          "value": "auto",
+          "label": "Autom\u00e1tico (hasta 3)"
+        }
       ]
     },
     {
       "key": "posterBadgeSize",
-      "label": "Tama\u00c3\u00b1o de la nota",
+      "label": "Tama\u00f1o de la nota",
       "type": "select",
       "default": "sharp",
       "hint": "Con tres notas se encoge solo",
       "options": [
-        { "value": "sharp", "label": "Grandes (recomendado)" },
-        { "value": "max", "label": "Muy grandes" },
-        { "value": "normal", "label": "Medianas" }
+        {
+          "value": "sharp",
+          "label": "Grandes (recomendado)"
+        },
+        {
+          "value": "max",
+          "label": "Muy grandes"
+        },
+        {
+          "value": "normal",
+          "label": "Medianas"
+        }
       ]
     },
     {
       "key": "posterTextless",
-      "label": "P\u00c3\u00b3ster sin el t\u00c3\u00adtulo",
+      "label": "P\u00f3ster sin el t\u00edtulo",
       "type": "toggle",
       "default": false
     },
     {
       "key": "posterType",
-      "label": "Tipo de p\u00c3\u00b3ster",
+      "label": "Tipo de p\u00f3ster",
       "type": "text",
       "default": "poster-default",
       "hint": "poster-default; con RPDB, poster-imdb-rated"
     },
     {
       "key": "backdropSec",
-      "label": "Fondo y cap\u00c3\u00adtulos (en la tele)",
+      "label": "Fondo y cap\u00edtulos (en la tele)",
       "type": "section"
     },
     {
       "key": "backdropRatings",
-      "label": "Qu\u00c3\u00a9 notas",
+      "label": "Qu\u00e9 notas",
       "type": "select",
       "default": "imdbRtMc",
-      "hint": "Pueden ser distintas de las del p\u00c3\u00b3ster",
+      "hint": "Pueden ser distintas de las del p\u00f3ster",
       "options": [
-        { "value": "imdb", "label": "Solo IMDb (estricto)" },
-        { "value": "imdbRt", "label": "IMDb y Rotten Tomatoes" },
-        { "value": "imdbRtMal", "label": "IMDb y RT (+ MAL en anime)" },
-        { "value": "imdbRtMc", "label": "IMDb, RT y Metacritic" },
-        { "value": "all", "label": "Todas las que haya (hasta 8)" },
-        { "value": "imdbFallback", "label": "IMDb y si no hay, TMDB" },
-        { "value": "auto", "label": "Autom\u00c3\u00a1tico (hasta 3)" }
+        {
+          "value": "imdb",
+          "label": "Solo IMDb (estricto)"
+        },
+        {
+          "value": "imdbRt",
+          "label": "IMDb y Rotten Tomatoes"
+        },
+        {
+          "value": "imdbRtMal",
+          "label": "IMDb y RT (+ MAL en anime)"
+        },
+        {
+          "value": "imdbRtMc",
+          "label": "IMDb, RT y Metacritic"
+        },
+        {
+          "value": "all",
+          "label": "Todas las que haya (hasta 8)"
+        },
+        {
+          "value": "imdbFallback",
+          "label": "IMDb y si no hay, TMDB"
+        },
+        {
+          "value": "auto",
+          "label": "Autom\u00e1tico (hasta 3)"
+        }
       ]
     },
     {
       "key": "backdropBadgeSize",
-      "label": "Tama\u00c3\u00b1o de la nota",
+      "label": "Tama\u00f1o de la nota",
       "type": "select",
       "default": "sharp",
       "options": [
-        { "value": "sharp", "label": "Grandes (recomendado)" },
-        { "value": "max", "label": "Muy grandes (imagen 4K, pesada)" },
-        { "value": "normal", "label": "Medianas" }
+        {
+          "value": "sharp",
+          "label": "Grandes (recomendado)"
+        },
+        {
+          "value": "max",
+          "label": "Muy grandes (imagen 4K, pesada)"
+        },
+        {
+          "value": "normal",
+          "label": "Medianas"
+        }
       ]
     },
     {
       "key": "backdropPosition",
-      "label": "D\u00c3\u00b3nde va la nota",
+      "label": "D\u00f3nde va la nota",
       "type": "select",
       "default": "auto",
       "hint": "Solo el fondo",
       "options": [
-        { "value": "auto", "label": "Como est\u00c3\u00a1 (esquina arriba derecha)" },
-        { "value": "bc", "label": "Abajo, centrada" },
-        { "value": "tc", "label": "Arriba, centrada" },
-        { "value": "l", "label": "A la izquierda" },
-        { "value": "r", "label": "A la derecha" },
-        { "value": "bl", "label": "Esquina abajo izquierda" },
-        { "value": "br", "label": "Esquina abajo derecha" },
-        { "value": "tl", "label": "Esquina arriba izquierda" },
-        { "value": "tr", "label": "Esquina arriba derecha" }
+        {
+          "value": "auto",
+          "label": "Como est\u00e1 (esquina arriba derecha)"
+        },
+        {
+          "value": "bc",
+          "label": "Abajo, centrada"
+        },
+        {
+          "value": "tc",
+          "label": "Arriba, centrada"
+        },
+        {
+          "value": "l",
+          "label": "A la izquierda"
+        },
+        {
+          "value": "r",
+          "label": "A la derecha"
+        },
+        {
+          "value": "bl",
+          "label": "Esquina abajo izquierda"
+        },
+        {
+          "value": "br",
+          "label": "Esquina abajo derecha"
+        },
+        {
+          "value": "tl",
+          "label": "Esquina arriba izquierda"
+        },
+        {
+          "value": "tr",
+          "label": "Esquina arriba derecha"
+        }
       ]
     },
     {
       "key": "diag",
-      "label": "Diagn\u00c3\u00b3stico",
+      "label": "Diagn\u00f3stico",
       "type": "section"
     },
     {
       "key": "serverStatus",
-      "label": "Qu\u00c3\u00a9 funciona",
+      "label": "Qu\u00e9 funciona",
       "type": "status"
     },
     {
