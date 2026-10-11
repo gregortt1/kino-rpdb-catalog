@@ -21,6 +21,24 @@ Rotten Tomatoes, Metacritic, Trakt, Letterboxd…), gracias a
 - **Búsqueda propia**: busca en todo el catálogo de TMDB, con "Ver más" para seguir mirando.
 - **Fichas completas**: sinopsis, nota, año, temporadas y capítulos.
 - **Imágenes con nota**: el póster, el fondo y los fotogramas de capítulo.
+- **Sus categorías en el Inicio**: además de Películas y Series, sus filas aparecen también bajo **Anime**
+  y **Documentales**, en los mismos chips de categoría que las demás fuentes.
+
+### Las categorías del Inicio
+
+Kino agrupa las filas de **todas** tus fuentes por categoría, y muestra esas categorías como chips en el
+Inicio y en la pestaña **Categorías**. Las filas de este plugin se marcan con la suya, así que aparecen
+donde les toca:
+
+| Fila | Categoría con la que se agrupa |
+| --- | --- |
+| Películas en tendencia, mejor valoradas, en cines, próximos estrenos | **Películas** |
+| Series en tendencia, mejor valoradas, al aire | **Series** |
+| Anime | **Anime** |
+| Documentales | **Documentales** |
+
+Antes las dos últimas se marcaban como Películas y Series, y por eso sus categorías **no aparecían**: la
+fila estaba, pero escondida dentro de otra categoría. Es un detalle pequeño con un efecto grande.
 
 Este plugin **no reproduce nada**. Es un catálogo para descubrir qué ver: cuando abres uno de sus
 títulos, Kino te ofrece **"Buscar dónde verlo"** y lo busca en tus otras fuentes.
@@ -43,17 +61,46 @@ servidor de imágenes, que se guarda cifrada en tu aparato y nunca sale de él.
 
 ## Configurarlo
 
-Hay **cinco ajustes**, y **ya vienen puestos para funcionar**: no tienes que escribir nada.
+La configuración está en **cuatro bloques**, y **ya viene puesta para funcionar**: no tienes que escribir
+nada.
+
+**Servidor** — de dónde salen las imágenes:
 
 | Ajuste | Qué hace |
 | --- | --- |
 | **Servidor de imágenes** | Una lista con dos: **OpenPosterDB (gratis)** y **RatingPosterDB**. Nada de escribir direcciones. |
-| **Clave del servidor** | Viene puesta `t0-free-rpdb`, la clave pública gratuita de OpenPosterDB. Cámbiala solo si usas otro servidor o sacas la tuya. |
+| **Clave del servidor** | Viene puesta `t0-free-rpdb`, la clave pública gratuita de OpenPosterDB. Cámbiala si usas otro servidor o sacas la tuya. |
+
+**Póster (solo en la tele)** — el póster es **vertical**, y por eso tiene sus propios ajustes:
+
+| Ajuste | Qué hace |
+| --- | --- |
+| **Qué notas** | `Solo IMDb (estricto)`, `IMDb y Rotten Tomatoes`, `IMDb, RT y Metacritic` (por defecto), `IMDb y si no hay, TMDB` o `Automático (hasta 3)`. |
+| **Tamaño de la nota** | `Grandes` (recomendado), `Muy grandes` o `Medianas`. Con tres notas se encoge solo, para que quepan en una fila. |
 | **Tipo de póster** | `poster-default`, o el tipo con nota que incluya tu plan (por ejemplo `poster-imdb-rated`). |
-| **En la tele: qué notas** | `Solo IMDb (estricto)`, `IMDb y Rotten Tomatoes`, `IMDb, RT y Metacritic`, `IMDb y si no hay, TMDB` o `Automático (hasta 3)`. |
-| **En la tele: tamaño** | `Grandes` (recomendado), `Muy grandes (imagen 4K)` o `Medianas`. |
-| **En la tele: la nota del fondo** | Nueve sitios para el fondo: centrada abajo o arriba, a un lado, o en una esquina. |
-| **Diagnóstico** | Una línea con **qué está funcionando** y un botón **"Probar el servidor"**. |
+
+**Fondo y capítulos (solo en la tele)** — son **apaisados**, y aguantan más que un póster:
+
+| Ajuste | Qué hace |
+| --- | --- |
+| **Qué notas** | Las mismas opciones, y **pueden ser distintas de las del póster**. |
+| **Tamaño de la nota** | `Grandes` (recomendado), `Muy grandes (imagen 4K, pesada)` o `Medianas`. |
+| **Dónde va la nota** | Nueve sitios: centrada abajo o arriba, a un lado, o en una esquina. |
+
+**Diagnóstico** — una línea con **qué está funcionando** y un botón **"Probar el servidor"**.
+
+### Por qué el póster y el fondo van por separado
+
+Porque **no tienen la misma forma**. El póster es vertical y estrecho: tres notas grandes no caben y el
+servidor las parte en dos líneas, justo encima del título. El fondo es apaisado y las aguanta de sobra.
+Con un solo ajuste para los dos, elegir para el póster significaba elegir también para el fondo — y no
+tiene por qué ser lo mismo.
+
+Los **capítulos de episodio** van con el grupo del fondo, porque también son apaisados. Su posición, eso
+sí, es fija: arriba a la derecha.
+
+Y nada de esto toca el **celular**: en el celular el plugin no manda ningún ajuste y se ve tal como lo
+sirve el servidor. Es lo que pediste, y sigue igual.
 
 ### Dónde va la nota
 
@@ -68,19 +115,6 @@ Cada imagen tiene su sitio, y **no se mezclan**:
 Tiene sentido que solo el fondo se elija: es el único que Kino recorta a lo ancho en una tele, y el póster
 y el fotograma ya tienen su encuadre natural. Antes un solo ajuste movía las tres cosas a la vez, que no
 es lo que quiere nadie.
-
-Las opciones del fondo:
-
-| Opción | Dónde queda |
-| --- | --- |
-| `Como está` | Esquina de arriba a la derecha (lo de siempre) |
-| `Abajo, centrada` | Centro del borde inferior |
-| `Arriba, centrada` | Centro del borde superior |
-| `A la izquierda` / `A la derecha` | Centro de cada lado |
-| `Esquina …` | Las cuatro esquinas |
-
-Las esquinas quedan muy al borde, así que en una tarjeta pueden rozar el redondeo o el "Ver más". Las
-centradas son las más limpias.
 
 ### Cuántas notas, y que quepan en una fila
 
@@ -97,11 +131,13 @@ Cuando se parten en dos, la segunda línea cae **encima del título del póster*
 que se veía mal. Por eso el plugin **baja el tamaño a mediano cuando son tres notas**: es el único en el
 que las tres caben en una fila. Con una o dos notas se respeta el tamaño que hayas elegido.
 
-En el **fondo** no hace falta: es ancho, y las tres caben en una fila en tamaño grande.
+En el **fondo** no hace falta: es ancho, y las tres caben en una fila en tamaño grande. Por eso los dos
+tienen su propio ajuste de tamaño y de notas.
 
 ### Qué notas salen
 
-En *En la tele: qué notas* eliges **cuáles** y, de paso, **cuántas**:
+En *Qué notas*, dentro de cada bloque (**Póster** y **Fondo y capítulos**), eliges **cuáles** y, de paso,
+**cuántas**:
 
 | Opción | Notas | Cuántas |
 | --- | --- | --- |

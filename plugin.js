@@ -82,8 +82,8 @@ const ROWS = [
   { id: "rpdb-top-shows", path: "/tv/top_rated", kind: "tv", genre: "series", title: "topShows" },
   { id: "rpdb-cinema", path: "/movie/now_playing", kind: "movie", genre: "peliculas", title: "inCinemas" },
   { id: "rpdb-on-air", path: "/tv/on_the_air", kind: "tv", genre: "series", title: "onAir" },
-  { id: "rpdb-anime", path: "/discover/tv", params: ANIME_PARAMS, kind: "tv", genre: "series", title: "anime" },
-  { id: "rpdb-docs", path: "/discover/movie", params: DOCS_PARAMS, kind: "movie", genre: "peliculas", title: "documentaries" },
+  { id: "rpdb-anime", path: "/discover/tv", params: ANIME_PARAMS, kind: "tv", genre: "anime", title: "anime" },
+  { id: "rpdb-docs", path: "/discover/movie", params: DOCS_PARAMS, kind: "movie", genre: "documentales", title: "documentaries" },
   { id: "rpdb-upcoming", path: "/movie/upcoming", kind: "movie", genre: "peliculas", title: "upcoming" },
 ];
 
@@ -99,13 +99,13 @@ const SECTION_ROWS = {
     { id: "sec-movies-trend", path: "/trending/movie/week", kind: "movie", genre: "peliculas", title: "trendMovies" },
     { id: "sec-movies-cinema", path: "/movie/now_playing", kind: "movie", genre: "peliculas", title: "inCinemas" },
     { id: "sec-movies-soon", path: "/movie/upcoming", kind: "movie", genre: "peliculas", title: "upcoming" },
-    { id: "sec-movies-docs", path: "/discover/movie", params: DOCS_PARAMS, kind: "movie", genre: "peliculas", title: "documentaries" },
+    { id: "sec-movies-docs", path: "/discover/movie", params: DOCS_PARAMS, kind: "movie", genre: "documentales", title: "documentaries" },
     { id: "sec-movies-top", path: "/movie/top_rated", kind: "movie", genre: "peliculas", title: "topMovies" },
   ],
   series: [
     { id: "sec-shows-trend", path: "/trending/tv/week", kind: "tv", genre: "series", title: "trendShows" },
     { id: "sec-shows-air", path: "/tv/on_the_air", kind: "tv", genre: "series", title: "onAir" },
-    { id: "sec-shows-anime", path: "/discover/tv", params: ANIME_PARAMS, kind: "tv", genre: "series", title: "anime" },
+    { id: "sec-shows-anime", path: "/discover/tv", params: ANIME_PARAMS, kind: "tv", genre: "anime", title: "anime" },
     { id: "sec-shows-pop", path: "/tv/popular", kind: "tv", genre: "series", title: "popularShows" },
     { id: "sec-shows-top", path: "/tv/top_rated", kind: "tv", genre: "series", title: "topShows" },
   ],
@@ -217,17 +217,30 @@ const RATINGS = {
   auto: { order: "", keys: null, count: 3 },
 };
 
-function ratingsMode() {
-  const stored = String(setting("tvRatings", "imdb")).trim().toLowerCase();
-  return Object.prototype.hasOwnProperty.call(RATINGS, stored) ? stored : "imdb";
+// The settings are split in two: one group for the poster and one for the backdrop. A poster is vertical
+// and a backdrop is 16:9, so what fits in one does not fit in the other — one setting for both meant
+// choosing notes for the poster and getting them on the backdrop too. The episode stills are 16:9 like a
+// backdrop, so they follow the backdrop's group (their position is fixed separately).
+function groupOf(kind) {
+  return kind === "poster" ? "poster" : "backdrop";
+}
+
+function groupSetting(kind, name, fallback) {
+  return setting(groupOf(kind) + name, fallback);
+}
+
+function ratingsMode(kind) {
+  const stored = String(groupSetting(kind, "Ratings", "imdbRtMc")).trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(RATINGS, stored) ? stored : "imdbrtmc";
 }
 
 // A poster is vertical and narrow: with three badges at the large sizes the server wraps them onto a
 // second line, right over the poster's own title. Measured against the live service at poster width,
 // three badges fit in ONE row only at "m"; two fit at "l" and at "xl"; one fits at any size. So the
 // chosen size is kept except for three badges on a poster, where it drops to "m" to stay on one line.
+// A backdrop is wide and needs no such care.
 function badgeSize(kind, chosen) {
-  if (kind === "poster" && RATINGS[ratingsMode()].count >= 3 && (chosen === "l" || chosen === "xl")) return "m";
+  if (kind === "poster" && RATINGS[ratingsMode(kind)].count >= 3 && (chosen === "l" || chosen === "xl")) return "m";
   return chosen;
 }
 
@@ -243,7 +256,7 @@ const POSITIONS = ["bc", "tc", "l", "r", "tl", "tr", "bl", "br"];
 const FIXED_POSITION = { poster: "bc", still: "tr" };
 
 function badgePosition() {
-  const stored = String(setting("tvBadgePosition", "auto")).trim().toLowerCase();
+  const stored = String(setting("backdropPosition", "auto")).trim().toLowerCase();
   return POSITIONS.indexOf(stored) === -1 ? "" : stored;
 }
 
@@ -252,8 +265,8 @@ function positionFor(kind) {
   return FIXED_POSITION[kind] || "";
 }
 
-function quality() {
-  const value = String(setting("tvBadgeSize", "sharp")).trim().toLowerCase();
+function quality(kind) {
+  const value = String(groupSetting(kind, "BadgeSize", "sharp")).trim().toLowerCase();
   return Object.prototype.hasOwnProperty.call(QUALITY, value) ? value : "sharp";
 }
 
@@ -266,21 +279,22 @@ function tuningWanted() {
 }
 
 // `mode`: "none" for a URL that only tests the server (no tuning at all), "force" for the probe of the
-// tuning itself, and "auto" for the real images. `kind` is which of the three images this is, because the
-// position of the badge is decided per image: only the backdrop is the person's to choose.
+// tuning itself, and "auto" for the real images. `kind` is which of the three images this is: the poster
+// and the backdrop each have their own settings, and only the backdrop's position is the person's to pick.
 function tuningQuery(mode, kind) {
   // fallback=true asks RPDB for the plain image when it cannot build the rated one. On the free server
   // it is accepted and ignored: it falls back to TMDB artwork instead of a 1x1 pixel placeholder.
   if (mode === "none" || !tuningWanted() || (mode !== "force" && tuningOff)) return "?fallback=true";
-  const q = QUALITY[quality()];
+  const q = QUALITY[quality(kind)];
   const parts = ["badge_size=" + badgeSize(kind, q.badge)];
-  if (q.size) parts.push("imageSize=" + q.size);
+  // imageSize only means something on a wide image; a poster is not scaled by it.
+  if (q.size && kind !== "poster") parts.push("imageSize=" + q.size);
   const position = positionFor(kind);
   if (position) parts.push("position=" + position);
   // Which notes, and how many. `ratings_order` alone only sorts and falls through to another source
   // (measured on Lanterns, where IMDb has a rating for episode 1 only), so the sources that are not
   // wanted are excluded outright — except in "automático", where the server picks.
-  const spec = RATINGS[ratingsMode()];
+  const spec = RATINGS[ratingsMode(kind)];
   if (spec.keys) {
     const exclude = RATING_KEYS.filter((k) => spec.keys.indexOf(k) === -1);
     parts.push("ratings_order=" + spec.order, "ratings_limit=" + spec.count);

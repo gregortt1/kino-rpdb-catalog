@@ -1,14 +1,14 @@
 {
   "id": "rpdb-catalog",
-  "name": "Catálogo con notas",
-  "version": "1.11.0",
+  "name": "OpenPoster",
+  "version": "1.12.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
   "discoverable": false,
-  "section": { "label": "Con notas" },
+  "section": { "label": "OpenPoster" },
   "theme": { "highlight": "#F5C518" },
-  "description": "Catálogo de TMDB (tendencias, mejor valoradas, en cines y búsqueda) con los pósters, los fondos y los fotogramas de capítulo con la nota incrustada, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la del servidor de imágenes es tuya y es opcional.",
+  "description": "Catálogo de TMDB (tendencias, mejor valoradas, en cines, anime, documentales y búsqueda) con los pósters, los fondos y los fotogramas de capítulo con la nota incrustada, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la del servidor de imágenes es tuya y es opcional.",
   "author": "gregorysteventt-source",
   "homepage": "https://github.com/gregorysteventt-source/kino-rpdb-catalog",
   "hosts": ["api.ratingposterdb.com", "openposterdb.com"],
@@ -17,10 +17,17 @@
   "icon": "icon.png",
   "settings": [
     {
+      "key": "servidor",
+      "label": "Servidor",
+      "type": "section",
+      "hint": "De aquí salen todas las imágenes con nota"
+    },
+    {
       "key": "service",
       "label": "Servidor de imágenes",
       "type": "select",
       "default": "openposterdb",
+      "hint": "OpenPosterDB es gratis y también sirve fondos y capítulos",
       "options": [
         { "value": "openposterdb", "label": "OpenPosterDB (gratis)" },
         { "value": "rpdb", "label": "RatingPosterDB" }
@@ -34,17 +41,16 @@
       "hint": "Viene puesta la clave pública gratuita de OpenPosterDB"
     },
     {
-      "key": "posterType",
-      "label": "Tipo de póster",
-      "type": "text",
-      "default": "poster-default",
-      "hint": "poster-default, poster-imdb-rated, poster-rt-rated…"
+      "key": "posterSec",
+      "label": "Póster (solo en la tele)",
+      "type": "section",
+      "hint": "Es vertical: la nota va abajo, centrada, y no se mueve"
     },
     {
-      "key": "tvRatings",
-      "label": "En la tele: qué notas",
+      "key": "posterRatings",
+      "label": "Qué notas",
       "type": "select",
-      "default": "imdb",
+      "default": "imdbRtMc",
       "hint": "Con tres notas se usa el tamaño mediano, el único que cabe en una fila",
       "options": [
         { "value": "imdb", "label": "Solo IMDb (estricto)" },
@@ -55,23 +61,62 @@
       ]
     },
     {
-      "key": "tvBadgeSize",
-      "label": "En la tele: tamaño",
+      "key": "posterBadgeSize",
+      "label": "Tamaño de la nota",
       "type": "select",
       "default": "sharp",
-      "hint": "Solo en la tele, no en el celular",
+      "hint": "Si son tres notas se encoge solo, para que quepan en una fila",
       "options": [
         { "value": "sharp", "label": "Grandes (recomendado)" },
-        { "value": "max", "label": "Muy grandes (imagen 4K, pesada)" },
-        { "value": "normal", "label": "Medianas (como al principio)" }
+        { "value": "max", "label": "Muy grandes" },
+        { "value": "normal", "label": "Medianas" }
       ]
     },
     {
-      "key": "tvBadgePosition",
-      "label": "En la tele: la nota del fondo",
+      "key": "posterType",
+      "label": "Tipo de póster",
+      "type": "text",
+      "default": "poster-default",
+      "hint": "poster-default; con RatingPosterDB, poster-imdb-rated…"
+    },
+    {
+      "key": "backdropSec",
+      "label": "Fondo y capítulos (solo en la tele)",
+      "type": "section",
+      "hint": "Son apaisados, y caben más notas que en un póster"
+    },
+    {
+      "key": "backdropRatings",
+      "label": "Qué notas",
+      "type": "select",
+      "default": "imdbRtMc",
+      "hint": "Pueden ser distintas de las del póster",
+      "options": [
+        { "value": "imdb", "label": "Solo IMDb (estricto)" },
+        { "value": "imdbRt", "label": "IMDb y Rotten Tomatoes" },
+        { "value": "imdbRtMc", "label": "IMDb, RT y Metacritic" },
+        { "value": "imdbFallback", "label": "IMDb y si no hay, TMDB" },
+        { "value": "auto", "label": "Automático (hasta 3)" }
+      ]
+    },
+    {
+      "key": "backdropBadgeSize",
+      "label": "Tamaño de la nota",
+      "type": "select",
+      "default": "sharp",
+      "hint": "Aquí no hace falta encoger: es ancho",
+      "options": [
+        { "value": "sharp", "label": "Grandes (recomendado)" },
+        { "value": "max", "label": "Muy grandes (imagen 4K, pesada)" },
+        { "value": "normal", "label": "Medianas" }
+      ]
+    },
+    {
+      "key": "backdropPosition",
+      "label": "Dónde va la nota",
       "type": "select",
       "default": "auto",
-      "hint": "Solo los fondos; el póster y los capítulos van fijos",
+      "hint": "Solo el fondo; el póster va abajo y el capítulo arriba",
       "options": [
         { "value": "auto", "label": "Como está (esquina arriba derecha)" },
         { "value": "bc", "label": "Abajo, centrada" },

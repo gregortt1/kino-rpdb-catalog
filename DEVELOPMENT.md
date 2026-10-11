@@ -104,6 +104,37 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### El nombre, el `genre` y los ajustes por imagen (1.12.0)
+
+**El nombre.** Pasa de «Catálogo con notas» a **OpenPoster**, a petición de quien lo usa. El **`id` no se
+toca** (`rpdb-catalog`): cambiarlo haría que Kino lo viera como otro plugin y se perderían los ajustes
+guardados y el consentimiento. El `name` es libre, el `id` no.
+
+**El `genre` de las filas.** La guía lo dice en una línea que es fácil pasar por alto: `genre` no es
+`peliculas`/`series`, es una **lista cerrada de diez** (`peliculas`, `series`, `anime`, `infantil`,
+`documentales`, `deportes`, `noticias`, `musica`, `entretenimiento`, `otros`) y **es lo que usa Kino para
+agrupar las filas de todas las fuentes**: la pestaña Categorías las junta por ahí, y el Inicio muestra esas
+categorías como chips. La fila de Anime iba marcada como `series` y la de Documentales como `peliculas`,
+así que existían pero **dentro de otra categoría**: de ahí que el Inicio solo enseñara Películas y Series.
+Corregido a `anime` y `documentales`. Sin `genre`, Kino lo adivina por el título de la fila.
+
+**Los ajustes, por tipo de imagen.** La 1.10.0 dejó una sola pareja de ajustes de notas y tamaño para las
+tres imágenes. Es el mismo error que ya se había corregido con la posición, y se corrige igual: `groupOf()`
+reparte los ajustes en dos grupos, `poster*` y `backdrop*`, y `groupSetting(kind, "Ratings", …)` lee el que
+toca. Los **capítulos van con el fondo** (los dos son 16:9), salvo su posición, que sigue fija.
+
+- `imageSize` solo se manda cuando la imagen no es un póster: en un póster no escala nada.
+- El valor por defecto pasa a ser **tres notas** (`imdbRtMc`) en los dos grupos, que es lo que se pedía y
+  lo que el tope de tamaño hace que quepa.
+- **Los ajustes viejos (`tvRatings`, `tvBadgeSize`, `tvBadgePosition`) quedan huérfanos**: Kino no borra lo
+  guardado, pero el plugin ya no los lee, así que vuelven a su valor de fábrica. Hay que volver a elegirlos
+  una vez.
+
+Y un fallo que cazó una prueba y que merece la pena recordar: el valor de reserva de `ratingsMode()` estaba
+escrito `"imdbRtMc"` (camelCase) mientras las claves de `RATINGS` son minúsculas (`imdbrtmc`), así que
+`RATINGS[valor]` era `undefined` y reventaba al leer `.count`. Las claves se normalizan con
+`toLowerCase()`, pero **las constantes escritas a mano no se normalizan solas**.
+
 ### Anime, Documentales y Próximamente (1.11.0)
 
 Tres filas más, en Inicio y una en cada pestaña de la sección. No son listas de TMDB: son `/discover`, así
