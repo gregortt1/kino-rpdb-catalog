@@ -75,11 +75,13 @@ servidor de imágenes, que se guarda cifrada en tu aparato y nunca sale de él.
 
 ## Configurarlo
 
-La configuración va en **cuatro tarjetas** —**Servidor**, **Póster**, **Fondo y capítulos** y
-**Diagnóstico**— y **ya viene puesta para funcionar**: no tienes que escribir nada.
+La configuración va en **cuatro bloques** —**Servidor**, **Póster**, **Fondo y capítulos** y
+**Diagnóstico**— y **ya viene puesta para funcionar**: no tienes que escribir nada. Solo verás una línea de
+ayuda bajo los campos donde de verdad aporta algo.
 
-> **Requiere Kino 0.9.55 o superior** (apiVersion 9): es la versión que sabe dibujar las tarjetas. En un
-> Kino anterior verías la misma lista de ajustes de siempre, en orden, sin las tarjetas.
+> Se probó a usar las **tarjetas** que Kino admite desde apiVersion 9 (con borde y explicación dentro), y
+> **en una tele se ven recargadas**: mucho marco para poca información. Se volvió a los encabezados, que
+> separan igual y pesan menos.
 
 **Servidor** — de dónde salen las imágenes:
 

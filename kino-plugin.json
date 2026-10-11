@@ -1,8 +1,8 @@
 {
   "id": "rpdb-catalog",
   "name": "OpenPoster",
-  "version": "1.15.0",
-  "apiVersion": 9,
+  "version": "1.16.0",
+  "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
   "discoverable": false,
@@ -18,11 +18,15 @@
   "icon": "icon.png",
   "settings": [
     {
+      "key": "servidor",
+      "label": "Servidor",
+      "type": "section"
+    },
+    {
       "key": "service",
       "label": "Servidor de imágenes",
       "type": "select",
       "default": "openposterdb",
-      "hint": "OpenPosterDB es gratis y también sirve fondos y capítulos",
       "options": [
         { "value": "openposterdb", "label": "OpenPosterDB (gratis)" },
         { "value": "rpdb", "label": "RatingPosterDB" }
@@ -33,14 +37,18 @@
       "label": "Clave del servidor",
       "type": "password",
       "default": "t0-free-rpdb",
-      "hint": "Viene puesta la clave pública gratuita de OpenPosterDB"
+      "hint": "La clave pública gratuita, ya puesta"
+    },
+    {
+      "key": "posterSec",
+      "label": "Póster (en la tele)",
+      "type": "section"
     },
     {
       "key": "posterRatings",
       "label": "Qué notas",
       "type": "select",
       "default": "imdbRtMc",
-      "hint": "Con tres notas se usa el tamaño mediano, el único que cabe en una fila",
       "options": [
         { "value": "imdb", "label": "Solo IMDb (estricto)" },
         { "value": "imdbRt", "label": "IMDb y Rotten Tomatoes" },
@@ -54,7 +62,7 @@
       "label": "Tamaño de la nota",
       "type": "select",
       "default": "sharp",
-      "hint": "Si son tres notas se encoge solo, para que quepan en una fila",
+      "hint": "Con tres notas se encoge solo",
       "options": [
         { "value": "sharp", "label": "Grandes (recomendado)" },
         { "value": "max", "label": "Muy grandes" },
@@ -65,15 +73,19 @@
       "key": "posterTextless",
       "label": "Póster sin el título",
       "type": "toggle",
-      "default": false,
-      "hint": "Quita el texto del arte; las notas se leen mucho mejor"
+      "default": false
     },
     {
       "key": "posterType",
       "label": "Tipo de póster",
       "type": "text",
       "default": "poster-default",
-      "hint": "poster-default; con RatingPosterDB, poster-imdb-rated…"
+      "hint": "poster-default; con RPDB, poster-imdb-rated"
+    },
+    {
+      "key": "backdropSec",
+      "label": "Fondo y capítulos (en la tele)",
+      "type": "section"
     },
     {
       "key": "backdropRatings",
@@ -95,7 +107,6 @@
       "label": "Tamaño de la nota",
       "type": "select",
       "default": "sharp",
-      "hint": "Cuanto más grandes, menos notas caben",
       "options": [
         { "value": "sharp", "label": "Grandes (recomendado)" },
         { "value": "max", "label": "Muy grandes (imagen 4K, pesada)" },
@@ -107,7 +118,7 @@
       "label": "Dónde va la nota",
       "type": "select",
       "default": "auto",
-      "hint": "Solo el fondo; el póster va abajo y el capítulo arriba",
+      "hint": "Solo el fondo",
       "options": [
         { "value": "auto", "label": "Como está (esquina arriba derecha)" },
         { "value": "bc", "label": "Abajo, centrada" },
@@ -121,6 +132,11 @@
       ]
     },
     {
+      "key": "diag",
+      "label": "Diagnóstico",
+      "type": "section"
+    },
+    {
       "key": "serverStatus",
       "label": "Qué funciona",
       "type": "status"
@@ -129,42 +145,6 @@
       "key": "testServer",
       "label": "Probar el servidor",
       "type": "action"
-    }
-  ],
-  "settingsLayout": [
-    {
-      "type": "card",
-      "title": "Servidor",
-      "children": [
-        { "type": "text", "text": "De aquí salen todas las imágenes con nota." },
-        { "type": "row", "children": [{ "setting": "service" }, { "setting": "key" }] }
-      ]
-    },
-    {
-      "type": "card",
-      "title": "Póster",
-      "children": [
-        { "type": "text", "text": "Es vertical: la nota va abajo, centrada, y no se mueve. Solo en la tele." },
-        { "type": "row", "children": [{ "setting": "posterRatings" }, { "setting": "posterBadgeSize" }] },
-        { "type": "row", "children": [{ "setting": "posterTextless" }, { "setting": "posterType" }] }
-      ]
-    },
-    {
-      "type": "card",
-      "title": "Fondo y capítulos",
-      "children": [
-        { "type": "text", "text": "Son apaisados y caben más notas. Solo en la tele." },
-        { "type": "row", "children": [{ "setting": "backdropRatings" }, { "setting": "backdropBadgeSize" }] },
-        { "setting": "backdropPosition" }
-      ]
-    },
-    {
-      "type": "card",
-      "title": "Diagnóstico",
-      "children": [
-        { "type": "text", "text": "Comprueba qué imágenes sirve tu servidor." },
-        { "type": "row", "children": [{ "setting": "serverStatus" }, { "setting": "testServer" }] }
-      ]
     }
   ]
 }

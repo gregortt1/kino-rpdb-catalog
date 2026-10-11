@@ -104,6 +104,39 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### Las tarjetas, probadas y descartadas (1.16.0)
+
+En la 1.15.0 subí a apiVersion 9 para usar `settingsLayout`: cuatro **tarjetas** con su explicación dentro y
+filas de dos ajustes en paralelo. La documentación las vende como *«la versión más rica»* del encabezado
+`section`, y sobre el papel era mejor.
+
+**En una tele de verdad, no.** Quien usa el plugin mandó una foto de su pantalla y el veredicto fue claro:
+*«me parece muy cargado»*. Mirando la foto, tenía razón, y se ve por qué:
+
+- Cada tarjeta suma **borde + título + una línea de explicación dentro + un separador**.
+- Las **filas de dos columnas** estrechan los campos: una opción larga como «Muy grandes (imagen 4K, pesada)»
+  se corta contra el borde de la tarjeta.
+- Y encima estaba el problema de fondo: **pistas de ayuda bajo casi todos los campos** (9 de 11), cada una
+  una línea de gris.
+
+Se volvió a los cuatro encabezados `section` —sin borde, sin explicación dentro— y **se recortaron las
+pistas a 5**, las que de verdad aportan: las que explican un comportamiento que no se deduce de la etiqueta
+(que con tres notas el tamaño se encoge solo, el formato del tipo de póster, que las notas del fondo pueden
+ser distintas, que la posición es solo del fondo, y que la clave ya viene puesta).
+
+Tres cosas que quedan de esta vuelta atrás:
+
+1. **`apiVersion` vuelve a 6.** Si no se usa la función que pide la 9, declararla solo sirve para rechazar
+   Kinos más viejos. La guía lo dice: *«declara el número más bajo que tenga lo que usas»*.
+2. **Hay un test que vigila el número de pistas** (`≤ 5`). La recarga visual se cuela poco a poco, una
+   línea de ayuda a la vez, y un tope escrito en una prueba es lo único que la frena.
+3. **La documentación describe capacidades, no lo que se ve bien en un salón.** Que algo exista y sea «la
+   versión rica» no lo hace mejor para quien lo mira desde el sofá. Es la segunda vez en este proyecto que
+   mirar el resultado de verdad cambia la decisión (la primera fue la tabla de notas del póster).
+
+El `contract.json` de apiVersion 9 se queda: valida un superconjunto, así que sirve igual para un manifiesto
+de apiVersion 6 y además entiende lo que vendrá.
+
 ### La documentación, espejada: `explore/docs.mjs` (1.15.0)
 
 **Un error de método, no de código.** Durante varias versiones fui leyendo la página que necesitaba en
