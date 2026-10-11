@@ -28,7 +28,7 @@ Piezas:
 
 | Pieza | Detalle |
 | --- | --- |
-| `home()` | 9 filas de TMDB (`/trending`, `/movie/top_rated`, `/tv/top_rated`, `/movie/now_playing`, `/tv/on_the_air`, `/movie/upcoming`, y tres `/discover`: anime, documentales). Una fila sin ítems no se devuelve. |
+| `home()` | 11 filas de TMDB. Las cuatro temáticas primero (anime, documentales, infantil, doramas) porque el tipo de un título lo decide la primera fila en que aparece, y después tendencias, mejor valoradas, en cines, al aire y próximos estrenos. Una fila sin ítems no se devuelve. |
 | `section({ tab })` | La sección propia: dos pestañas (Películas, Series) con sus filas y un destacado. Ver abajo. |
 | `categories()` | Los mosaicos de Categorías: doce géneros como listas `/discover`. Ver abajo. |
 | `browse(ref, cursor)` | Pagina una fila. El `ref` lleva `{ path, kind }` y solo se acepta una ruta de TMDB. |
@@ -103,6 +103,48 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
+
+### El Home por categorías: `genres` en cada ítem (1.14.0)
+
+**Esta sección corrige un error mío.** En la 1.13.0 afirmé, y quedó escrito en el README, que las
+categorías eran una lista cerrada de diez y que por eso «Populares» o «Mejor valoradas» no podían ser un
+chip. Era cierto **a medias**: leí la guía del repositorio de plugins y la página de la API, pero **no** la
+página [Home por categorías](https://kinotvapp.github.io/kino-plugins/categories/), que es donde está todo
+esto. Quien usa el plugin la señaló, y tenía razón. Lo que dice:
+
+- Kino tiene un **Home por categorías** (un experimento, apagado por defecto): una sola lista con **una
+  fila por categoría** y una tarjeta por título. Se arma **solo con lo que `home()` dejó guardado**.
+- **Las filas de género se llenan con los `genres` de cada ÍTEM** (`["accion", "drama"]`), no con el
+  `genre` de la fila. Un título con géneros **no** aparece en la fila genérica «Películas»; aparece en las
+  de género.
+- El vocabulario es **mucho más amplio** que los diez ids: hay géneros de vídeo (20), géneros de anime
+  (`shonen`, `isekai`, `mecha`, `escolar`, `slice-of-life`), tipos temáticos (`anime`, `doramas`,
+  `infantil`, `documentales`, `clasicos`, `deportes`, `noticias`), tipos de audio y géneros de audio.
+- **Desde la próxima versión** el `genre` de una fila acepta **cualquier** categoría (se canoniza a un
+  slug); un Kino anterior ignora lo que no estuviera en los diez.
+- El **tipo** de un título lo decide **la primera fila en que aparece**.
+
+Lo que se hizo con eso:
+
+- **`KINO_GENRE_BY_TMDB` + `genresOf()`**: los `genre_ids` de TMDB (que vienen en todas las listas) se
+  traducen a los ids de Kino y se ponen en `genres` de cada ítem. Varios ids de TMDB apuntan al mismo de
+  Kino (`10759` Action & Adventure → `accion`, `10766` Soap → `drama`), así que se deduplica, y Kino admite
+  cinco como mucho. Los ids de **tipo** no están en el mapa a propósito: Kino ignora un tipo dentro de
+  `genres`.
+- **Dos filas nuevas**: **Infantil** (`with_genres=16,10751`, animación Y familia) y **Doramas**
+  (`with_original_language=ko` + drama). Cada una con su `genre` de tipo, así que sus títulos aparecen en
+  esas filas completas.
+- **Las filas temáticas van PRIMERO en `home()`** (Anime, Documentales, Infantil, Doramas y después el
+  resto). Es lo que hace que un anime que también es tendencia se marque como anime y llegue a su fila.
+  En el Home por categorías el orden de las filas lo pone Kino, así que ahí no se pierde nada; en el Home
+  clásico solo cambia el orden.
+- **En la sección NO se reordenó.** La sección no alimenta el Home por categorías, y poner las temáticas
+  primero cambiaría el **destacado** (saldría un documental en vez de la película en tendencia). Cada cosa
+  en su sitio.
+
+De paso, los tests dejaron de depender del **índice** de la fila: buscaban `rows[0]`, y al reordenar se
+rompieron diez de golpe. Ahora hay `filmsRow(rows)` / `showsRow(rows)` / `film0(rows)` / `show0(rows)`, que
+buscan por id. Un índice es una posición; un id es un hecho.
 
 ### Pestañas, notas del fondo y póster sin texto (1.13.0)
 

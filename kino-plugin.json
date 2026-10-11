@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "OpenPoster",
-  "version": "1.13.0",
+  "version": "1.14.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,

@@ -47,6 +47,8 @@ const TEXT = {
     popularShows: "Series populares",
     anime: "Anime",
     documentaries: "Documentales",
+    kids: "Infantil",
+    doramas: "Doramas",
     movies: "Películas",
     shows: "Series",
     popMovies: "Películas populares",
@@ -75,6 +77,8 @@ const TEXT = {
     popularShows: "Popular shows",
     anime: "Anime",
     documentaries: "Documentaries",
+    kids: "Kids",
+    doramas: "Doramas",
     movies: "Movies",
     shows: "Shows",
     popMovies: "Popular movies",
@@ -99,17 +103,27 @@ const TEXT = {
 // `/discover` takes these as query parameters, so each row carries them and its "Ver más" keeps them.
 const ANIME_PARAMS = { with_genres: 16, with_original_language: "ja", sort_by: "popularity.desc" };
 const DOCS_PARAMS = { with_genres: 99, sort_by: "popularity.desc" };
+// 16 + 10751 with a comma is TMDB's AND: animation AND family, which is what "Infantil" means.
+const KIDS_PARAMS = { with_genres: "16,10751", sort_by: "popularity.desc" };
+const DORAMA_PARAMS = { with_genres: 18, with_original_language: "ko", sort_by: "popularity.desc" };
 
-// What each Home row asks TMDB for. Nine rows, nine calls: well inside the 40 calls per 10 s a plugin gets.
+// What each Home row asks TMDB for.
+//
+// THE ORDER MATTERS. In the "Home por categorías" the TYPE of a title (anime, infantil, documentales,
+// doramas…) is decided by the first row it appears in, so the themed rows go first: an anime that is also
+// trending would otherwise be typed as a plain movie and never reach the Anime row. In the classic Home
+// that only changes the order of the rows.
 const ROWS = [
+  { id: "rpdb-anime", path: "/discover/tv", params: ANIME_PARAMS, kind: "tv", genre: "anime", title: "anime" },
+  { id: "rpdb-docs", path: "/discover/movie", params: DOCS_PARAMS, kind: "movie", genre: "documentales", title: "documentaries" },
+  { id: "rpdb-kids", path: "/discover/movie", params: KIDS_PARAMS, kind: "movie", genre: "infantil", title: "kids" },
+  { id: "rpdb-doramas", path: "/discover/tv", params: DORAMA_PARAMS, kind: "tv", genre: "doramas", title: "doramas" },
   { id: "rpdb-trend-movies", path: "/trending/movie/week", kind: "movie", genre: "peliculas", title: "trendMovies" },
   { id: "rpdb-trend-shows", path: "/trending/tv/week", kind: "tv", genre: "series", title: "trendShows" },
   { id: "rpdb-top-movies", path: "/movie/top_rated", kind: "movie", genre: "peliculas", title: "topMovies" },
   { id: "rpdb-top-shows", path: "/tv/top_rated", kind: "tv", genre: "series", title: "topShows" },
   { id: "rpdb-cinema", path: "/movie/now_playing", kind: "movie", genre: "peliculas", title: "inCinemas" },
   { id: "rpdb-on-air", path: "/tv/on_the_air", kind: "tv", genre: "series", title: "onAir" },
-  { id: "rpdb-anime", path: "/discover/tv", params: ANIME_PARAMS, kind: "tv", genre: "anime", title: "anime" },
-  { id: "rpdb-docs", path: "/discover/movie", params: DOCS_PARAMS, kind: "movie", genre: "documentales", title: "documentaries" },
   { id: "rpdb-upcoming", path: "/movie/upcoming", kind: "movie", genre: "peliculas", title: "upcoming" },
 ];
 
@@ -146,12 +160,14 @@ const SECTION_ROWS = {
     { id: "sec-movies-cinema", path: "/movie/now_playing", kind: "movie", genre: "peliculas", title: "inCinemas" },
     { id: "sec-movies-soon", path: "/movie/upcoming", kind: "movie", genre: "peliculas", title: "upcoming" },
     { id: "sec-movies-docs", path: "/discover/movie", params: DOCS_PARAMS, kind: "movie", genre: "documentales", title: "documentaries" },
+    { id: "sec-movies-kids", path: "/discover/movie", params: KIDS_PARAMS, kind: "movie", genre: "infantil", title: "kids" },
     { id: "sec-movies-top", path: "/movie/top_rated", kind: "movie", genre: "peliculas", title: "topMovies" },
   ],
   series: [
     { id: "sec-shows-trend", path: "/trending/tv/week", kind: "tv", genre: "series", title: "trendShows" },
     { id: "sec-shows-air", path: "/tv/on_the_air", kind: "tv", genre: "series", title: "onAir" },
     { id: "sec-shows-anime", path: "/discover/tv", params: ANIME_PARAMS, kind: "tv", genre: "anime", title: "anime" },
+    { id: "sec-shows-doramas", path: "/discover/tv", params: DORAMA_PARAMS, kind: "tv", genre: "doramas", title: "doramas" },
     { id: "sec-shows-pop", path: "/tv/popular", kind: "tv", genre: "series", title: "popularShows" },
     { id: "sec-shows-top", path: "/tv/top_rated", kind: "tv", genre: "series", title: "topShows" },
   ],
@@ -538,6 +554,33 @@ function results(data) {
   return data && Array.isArray(data.results) ? data.results : [];
 }
 
+// TMDB genre ids -> the ids of Kino's own vocabulary ("Home por categorías"). Kino builds that Home out
+// of the `genres` of each ITEM: a title with genres shows up in the Acción / Comedia / Drama rows, and one
+// without them only in the generic "Películas" row. So this map is what puts our catalogue in the genre
+// rows at all. A few TMDB ids map to the same Kino id (Action & Adventure is `accion`, Soap is `drama`)
+// and the result is deduplicated; anything missing here is simply ignored by Kino.
+//
+// The ids of TYPE (anime, documentales, infantil…) are NOT here on purpose: Kino ignores a type in
+// `genres`, and a title takes its type from the `genre` of the row it first appears in.
+const KINO_GENRE_BY_TMDB = {
+  28: "accion", 12: "aventura", 16: "animacion", 35: "comedia", 80: "crimen",
+  18: "drama", 10751: "familia", 14: "fantasia", 36: "historia", 27: "terror",
+  10402: "musical", 9648: "misterio", 10749: "romance", 878: "ciencia-ficcion",
+  53: "suspenso", 10752: "belica", 37: "western", 10759: "accion",
+  10765: "ciencia-ficcion", 10764: "reality", 10766: "drama", 10767: "entretenimiento", 10768: "belica",
+};
+
+function genresOf(m) {
+  const ids = m && Array.isArray(m.genre_ids) ? m.genre_ids : [];
+  const out = [];
+  for (const id of ids) {
+    const kino = KINO_GENRE_BY_TMDB[Number(id)];
+    // Kino admits at most five, and the same Kino genre can arrive from two TMDB ids.
+    if (kino && out.indexOf(kino) === -1 && out.length < 5) out.push(kino);
+  }
+  return out;
+}
+
 function item(m, kind) {
   const isTv = kind === "tv";
   const title = String((isTv ? m.name : m.title) || m.original_title || m.original_name || "").slice(0, 200);
@@ -553,6 +596,8 @@ function item(m, kind) {
     ids: { tmdb: m.id },
   };
   if (/^\d{4}/.test(date)) out.year = date.slice(0, 4);
+  const genres = genresOf(m);
+  if (genres.length) out.genres = genres;
   // Worth a line in the log: it is the case where TMDB returned no image path, so if RPDB also has
   // nothing for this title the card stays empty and this line says which title it was.
   if (!m.poster_path && serverReady()) log("TMDB no trajo imagen para «" + title + "»: se le pide a RPDB igual");

@@ -15,36 +15,44 @@ Rotten Tomatoes, Metacritic, Trakt, Letterboxd…), gracias a
   Documentales…) que se abren como una lista paginada, con el arte de cada mosaico también con nota.
 - **Anime de verdad**: la fila de Anime pide animación **con idioma original japonés**, no cualquier
   dibujo animado — sin ese filtro entrarían también los dibujos occidentales.
-- **Filas en Inicio**: películas y series en tendencia, mejor valoradas, en cines, al aire, **Anime**,
-  **Documentales** y próximos estrenos, **sin repetir títulos entre filas** (las listas de TMDB se solapan,
-  y el mismo título salía varias veces en el mismo Inicio).
+- **Filas en Inicio**: **Anime**, **Documentales**, **Infantil** y **Doramas**, más películas y series en
+  tendencia, mejor valoradas, en cines, al aire y próximos estrenos, **sin repetir títulos entre filas**
+  (las listas de TMDB se solapan, y el mismo título salía varias veces en el mismo Inicio).
 - **Búsqueda propia**: busca en todo el catálogo de TMDB, con "Ver más" para seguir mirando.
 - **Fichas completas**: sinopsis, nota, año, temporadas y capítulos.
 - **Imágenes con nota**: el póster, el fondo y los fotogramas de capítulo.
-- **Sus categorías en el Inicio**: además de Películas y Series, sus filas aparecen también bajo **Anime**
-  y **Documentales**, en los mismos chips de categoría que las demás fuentes.
+- **Sus categorías en el Inicio**: sus títulos aparecen en las filas de categoría de Kino —**Anime**,
+  **Documentales**, **Infantil**, **Doramas** y todas las de género (Acción, Comedia, Drama, Terror,
+  Suspenso…)—, junto a los de tus otras fuentes.
 
-### Las categorías del Inicio
+### El Home por categorías
 
-Kino agrupa las filas de **todas** tus fuentes por categoría, y muestra esas categorías como chips en el
-Inicio y en la pestaña **Categorías**. Las filas de este plugin se marcan con la suya, así que aparecen
-donde les toca:
+Kino tiene un **Home por categorías** (se activa en *Ajustes ▸ App*): en vez de pestañas por tipo, es una
+sola lista con **una fila por categoría** —Acción, Comedia, Drama, Terror, Anime, Infantil…— y una tarjeta
+por título. Se arma **solo con lo que las filas del Inicio dejaron guardado**, así que lo que el plugin
+declare decide dónde cae cada cosa.
 
-| Fila | Categoría con la que se agrupa |
+Este plugin lo aprovecha al máximo:
+
+| Qué | Cómo |
 | --- | --- |
-| Películas en tendencia, mejor valoradas, en cines, próximos estrenos | **Películas** |
-| Series en tendencia, mejor valoradas, al aire | **Series** |
-| Anime | **Anime** |
-| Documentales | **Documentales** |
+| **Las filas de género se llenan** | Cada título lleva sus **géneros** (`Acción`, `Ciencia ficción`, `Drama`…), traducidos de TMDB a los nombres que Kino entiende. Sin esto, un título solo caería en la fila genérica «Películas» y **nunca** en Acción o Comedia. |
+| **Las categorías temáticas** | Las filas de **Anime**, **Documentales**, **Infantil** y **Doramas** van marcadas como tales, así que sus títulos aparecen en esas filas **completas** (con género o sin él). |
+| **Una tarjeta por título** | Cada ítem lleva su **id de TMDB** y su **año**, que es lo que Kino usa para juntar el mismo título cuando lo tienen varias fuentes y mostrar una sola tarjeta. |
 
-Antes las dos últimas se marcaban como Películas y Series, y por eso sus categorías **no aparecían**: la
-fila estaba, pero escondida dentro de otra categoría.
+**Por qué las filas temáticas van primero.** Kino decide el tipo de un título (anime, infantil,
+documentales, doramas…) por **la primera fila en que aparece**. Si *Tendencias* fuera antes que *Anime*, un
+anime que también es tendencia se quedaría como película y no llegaría nunca a la fila Anime. Por eso el
+plugin pone Anime, Documentales, Infantil y Doramas al principio: en el Home por categorías el orden de las
+filas lo pone Kino, así que no se pierde nada.
 
-**Hasta aquí llega lo que se puede hacer con los chips.** Kino tiene una lista **cerrada de diez**
-categorías (`peliculas`, `series`, `anime`, `infantil`, `documentales`, `deportes`, `noticias`, `musica`,
-`entretenimiento`, `otros`) y no admite inventar otras. Por eso "Tendencias de hoy", "Populares" o "Mejor
-valoradas" **no pueden ser un chip del Inicio**: están, en cambio, donde Kino sí deja organizarlos — en las
-**pestañas de su sección** y en los **mosaicos de Categorías**.
+> **Un aviso honesto.** Hasta hace poco el `genre` de una fila solo aceptaba **diez** categorías
+> (`peliculas`, `series`, `anime`, `infantil`, `documentales`, `deportes`, `noticias`, `musica`,
+> `entretenimiento`, `otros`), y **`Doramas` es nueva**: en un Kino anterior a esa versión, esa fila
+> simplemente no se agrupa (no se rompe nada). Las de género, en cambio, funcionan siempre, porque van por
+> los `genres` de cada título y ahí el vocabulario es mucho más amplio: Acción, Aventura, Animación,
+> Ciencia ficción, Comedia, Crimen, Drama, Familia, Fantasía, Historia, Misterio, Musical, Romance,
+> Suspenso, Terror, Bélica, Western, Reality, Biografía, Deportivo…
 
 Este plugin **no reproduce nada**. Es un catálogo para descubrir qué ver: cuando abres uno de sus
 títulos, Kino te ofrece **"Buscar dónde verlo"** y lo busca en tus otras fuentes.
