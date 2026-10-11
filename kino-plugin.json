@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "Catálogo con notas",
-  "version": "1.9.0",
+  "version": "1.11.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
@@ -45,11 +45,13 @@
       "label": "En la tele: qué notas",
       "type": "select",
       "default": "imdb",
-      "hint": "Solo en la tele, no en el celular",
+      "hint": "Con tres notas se usa el tamaño mediano, el único que cabe en una fila",
       "options": [
         { "value": "imdb", "label": "Solo IMDb (estricto)" },
-        { "value": "imdbFallback", "label": "IMDb y TMDB si no hay" },
-        { "value": "auto", "label": "Automático (varias notas)" }
+        { "value": "imdbRt", "label": "IMDb y Rotten Tomatoes" },
+        { "value": "imdbRtMc", "label": "IMDb, RT y Metacritic" },
+        { "value": "imdbFallback", "label": "IMDb y si no hay, TMDB" },
+        { "value": "auto", "label": "Automático (hasta 3)" }
       ]
     },
     {

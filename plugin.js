@@ -45,6 +45,8 @@ const TEXT = {
     onAir: "Series al aire",
     upcoming: "Próximos estrenos",
     popularShows: "Series populares",
+    anime: "Anime",
+    documentaries: "Documentales",
     movies: "Películas",
     shows: "Series",
     noSource: "Este catálogo no reproduce títulos: busca dónde verlo en tus otras fuentes.",
@@ -58,13 +60,21 @@ const TEXT = {
     onAir: "On the air",
     upcoming: "Coming soon",
     popularShows: "Popular shows",
+    anime: "Anime",
+    documentaries: "Documentaries",
     movies: "Movies",
     shows: "Shows",
     noSource: "This catalogue plays nothing: use it to find the title in your other sources.",
   },
 };
 
-// What each Home row asks TMDB for. Six rows, six calls: well inside the 40 calls per 10 s a plugin gets.
+// TMDB genre ids: 16 is Animation (for series and for films alike) and 99 is Documentary. The language
+// filter is what makes Anime actually anime: Animation on its own also brings every western cartoon.
+// `/discover` takes these as query parameters, so each row carries them and its "Ver más" keeps them.
+const ANIME_PARAMS = { with_genres: 16, with_original_language: "ja", sort_by: "popularity.desc" };
+const DOCS_PARAMS = { with_genres: 99, sort_by: "popularity.desc" };
+
+// What each Home row asks TMDB for. Nine rows, nine calls: well inside the 40 calls per 10 s a plugin gets.
 const ROWS = [
   { id: "rpdb-trend-movies", path: "/trending/movie/week", kind: "movie", genre: "peliculas", title: "trendMovies" },
   { id: "rpdb-trend-shows", path: "/trending/tv/week", kind: "tv", genre: "series", title: "trendShows" },
@@ -72,6 +82,9 @@ const ROWS = [
   { id: "rpdb-top-shows", path: "/tv/top_rated", kind: "tv", genre: "series", title: "topShows" },
   { id: "rpdb-cinema", path: "/movie/now_playing", kind: "movie", genre: "peliculas", title: "inCinemas" },
   { id: "rpdb-on-air", path: "/tv/on_the_air", kind: "tv", genre: "series", title: "onAir" },
+  { id: "rpdb-anime", path: "/discover/tv", params: ANIME_PARAMS, kind: "tv", genre: "series", title: "anime" },
+  { id: "rpdb-docs", path: "/discover/movie", params: DOCS_PARAMS, kind: "movie", genre: "peliculas", title: "documentaries" },
+  { id: "rpdb-upcoming", path: "/movie/upcoming", kind: "movie", genre: "peliculas", title: "upcoming" },
 ];
 
 // The plugin's own section: two tabs, each with its own rows. Same shape as a Home row, so the same
@@ -86,11 +99,13 @@ const SECTION_ROWS = {
     { id: "sec-movies-trend", path: "/trending/movie/week", kind: "movie", genre: "peliculas", title: "trendMovies" },
     { id: "sec-movies-cinema", path: "/movie/now_playing", kind: "movie", genre: "peliculas", title: "inCinemas" },
     { id: "sec-movies-soon", path: "/movie/upcoming", kind: "movie", genre: "peliculas", title: "upcoming" },
+    { id: "sec-movies-docs", path: "/discover/movie", params: DOCS_PARAMS, kind: "movie", genre: "peliculas", title: "documentaries" },
     { id: "sec-movies-top", path: "/movie/top_rated", kind: "movie", genre: "peliculas", title: "topMovies" },
   ],
   series: [
     { id: "sec-shows-trend", path: "/trending/tv/week", kind: "tv", genre: "series", title: "trendShows" },
     { id: "sec-shows-air", path: "/tv/on_the_air", kind: "tv", genre: "series", title: "onAir" },
+    { id: "sec-shows-anime", path: "/discover/tv", params: ANIME_PARAMS, kind: "tv", genre: "series", title: "anime" },
     { id: "sec-shows-pop", path: "/tv/popular", kind: "tv", genre: "series", title: "popularShows" },
     { id: "sec-shows-top", path: "/tv/top_rated", kind: "tv", genre: "series", title: "topShows" },
   ],
@@ -190,7 +205,31 @@ const QUALITY = {
 // where IMDb has a rating for episode 1 only). A key here that the server does NOT know makes it answer
 // 400 and the whole image is lost, which is why the list is probed before it is used.
 const RATING_KEYS = ["mal", "lb", "rt", "mc", "rta", "tmdb", "trakt", "mdblist", "ebert"];
-const IMDB_EXCLUDE = RATING_KEYS.join(",");
+
+// Which notes the person wants, and how many that is. `keys` is what is kept and the rest is excluded;
+// null means "do not restrict, take what the server has" (its own priority order, which starts with
+// MyAnimeList and Letterboxd — fine for anime, odd for everything else).
+const RATINGS = {
+  imdb: { order: "imdb", keys: ["imdb"], count: 1 },
+  imdbfallback: { order: "imdb,tmdb", keys: ["imdb", "tmdb"], count: 1 },
+  imdbrt: { order: "imdb,rt", keys: ["imdb", "rt"], count: 2 },
+  imdbrtmc: { order: "imdb,rt,mc", keys: ["imdb", "rt", "mc"], count: 3 },
+  auto: { order: "", keys: null, count: 3 },
+};
+
+function ratingsMode() {
+  const stored = String(setting("tvRatings", "imdb")).trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(RATINGS, stored) ? stored : "imdb";
+}
+
+// A poster is vertical and narrow: with three badges at the large sizes the server wraps them onto a
+// second line, right over the poster's own title. Measured against the live service at poster width,
+// three badges fit in ONE row only at "m"; two fit at "l" and at "xl"; one fits at any size. So the
+// chosen size is kept except for three badges on a poster, where it drops to "m" to stay on one line.
+function badgeSize(kind, chosen) {
+  if (kind === "poster" && RATINGS[ratingsMode()].count >= 3 && (chosen === "l" || chosen === "xl")) return "m";
+  return chosen;
+}
 
 let tuningOff = false;
 
@@ -234,20 +273,20 @@ function tuningQuery(mode, kind) {
   // it is accepted and ignored: it falls back to TMDB artwork instead of a 1x1 pixel placeholder.
   if (mode === "none" || !tuningWanted() || (mode !== "force" && tuningOff)) return "?fallback=true";
   const q = QUALITY[quality()];
-  const parts = ["badge_size=" + q.badge];
+  const parts = ["badge_size=" + badgeSize(kind, q.badge)];
   if (q.size) parts.push("imageSize=" + q.size);
   const position = positionFor(kind);
   if (position) parts.push("position=" + position);
-  // One rating, and strictly IMDb when asked: five stacked badges are unreadable on a card, and an
-  // episode that fell through to TMDB made the list look inconsistent. `ratings_order` alone only sorts
-  // (measured: it does fall through), so the strict mode also excludes every other source.
-  const stored = String(setting("tvRatings", "imdb")).trim().toLowerCase();
-  // Anything unrecognised falls back to the manifest's default, not to "no tuning at all".
-  const ratings = stored === "auto" || stored === "imdbfallback" ? stored : "imdb";
-  if (ratings === "imdb") {
-    parts.push("ratings_order=imdb", "ratings_limit=1", "ratings_exclude=" + IMDB_EXCLUDE);
-  } else if (ratings === "imdbfallback") {
-    parts.push("ratings_order=imdb,tmdb", "ratings_limit=1");
+  // Which notes, and how many. `ratings_order` alone only sorts and falls through to another source
+  // (measured on Lanterns, where IMDb has a rating for episode 1 only), so the sources that are not
+  // wanted are excluded outright — except in "automático", where the server picks.
+  const spec = RATINGS[ratingsMode()];
+  if (spec.keys) {
+    const exclude = RATING_KEYS.filter((k) => spec.keys.indexOf(k) === -1);
+    parts.push("ratings_order=" + spec.order, "ratings_limit=" + spec.count);
+    if (exclude.length) parts.push("ratings_exclude=" + exclude.join(","));
+  } else {
+    parts.push("ratings_limit=" + spec.count);
   }
   parts.push("fallback=true");
   return "?" + parts.join("&");

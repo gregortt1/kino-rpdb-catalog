@@ -9,11 +9,15 @@ Rotten Tomatoes, Metacritic, Trakt, Letterboxd…), gracias a
 ## Qué añade a Kino
 
 - **Su propia sección**: en la tele, una entrada en el menú lateral; en el celular, un chip arriba en
-  Inicio. Con dos pestañas, **Películas** y **Series**, un destacado y sus propias filas.
+  Inicio. Con dos pestañas, **Películas** y **Series**, un destacado y sus propias filas (cada pestaña con
+  su fila de **Documentales** y de **Anime**).
 - **Mosaicos en Categorías**: doce géneros (Acción, Comedia, Drama, Terror, Ciencia ficción, Animación,
   Documentales…) que se abren como una lista paginada, con el arte de cada mosaico también con nota.
-- **Filas en Inicio**: películas y series en tendencia, mejor valoradas, en cines y al aire, **sin repetir
-  títulos entre filas** (las listas de TMDB se solapan, y el mismo título salía varias veces en el mismo Inicio).
+- **Anime de verdad**: la fila de Anime pide animación **con idioma original japonés**, no cualquier
+  dibujo animado — sin ese filtro entrarían también los dibujos occidentales.
+- **Filas en Inicio**: películas y series en tendencia, mejor valoradas, en cines, al aire, **Anime**,
+  **Documentales** y próximos estrenos, **sin repetir títulos entre filas** (las listas de TMDB se solapan,
+  y el mismo título salía varias veces en el mismo Inicio).
 - **Búsqueda propia**: busca en todo el catálogo de TMDB, con "Ver más" para seguir mirando.
 - **Fichas completas**: sinopsis, nota, año, temporadas y capítulos.
 - **Imágenes con nota**: el póster, el fondo y los fotogramas de capítulo.
@@ -46,7 +50,7 @@ Hay **cinco ajustes**, y **ya vienen puestos para funcionar**: no tienes que esc
 | **Servidor de imágenes** | Una lista con dos: **OpenPosterDB (gratis)** y **RatingPosterDB**. Nada de escribir direcciones. |
 | **Clave del servidor** | Viene puesta `t0-free-rpdb`, la clave pública gratuita de OpenPosterDB. Cámbiala solo si usas otro servidor o sacas la tuya. |
 | **Tipo de póster** | `poster-default`, o el tipo con nota que incluya tu plan (por ejemplo `poster-imdb-rated`). |
-| **En la tele: qué notas** | `Solo IMDb (estricto)`, `IMDb y TMDB si no hay`, o `Automático (varias notas)`. |
+| **En la tele: qué notas** | `Solo IMDb (estricto)`, `IMDb y Rotten Tomatoes`, `IMDb, RT y Metacritic`, `IMDb y si no hay, TMDB` o `Automático (hasta 3)`. |
 | **En la tele: tamaño** | `Grandes` (recomendado), `Muy grandes (imagen 4K)` o `Medianas`. |
 | **En la tele: la nota del fondo** | Nueve sitios para el fondo: centrada abajo o arriba, a un lado, o en una esquina. |
 | **Diagnóstico** | Una línea con **qué está funcionando** y un botón **"Probar el servidor"**. |
@@ -77,6 +81,40 @@ Las opciones del fondo:
 
 Las esquinas quedan muy al borde, así que en una tarjeta pueden rozar el redondeo o el "Ver más". Las
 centradas son las más limpias.
+
+### Cuántas notas, y que quepan en una fila
+
+El póster es **vertical y estrecho**, así que las notas no caben de cualquier manera. Medido contra el
+servicio real, a ancho de póster:
+
+| | **1 nota** | **2 notas** | **3 notas** |
+| --- | --- | --- | --- |
+| **tamaño muy grande** | una fila | una fila | **se parte en dos** |
+| **tamaño grande** | una fila | una fila | **se parte en dos** |
+| **tamaño mediano** | una fila | una fila | **una fila** |
+
+Cuando se parten en dos, la segunda línea cae **encima del título del póster**, y eso es exactamente lo
+que se veía mal. Por eso el plugin **baja el tamaño a mediano cuando son tres notas**: es el único en el
+que las tres caben en una fila. Con una o dos notas se respeta el tamaño que hayas elegido.
+
+En el **fondo** no hace falta: es ancho, y las tres caben en una fila en tamaño grande.
+
+### Qué notas salen
+
+En *En la tele: qué notas* eliges **cuáles** y, de paso, **cuántas**:
+
+| Opción | Notas | Cuántas |
+| --- | --- | --- |
+| `Solo IMDb (estricto)` | IMDb | 1 |
+| `IMDb y Rotten Tomatoes` | IMDb, RT | 2 |
+| `IMDb, RT y Metacritic` | IMDb, RT, MC | 3 |
+| `IMDb y si no hay, TMDB` | IMDb o TMDB | 1 |
+| `Automático (hasta 3)` | Las que tenga el servidor | hasta 3 |
+
+Merece la pena saber por qué existe esta lista. El servidor tiene su **propio orden de prioridad**, que
+empieza por **MyAnimeList y Letterboxd**: en "automático" una película normal sale con IMDb, Letterboxd y
+Rotten Tomatoes — con la nota de Letterboxd sobre 5, que no pega con las demás. Eligiendo la opción, las
+notas son las que tú quieres y ninguna más.
 
 ### El diagnóstico: por qué no se ven las notas
 

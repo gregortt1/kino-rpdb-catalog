@@ -28,7 +28,7 @@ Piezas:
 
 | Pieza | Detalle |
 | --- | --- |
-| `home()` | 6 filas de TMDB (`/trending`, `/movie/top_rated`, `/tv/top_rated`, `/movie/now_playing`, `/tv/on_the_air`). Una fila sin ítems no se devuelve. |
+| `home()` | 9 filas de TMDB (`/trending`, `/movie/top_rated`, `/tv/top_rated`, `/movie/now_playing`, `/tv/on_the_air`, `/movie/upcoming`, y tres `/discover`: anime, documentales). Una fila sin ítems no se devuelve. |
 | `section({ tab })` | La sección propia: dos pestañas (Películas, Series) con sus filas y un destacado. Ver abajo. |
 | `categories()` | Los mosaicos de Categorías: doce géneros como listas `/discover`. Ver abajo. |
 | `browse(ref, cursor)` | Pagina una fila. El `ref` lleva `{ path, kind }` y solo se acepta una ruta de TMDB. |
@@ -103,6 +103,55 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
+
+### Anime, Documentales y Próximamente (1.11.0)
+
+Tres filas más, en Inicio y una en cada pestaña de la sección. No son listas de TMDB: son `/discover`, así
+que van con parámetros y el `ref` de la fila tiene que llevarlos para que su "Ver más" pida lo mismo.
+
+- **Anime** = `with_genres=16&with_original_language=ja`. El filtro de idioma **no es opcional**: sin él,
+  "Animation" trae también todos los dibujos occidentales, que no es lo que nadie espera de una fila
+  llamada Anime.
+- **Documentales** = `with_genres=99`, que sirve igual para películas y para series.
+- **Próximamente** = `/movie/upcoming`, que la sección ya usaba.
+
+`ANIME_PARAMS` y `DOCS_PARAMS` están declarados **antes** de `ROWS` a propósito: los `const` se evalúan en
+orden y usarlos desde `ROWS` antes de declararlos sería un error de zona muerta temporal, no un aviso.
+
+El fixture de las pruebas tuvo que **aprender a responder según los parámetros**: `/discover/movie` tiene
+que devolver documentales cuando se pide el género 99, y otra cosa cuando lo pide un mosaico de categoría.
+El doble de `kino.tmdb` acepta ahora una función por ruta, y sin eso las dos filas no se podrían comprobar
+por separado (ambas caerían en el mismo resultado y la deduplicación se llevaría una).
+
+### Que las notas quepan en una fila (1.10.0)
+
+Reportado con una foto de la tele: en los pósters las notas aparecían **una encima de otra**. Medido contra
+el servicio real, la causa no era el apilado sino el **ancho**:
+
+| | 1 nota | 2 notas | 3 notas |
+| --- | --- | --- | --- |
+| `badge_size=xl` | una fila | una fila | **2 + 1** |
+| `badge_size=l` | una fila | una fila | **2 + 1** |
+| `badge_size=m` | una fila | una fila | **una fila** |
+
+Con tres notas a `l` o `xl` el servidor las envuelve: dos en una línea y la tercera debajo, justo **encima
+del título del póster**. A `m` caben las tres en una sola línea. De ahí `badgeSize(kind, chosen)`: mantiene
+el tamaño elegido y solo lo baja a `m` cuando son tres notas **y** la imagen es un póster. En el fondo, que
+es ancho, las tres caben a `l` sin tocar nada.
+
+Dos cosas más que se midieron y evitaron una solución equivocada:
+
+- **`badge_direction` no era el problema.** `d` y `h` devuelven el **mismo archivo** (la disposición por
+  defecto ya es horizontal); solo `v` cambia. Si se hubiera dado por hecho que "se apilan en columna", se
+  habría añadido un parámetro que no arregla nada.
+- **`split=true` no sirve aquí.** Con 3 notas reparte una arriba y dos abajo (queda bien), pero **con 2 las
+  separa**: una arriba y otra abajo. Descartado.
+
+Y de paso se rehizo la lista de notas. El orden propio del servidor empieza por **MyAnimeList y
+Letterboxd**, así que en "automático" una película corriente salía con IMDb, Letterboxd (sobre 5) y RT:
+mezcla rara. `RATINGS` declara ahora, por opción, el orden, las claves que se conservan y cuántas son; el
+`ratings_exclude` se **calcula** como el resto de `RATING_KEYS`, en vez de estar escrito a mano, y solo se
+manda si queda algo (una lista vacía podría ser un 400 y tumbar la imagen entera).
 
 ### La posición es por imagen, y no se repiten títulos (1.9.0)
 
