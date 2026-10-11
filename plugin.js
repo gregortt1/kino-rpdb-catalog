@@ -49,6 +49,19 @@ const TEXT = {
     documentaries: "Documentales",
     movies: "Películas",
     shows: "Series",
+    popMovies: "Películas populares",
+    popShows: "Series populares",
+    todayMovies: "Películas en tendencia hoy",
+    todayShows: "Series en tendencia hoy",
+    action: "Acción",
+    comedy: "Comedia",
+    horror: "Terror",
+    scifi: "Ciencia ficción",
+    animation: "Animación",
+    today: "Tendencias de hoy",
+    popular: "Populares",
+    topRated: "Mejor valoradas",
+    genres: "Géneros",
     noSource: "Este catálogo no reproduce títulos: busca dónde verlo en tus otras fuentes.",
   },
   en: {
@@ -64,6 +77,19 @@ const TEXT = {
     documentaries: "Documentaries",
     movies: "Movies",
     shows: "Shows",
+    popMovies: "Popular movies",
+    popShows: "Popular shows",
+    todayMovies: "Trending movies today",
+    todayShows: "Trending shows today",
+    action: "Action",
+    comedy: "Comedy",
+    horror: "Horror",
+    scifi: "Science fiction",
+    animation: "Animation",
+    today: "Trending today",
+    popular: "Popular",
+    topRated: "Top rated",
+    genres: "Genres",
     noSource: "This catalogue plays nothing: use it to find the title in your other sources.",
   },
 };
@@ -87,12 +113,32 @@ const ROWS = [
   { id: "rpdb-upcoming", path: "/movie/upcoming", kind: "movie", genre: "peliculas", title: "upcoming" },
 ];
 
-// The plugin's own section: two tabs, each with its own rows. Same shape as a Home row, so the same
+// The plugin's own section: six tabs, each with its own rows. Same shape as a Home row, so the same
 // builder is used for both.
+//
+// Two of them split by what the title IS (Películas, Series) and four by what the list IS (Tendencias de
+// hoy, Populares, Mejor valoradas, Géneros). Kino's Home only shows the ten fixed category chips
+// (`peliculas`, `series`, `anime`…), so "Populares" or "Mejor valoradas" can never be a chip there: this
+// is the place for them, and Kino allows up to 8 tabs.
 const SECTION_TABS = [
   { id: "pelis", label: "movies" },
   { id: "series", label: "shows" },
+  { id: "hoy", label: "today" },
+  { id: "populares", label: "popular" },
+  { id: "mejor", label: "topRated" },
+  { id: "generos", label: "genres" },
 ];
+
+// The genre rows of the last tab. TMDB film genre ids: 28 Action, 35 Comedy, 27 Horror, 878 Science
+// Fiction, 16 Animation, 99 Documentary.
+const GENRE_ROWS = [
+  { id: "sec-gen-action", params: { with_genres: 28, sort_by: "popularity.desc" }, title: "action" },
+  { id: "sec-gen-comedy", params: { with_genres: 35, sort_by: "popularity.desc" }, title: "comedy" },
+  { id: "sec-gen-horror", params: { with_genres: 27, sort_by: "popularity.desc" }, title: "horror" },
+  { id: "sec-gen-scifi", params: { with_genres: 878, sort_by: "popularity.desc" }, title: "scifi" },
+  { id: "sec-gen-animation", params: { with_genres: 16, sort_by: "popularity.desc" }, title: "animation" },
+  { id: "sec-gen-docs", params: DOCS_PARAMS, title: "documentaries" },
+].map((row) => Object.assign({ path: "/discover/movie", kind: "movie", genre: "peliculas" }, row));
 
 const SECTION_ROWS = {
   pelis: [
@@ -109,6 +155,20 @@ const SECTION_ROWS = {
     { id: "sec-shows-pop", path: "/tv/popular", kind: "tv", genre: "series", title: "popularShows" },
     { id: "sec-shows-top", path: "/tv/top_rated", kind: "tv", genre: "series", title: "topShows" },
   ],
+  hoy: [
+    { id: "sec-today-movies", path: "/trending/movie/day", kind: "movie", genre: "peliculas", title: "todayMovies" },
+    { id: "sec-today-shows", path: "/trending/tv/day", kind: "tv", genre: "series", title: "todayShows" },
+  ],
+  populares: [
+    { id: "sec-pop-movies", path: "/movie/popular", kind: "movie", genre: "peliculas", title: "popMovies" },
+    { id: "sec-pop-shows", path: "/tv/popular", kind: "tv", genre: "series", title: "popShows" },
+    { id: "sec-pop-air", path: "/tv/on_the_air", kind: "tv", genre: "series", title: "onAir" },
+  ],
+  mejor: [
+    { id: "sec-top-movies", path: "/movie/top_rated", kind: "movie", genre: "peliculas", title: "topMovies" },
+    { id: "sec-top-shows", path: "/tv/top_rated", kind: "tv", genre: "series", title: "topShows" },
+  ],
+  generos: GENRE_ROWS,
 };
 
 // The tiles of Kino's Categorías tab. TMDB's genre ids are stable and well known; the ones used here are
@@ -129,6 +189,17 @@ const GENRE_TILES = [
   { id: "documental", label: "Documentales", kind: "movie", genre: 99 },
 ];
 
+// The tiles that are not a genre but a KIND of list. In the Inicio they cannot be category chips — Kino
+// only knows ten fixed ones — so this is where "Tendencias de hoy", "Más populares" and "Mejor valoradas"
+// can live as something the person browses. `path` + `params`, and the artwork comes from the first title.
+const LIST_TILES = [
+  { id: "lista-hoy", label: "Tendencias de hoy", kind: "movie", path: "/trending/movie/day" },
+  { id: "lista-populares", label: "Más populares", kind: "movie", path: "/movie/popular" },
+  { id: "lista-mejor", label: "Mejor valoradas", kind: "movie", path: "/movie/top_rated" },
+  { id: "lista-anime", label: "Anime", kind: "tv", path: "/discover/tv", params: ANIME_PARAMS },
+  { id: "lista-docs", label: "Documentales", kind: "movie", path: "/discover/movie", params: DOCS_PARAMS },
+];
+
 // kino.log must never break the answer it reports on.
 function log(...args) {
   try {
@@ -145,6 +216,13 @@ function setting(name, fallback) {
   } catch {
     return fallback;
   }
+}
+
+// Kino hands a `toggle` back as a real boolean, but a value can arrive from anywhere: only an explicit
+// true (or the text "true") turns something on. Anything else — including a missing setting — is off.
+function isOn(name) {
+  const value = setting(name, false);
+  return value === true || value === "true";
 }
 
 function appLang() {
@@ -214,6 +292,10 @@ const RATINGS = {
   imdbfallback: { order: "imdb,tmdb", keys: ["imdb", "tmdb"], count: 1 },
   imdbrt: { order: "imdb,rt", keys: ["imdb", "rt"], count: 2 },
   imdbrtmc: { order: "imdb,rt,mc", keys: ["imdb", "rt", "mc"], count: 3 },
+  // "Todas las que haya", solo para fondos: medido contra el servicio, un fondo de 1920 px encaja ocho
+  // notas en una fila sin solaparse (a partir de ahí el servidor no da más). En un póster no se ofrece
+  // porque ocho notas verticales se envuelven y tapan el título: ahí el máximo legible es tres.
+  all: { order: "", keys: null, count: 8 },
   auto: { order: "", keys: null, count: 3 },
 };
 
@@ -289,6 +371,11 @@ function tuningQuery(mode, kind) {
   const parts = ["badge_size=" + badgeSize(kind, q.badge)];
   // imageSize only means something on a wide image; a poster is not scaled by it.
   if (q.size && kind !== "poster") parts.push("imageSize=" + q.size);
+  // The textless artwork. It matters because the badge row sits at the bottom, right where the poster
+  // prints its own title: without the text, the notes stop fighting with it. Verified against the live
+  // service (a documented boolean): when there is no textless version it serves the normal one, so it is
+  // safe to ask for. Only posters, where the clash happens.
+  if (kind === "poster" && isOn("posterTextless")) parts.push("textless=true");
   const position = positionFor(kind);
   if (position) parts.push("position=" + position);
   // Which notes, and how many. `ratings_order` alone only sorts and falls through to another source
@@ -599,29 +686,32 @@ export async function section(args) {
 
 // The tiles of Kino's Categorías tab. Each one is a `/discover` list, and its artwork is the poster of
 // the most popular title of that list, so the tile carries a note too.
+//
+// Both lists are flattened into one shape first: a tile is a path, some parameters and a kind of title,
+// and the only thing the artwork needs is the first result of its own list.
 export async function categories() {
   try {
     await ensureProbe();
     await ensureTuningProbe();
     await ensureBackdropProbe();
-    const pages = await Promise.all(
-      GENRE_TILES.map((tile) =>
-        tmdb(tile.path || (tile.kind === "tv" ? "/discover/tv" : "/discover/movie"), {
-          with_genres: tile.genre,
-          sort_by: "popularity.desc",
-        }).catch(() => null)
-      )
-    );
-    const tiles = [];
-    GENRE_TILES.forEach((tile, i) => {
-      const params = { with_genres: tile.genre, sort_by: "popularity.desc" };
-      const path = tile.kind === "tv" ? "/discover/tv" : "/discover/movie";
-      const first = results(pages[i])[0];
-      const tileArt = first ? art(first, "poster", tile.kind) : undefined;
-      const out = {
+    const specs = LIST_TILES.concat(
+      GENRE_TILES.map((tile) => ({
         id: tile.id,
-        title: String(tile.label).slice(0, 40),
-        ref: JSON.stringify({ path, kind: tile.kind, params, list: true }),
+        label: tile.label,
+        kind: tile.kind,
+        path: tile.kind === "tv" ? "/discover/tv" : "/discover/movie",
+        params: { with_genres: tile.genre, sort_by: "popularity.desc" },
+      }))
+    );
+    const pages = await Promise.all(specs.map((spec) => tmdb(spec.path, spec.params).catch(() => null)));
+    const tiles = [];
+    specs.forEach((spec, i) => {
+      const first = results(pages[i])[0];
+      const tileArt = first ? art(first, "poster", spec.kind) : undefined;
+      const out = {
+        id: spec.id,
+        title: String(spec.label).slice(0, 40),
+        ref: JSON.stringify({ path: spec.path, kind: spec.kind, params: spec.params, list: true }),
       };
       if (tileArt) out.art = tileArt;
       tiles.push(out);

@@ -9,8 +9,8 @@ Rotten Tomatoes, Metacritic, Trakt, Letterboxd…), gracias a
 ## Qué añade a Kino
 
 - **Su propia sección**: en la tele, una entrada en el menú lateral; en el celular, un chip arriba en
-  Inicio. Con dos pestañas, **Películas** y **Series**, un destacado y sus propias filas (cada pestaña con
-  su fila de **Documentales** y de **Anime**).
+  Inicio. Con **seis pestañas**: *Películas*, *Series*, *Tendencias de hoy*, *Populares*, *Mejor valoradas*
+  y *Géneros*, cada una con sus filas y un destacado.
 - **Mosaicos en Categorías**: doce géneros (Acción, Comedia, Drama, Terror, Ciencia ficción, Animación,
   Documentales…) que se abren como una lista paginada, con el arte de cada mosaico también con nota.
 - **Anime de verdad**: la fila de Anime pide animación **con idioma original japonés**, no cualquier
@@ -38,7 +38,13 @@ donde les toca:
 | Documentales | **Documentales** |
 
 Antes las dos últimas se marcaban como Películas y Series, y por eso sus categorías **no aparecían**: la
-fila estaba, pero escondida dentro de otra categoría. Es un detalle pequeño con un efecto grande.
+fila estaba, pero escondida dentro de otra categoría.
+
+**Hasta aquí llega lo que se puede hacer con los chips.** Kino tiene una lista **cerrada de diez**
+categorías (`peliculas`, `series`, `anime`, `infantil`, `documentales`, `deportes`, `noticias`, `musica`,
+`entretenimiento`, `otros`) y no admite inventar otras. Por eso "Tendencias de hoy", "Populares" o "Mejor
+valoradas" **no pueden ser un chip del Inicio**: están, en cambio, donde Kino sí deja organizarlos — en las
+**pestañas de su sección** y en los **mosaicos de Categorías**.
 
 Este plugin **no reproduce nada**. Es un catálogo para descubrir qué ver: cuando abres uno de sus
 títulos, Kino te ofrece **"Buscar dónde verlo"** y lo busca en tus otras fuentes.
@@ -64,6 +70,11 @@ servidor de imágenes, que se guarda cifrada en tu aparato y nunca sale de él.
 La configuración está en **cuatro bloques**, y **ya viene puesta para funcionar**: no tienes que escribir
 nada.
 
+> **¿Por qué bloques y no pestañas?** Porque Kino no las admite: los tipos de ajuste que acepta son
+> campos, interruptores, listas, encabezados (`section`), líneas de estado y botones — y **no hay un tipo
+> de pestañas**. El encabezado es la única forma de agrupar, así que se usa a fondo: los cuatro bloques
+> son lo más cerca que se puede estar de unas pestañas.
+
 **Servidor** — de dónde salen las imágenes:
 
 | Ajuste | Qué hace |
@@ -83,11 +94,24 @@ nada.
 
 | Ajuste | Qué hace |
 | --- | --- |
-| **Qué notas** | Las mismas opciones, y **pueden ser distintas de las del póster**. |
+| **Qué notas** | Las mismas opciones, y **pueden ser distintas de las del póster**. Incluye `Todas las que haya (hasta 8)`. |
 | **Tamaño de la nota** | `Grandes` (recomendado), `Muy grandes (imagen 4K, pesada)` o `Medianas`. |
 | **Dónde va la nota** | Nueve sitios: centrada abajo o arriba, a un lado, o en una esquina. |
 
 **Diagnóstico** — una línea con **qué está funcionando** y un botón **"Probar el servidor"**.
+
+### Todas las notas en el fondo
+
+El fondo es apaisado y **aguanta muchas más notas que un póster**: medido contra el servicio, caben
+**ocho en una sola fila** sin solaparse (a partir de ahí el servidor no da más). Por eso la opción
+`Todas las que haya (hasta 8)` **solo está en el bloque del fondo**: en un póster vertical ocho notas se
+envuelven y acaban tapando el título.
+
+Y el póster tiene la opción que faltaba: **`Póster sin el título`**. Quita el texto del arte, y como las
+notas van justo abajo, **dejan de pelearse con el título impreso**. Viene **apagado**, porque cambia el
+arte de todos los pósters (y a veces el servidor tiene una versión sin texto que es otra imagen, no la
+misma sin letras). Pruébalo: es la diferencia entre tres notas encima de "GAME OF THRONES" y las mismas
+tres sobre el arte limpio.
 
 ### Por qué el póster y el fondo van por separado
 

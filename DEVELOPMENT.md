@@ -104,6 +104,42 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### Pestañas, notas del fondo y póster sin texto (1.13.0)
+
+Tres peticiones, y una de ellas se contestó con un "no" documentado.
+
+**Pestañas en el formulario: no existen.** La documentación actual de la API lista los tipos de ajuste
+—`text`, `url`, `password`, `select`, `toggle`, `list`, `section`, `status`, `action`— y no hay ninguno de
+pestañas: dentro del formulario, `section` (un encabezado con su explicación) es lo único que agrupa. Un
+plugin recibe **su propia pestaña en Ajustes** para todo el formulario, pero no puede partirla. Así que la
+respuesta es no, y los cuatro `section` son el límite de lo que se puede hacer. Dato útil que salió en la
+misma lectura: un `select` **sin** `default` vale su primera opción (nunca queda vacío), así que poner
+`default` explícito siempre es lo correcto.
+
+**Chips del Inicio: son diez y no se inventan.** `genre` es una lista cerrada (`peliculas`, `series`,
+`anime`, `infantil`, `documentales`, `deportes`, `noticias`, `musica`, `entretenimiento`, `otros`), así que
+"Tendencias de hoy", "Populares" o "Mejor valoradas" **no pueden ser un chip**. Donde sí caben es en las
+**pestañas de la sección** (Kino admite hasta 8) y en los **mosaicos de `categories()`** (hasta 24). De ahí
+la 1.13.0: la sección pasa a seis pestañas —dos por lo que el título ES y cuatro por lo que la lista ES— y
+`categories()` gana cinco mosaicos de lista delante de los doce de género.
+
+**"Todas las notas" y el póster sin texto**, los dos medidos antes de ofrecerlos:
+
+- Los fondos aceptan mucho más de tres: con `ratings_limit=8` el servidor devuelve ocho notas **en una
+  sola fila** y sin solaparse (más allá de ocho no da más: `ratings_limit=10` devuelve el mismo archivo
+  que 8). Por eso `RATINGS.all` (ocho, sin exclusiones) se ofrece **solo en el grupo del fondo**: en un
+  póster ocho notas se envuelven sobre el título.
+- `textless=true` sí cambia la imagen (comprobado en dos títulos, con archivos de bytes distintos) y es un
+  booleano documentado que el servidor acepta, así que **no necesita sonda**: cuando no hay versión sin
+  texto sirve la normal. Va como `toggle` apagado por defecto y **solo en el póster**, que es donde la
+  fila de notas choca con el título impreso.
+
+**Un detalle de `kino.tmdb` que conviene tener anotado**: máximo **40 llamadas cada 10 s** por plugin, en
+un balde de fichas, y **sin límite de llamadas simultáneas** (el de 6 en vuelo es de `kino.fetch`, no de
+`kino.tmdb`). Además cachea 10 minutos en memoria por ruta y parámetros. Por eso las 17 llamadas de
+`categories()` o las 9 del Inicio en paralelo están bien; aun así, iremos con cuidado si algún día se
+suman muchas más.
+
 ### El nombre, el `genre` y los ajustes por imagen (1.12.0)
 
 **El nombre.** Pasa de «Catálogo con notas» a **OpenPoster**, a petición de quien lo usa. El **`id` no se

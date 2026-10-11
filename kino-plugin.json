@@ -1,14 +1,14 @@
 {
   "id": "rpdb-catalog",
   "name": "OpenPoster",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
   "discoverable": false,
   "section": { "label": "OpenPoster" },
   "theme": { "highlight": "#F5C518" },
-  "description": "Catálogo de TMDB (tendencias, mejor valoradas, en cines, anime, documentales y búsqueda) con los pósters, los fondos y los fotogramas de capítulo con la nota incrustada, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la del servidor de imágenes es tuya y es opcional.",
+  "description": "Catálogo de TMDB (tendencias, populares, mejor valoradas, anime, documentales, géneros y búsqueda) con los pósters, los fondos y los fotogramas de capítulo con la nota incrustada, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la del servidor de imágenes es tuya y es opcional.",
   "author": "gregorysteventt-source",
   "homepage": "https://github.com/gregorysteventt-source/kino-rpdb-catalog",
   "hosts": ["api.ratingposterdb.com", "openposterdb.com"],
@@ -42,7 +42,7 @@
     },
     {
       "key": "posterSec",
-      "label": "Póster (solo en la tele)",
+      "label": "Póster (en la tele)",
       "type": "section",
       "hint": "Es vertical: la nota va abajo, centrada, y no se mueve"
     },
@@ -73,6 +73,13 @@
       ]
     },
     {
+      "key": "posterTextless",
+      "label": "Póster sin el título",
+      "type": "toggle",
+      "default": false,
+      "hint": "Quita el texto del arte; las notas se leen mucho mejor"
+    },
+    {
       "key": "posterType",
       "label": "Tipo de póster",
       "type": "text",
@@ -81,7 +88,7 @@
     },
     {
       "key": "backdropSec",
-      "label": "Fondo y capítulos (solo en la tele)",
+      "label": "Fondo y capítulos (en la tele)",
       "type": "section",
       "hint": "Son apaisados, y caben más notas que en un póster"
     },
@@ -95,6 +102,7 @@
         { "value": "imdb", "label": "Solo IMDb (estricto)" },
         { "value": "imdbRt", "label": "IMDb y Rotten Tomatoes" },
         { "value": "imdbRtMc", "label": "IMDb, RT y Metacritic" },
+        { "value": "all", "label": "Todas las que haya (hasta 8)" },
         { "value": "imdbFallback", "label": "IMDb y si no hay, TMDB" },
         { "value": "auto", "label": "Automático (hasta 3)" }
       ]
@@ -104,7 +112,7 @@
       "label": "Tamaño de la nota",
       "type": "select",
       "default": "sharp",
-      "hint": "Aquí no hace falta encoger: es ancho",
+      "hint": "Cuanto más grandes, menos notas caben",
       "options": [
         { "value": "sharp", "label": "Grandes (recomendado)" },
         { "value": "max", "label": "Muy grandes (imagen 4K, pesada)" },
