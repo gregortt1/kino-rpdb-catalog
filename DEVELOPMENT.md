@@ -104,6 +104,38 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### Las tildes en el celular: escapes `\uXXXX` (1.18.0)
+
+Reportado desde el celular: *«las palabras con tilde y con la letra ñ no se ven bien»* — `TamaÃ±o`,
+`imÃ¡genes`, `PÃ³ster`. Es el mojibake clásico de **UTF-8 leído como Latin-1**, y la investigación descartó
+todo lo que se podía descartar:
+
+| Comprobación | Resultado |
+| --- | --- |
+| Cabecera que manda GitHub | `text/plain; charset=utf-8` ✓ (también pidiendo `Accept: application/json`) |
+| Archivo publicado vs. local | **byte a byte idénticos**; 24 secuencias UTF-8 correctas en el manifiesto |
+| La tele | los mismos textos se ven **perfectos** |
+| El celular | `imÃ¡genes` |
+
+O sea: **los archivos están bien y el servidor declara la codificación**; es la app en Android la que la
+ignora y decodifica como Latin-1. Eso no se puede arreglar desde un plugin, pero **sí se puede hacer que la
+codificación deje de importar**: si el carácter va como `\u00f3` en lugar del byte literal, lo produce el
+escape y no el archivo, así que da igual cómo se adivine la codificación. Un `\uXXXX` es JSON válido y
+JavaScript válido.
+
+- `explore/escape-unicode.mjs` lo hace por los dos archivos publicados. **En `plugin.js` escapa solo dentro
+  de literales de cadena**, con una máquina de estados que respeta `//`, `/* */`, `'`, `"` y las secuencias
+  ya escapadas: los comentarios se quedan legibles con sus tildes.
+- El **README y este archivo conservan las tildes a propósito**: los lee GitHub en UTF-8 y nadie más. Lo que
+  se escapa es lo que Kino descarga y muestra.
+- Hay un **test** que lo vigila: el manifiesto tiene que ser ASCII puro, y en `plugin.js` no puede quedar
+  ninguna tilde literal fuera de los comentarios.
+- **Paso nuevo en la rutina**: después de tocar cualquier texto visible, `node explore/escape-unicode.mjs`
+  y otra vez las pruebas. El guardia avisa si se olvida.
+
+Y queda dicho para quien lo lea: **es un fallo de la app en Android**, no del plugin. Vale la pena
+reportarlo, porque cualquier plugin en español lo sufre.
+
 ### MyAnimeList no puntúa todo (1.17.0)
 
 Otra corrección que llegó de una foto de la tele. En la 1.13.0 escribí, y quedó en el README, que el orden

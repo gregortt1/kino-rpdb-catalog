@@ -37,34 +37,34 @@ const TMDB_PAGE_CAP = 500;
 
 const TEXT = {
   es: {
-    trendMovies: "Películas en tendencia",
+    trendMovies: "Pel\u00edculas en tendencia",
     trendShows: "Series en tendencia",
-    topMovies: "Películas mejor valoradas",
+    topMovies: "Pel\u00edculas mejor valoradas",
     topShows: "Series mejor valoradas",
     inCinemas: "En cines",
     onAir: "Series al aire",
-    upcoming: "Próximos estrenos",
+    upcoming: "Pr\u00f3ximos estrenos",
     popularShows: "Series populares",
     anime: "Anime",
     documentaries: "Documentales",
     kids: "Infantil",
     doramas: "Doramas",
-    movies: "Películas",
+    movies: "Pel\u00edculas",
     shows: "Series",
-    popMovies: "Películas populares",
+    popMovies: "Pel\u00edculas populares",
     popShows: "Series populares",
-    todayMovies: "Películas en tendencia hoy",
+    todayMovies: "Pel\u00edculas en tendencia hoy",
     todayShows: "Series en tendencia hoy",
-    action: "Acción",
+    action: "Acci\u00f3n",
     comedy: "Comedia",
     horror: "Terror",
-    scifi: "Ciencia ficción",
-    animation: "Animación",
+    scifi: "Ciencia ficci\u00f3n",
+    animation: "Animaci\u00f3n",
     today: "Tendencias de hoy",
     popular: "Populares",
     topRated: "Mejor valoradas",
-    genres: "Géneros",
-    noSource: "Este catálogo no reproduce títulos: busca dónde verlo en tus otras fuentes.",
+    genres: "G\u00e9neros",
+    noSource: "Este cat\u00e1logo no reproduce t\u00edtulos: busca d\u00f3nde verlo en tus otras fuentes.",
   },
   en: {
     trendMovies: "Trending movies",
@@ -191,17 +191,17 @@ const SECTION_ROWS = {
 // the film and series variants of the same handful of genres. Each tile is a `/discover` list, so the
 // tile's ref has to carry its parameters through browse().
 const GENRE_TILES = [
-  { id: "accion", label: "Acción", kind: "movie", genre: 28 },
-  { id: "accion-series", label: "Acción y aventura", kind: "tv", genre: 10759 },
+  { id: "accion", label: "Acci\u00f3n", kind: "movie", genre: 28 },
+  { id: "accion-series", label: "Acci\u00f3n y aventura", kind: "tv", genre: 10759 },
   { id: "comedia", label: "Comedia", kind: "movie", genre: 35 },
   { id: "comedia-series", label: "Comedia (series)", kind: "tv", genre: 35 },
   { id: "drama", label: "Drama", kind: "movie", genre: 18 },
   { id: "drama-series", label: "Drama (series)", kind: "tv", genre: 18 },
   { id: "terror", label: "Terror", kind: "movie", genre: 27 },
   { id: "misterio-series", label: "Misterio (series)", kind: "tv", genre: 9648 },
-  { id: "ciencia-ficcion", label: "Ciencia ficción", kind: "movie", genre: 878 },
-  { id: "fantasia-series", label: "Ciencia ficción y fantasía", kind: "tv", genre: 10765 },
-  { id: "animacion", label: "Animación", kind: "movie", genre: 16 },
+  { id: "ciencia-ficcion", label: "Ciencia ficci\u00f3n", kind: "movie", genre: 878 },
+  { id: "fantasia-series", label: "Ciencia ficci\u00f3n y fantas\u00eda", kind: "tv", genre: 10765 },
+  { id: "animacion", label: "Animaci\u00f3n", kind: "movie", genre: 16 },
   { id: "documental", label: "Documentales", kind: "movie", genre: 99 },
 ];
 
@@ -210,7 +210,7 @@ const GENRE_TILES = [
 // can live as something the person browses. `path` + `params`, and the artwork comes from the first title.
 const LIST_TILES = [
   { id: "lista-hoy", label: "Tendencias de hoy", kind: "movie", path: "/trending/movie/day" },
-  { id: "lista-populares", label: "Más populares", kind: "movie", path: "/movie/popular" },
+  { id: "lista-populares", label: "M\u00e1s populares", kind: "movie", path: "/movie/popular" },
   { id: "lista-mejor", label: "Mejor valoradas", kind: "movie", path: "/movie/top_rated" },
   { id: "lista-anime", label: "Anime", kind: "tv", path: "/discover/tv", params: ANIME_PARAMS },
   { id: "lista-docs", label: "Documentales", kind: "movie", path: "/discover/movie", params: DOCS_PARAMS },
@@ -449,7 +449,7 @@ async function ensureProbe(timeoutMs) {
     const r = await kino.fetch(artUrl(key, "imdb", posterType(), PROBE_ID, "none", "poster"), { method: "HEAD", timeoutMs: timeoutMs || 10000 });
     if (r.status === 401 || r.status === 403) {
       keyRejected = true;
-      log("El servidor rechazó la clave (" + r.status + "): se usan las imágenes de TMDB");
+      log("El servidor rechaz\u00f3 la clave (" + r.status + "): se usan las im\u00e1genes de TMDB");
     }
   } catch (e) {
     log("no pude comprobar la clave del servidor: " + (e && e.message ? e.message : e));
@@ -604,7 +604,7 @@ function item(m, kind) {
   if (genres.length) out.genres = genres;
   // Worth a line in the log: it is the case where TMDB returned no image path, so if RPDB also has
   // nothing for this title the card stays empty and this line says which title it was.
-  if (!m.poster_path && serverReady()) log("TMDB no trajo imagen para «" + title + "»: se le pide a RPDB igual");
+  if (!m.poster_path && serverReady()) log("TMDB no trajo imagen para \u00ab" + title + "\u00bb: se le pide a RPDB igual");
   const poster = art(m, "poster", kind);
   if (poster) out.poster = poster;
   const backdrop = art(m, "backdrop", kind);
@@ -772,7 +772,7 @@ export async function categories() {
     return tiles;
   } catch (e) {
     // A group that fails contributes nothing; Kino is not blocked by it.
-    log("no pude armar las categorías: " + (e && e.message ? e.message : e));
+    log("no pude armar las categor\u00edas: " + (e && e.message ? e.message : e));
     return [];
   }
 }
@@ -900,13 +900,13 @@ const ACTION_KEY = "testServer";
 
 async function probeEverything(timeoutMs) {
   await ensureProbe(timeoutMs);
-  if (!rpdbKey()) return ["Sin clave: se usan las imágenes de TMDB"];
-  if (keyRejected) return ["El servidor rechazó la clave: revisa que sea la de ese servidor"];
-  const notes = ["clave ✓"];
+  if (!rpdbKey()) return ["Sin clave: se usan las im\u00e1genes de TMDB"];
+  if (keyRejected) return ["El servidor rechaz\u00f3 la clave: revisa que sea la de ese servidor"];
+  const notes = ["clave \u2713"];
   await Promise.all([ensureTuningProbe(timeoutMs), ensureBackdropProbe(timeoutMs), ensureStillProbe(timeoutMs)]);
-  notes.push(backdropsOn ? "fondos con nota ✓" : "fondos: los pone TMDB");
-  notes.push(stillsOn ? "fotogramas ✓" : "fotogramas: los pone TMDB");
-  if (tuningWanted()) notes.push(tuningOff ? "ajuste de notas: no lo acepta" : "ajuste de notas ✓");
+  notes.push(backdropsOn ? "fondos con nota \u2713" : "fondos: los pone TMDB");
+  notes.push(stillsOn ? "fotogramas \u2713" : "fotogramas: los pone TMDB");
+  if (tuningWanted()) notes.push(tuningOff ? "ajuste de notas: no lo acepta" : "ajuste de notas \u2713");
   else if (isTv()) notes.push("ajuste de notas: solo con otro servidor");
   return notes;
 }
@@ -915,7 +915,7 @@ export async function settingsStatus() {
   // Kino da 10 s al formulario, así que aquí las sondas van con menos paciencia que en una llamada normal.
   try {
     const notes = await probeEverything(2500);
-    return { [STATUS_KEY]: notes.join(" · ").slice(0, 200) };
+    return { [STATUS_KEY]: notes.join(" \u00b7 ").slice(0, 200) };
   } catch (e) {
     log("no pude armar el estado: " + (e && e.message ? e.message : e));
     return { [STATUS_KEY]: "No se pudo consultar el servidor" };
@@ -923,11 +923,11 @@ export async function settingsStatus() {
 }
 
 export async function action(key) {
-  if (key !== ACTION_KEY) return { message: "Acción desconocida" };
+  if (key !== ACTION_KEY) return { message: "Acci\u00f3n desconocida" };
   resetProbes();
   try {
     const notes = await probeEverything(8000);
-    return { message: notes.join(" · ").slice(0, 300) };
+    return { message: notes.join(" \u00b7 ").slice(0, 300) };
   } catch (e) {
     return { message: "No se pudo consultar el servidor: " + (e && e.message ? e.message : e) };
   }
