@@ -308,6 +308,10 @@ const RATINGS = {
   imdbfallback: { order: "imdb,tmdb", keys: ["imdb", "tmdb"], count: 1 },
   imdbrt: { order: "imdb,rt", keys: ["imdb", "rt"], count: 2 },
   imdbrtmc: { order: "imdb,rt,mc", keys: ["imdb", "rt", "mc"], count: 3 },
+  // IMDb y RT, más MyAnimeList cuando la tiene. El orden pone `mal` primero a propósito: MyAnimeList
+  // solo puntúa anime, así que en una película no existe y el servidor pasa directo a IMDb. Se deja fuera
+  // Letterboxd, que puntúa sobre 5 y quedaba mezclado con notas sobre 10 y porcentajes.
+  imdbrtmal: { order: "mal,imdb,rt,mc", keys: ["mal", "imdb", "rt", "mc"], count: 3 },
   // "Todas las que haya", solo para fondos: medido contra el servicio, un fondo de 1920 px encaja ocho
   // notas en una fila sin solaparse (a partir de ahí el servidor no da más). En un póster no se ofrece
   // porque ocho notas verticales se envuelven y tapan el título: ahí el máximo legible es tres.

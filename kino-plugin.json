@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "OpenPoster",
-  "version": "1.16.0",
+  "version": "1.17.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
@@ -9,7 +9,7 @@
   "categories": ["movies", "series"],
   "section": { "label": "OpenPoster" },
   "theme": { "highlight": "#F5C518" },
-  "description": "Catálogo de TMDB (tendencias, populares, mejor valoradas, anime, documentales y géneros) con los pósters, los fondos y los fotogramas de capítulo con la nota incrustada. Rellena el póster de los títulos de tus otras fuentes y no reproduce nada.",
+  "description": "CatÃ¡logo de TMDB (tendencias, populares, mejor valoradas, anime, documentales y gÃ©neros) con los pÃ³sters, los fondos y los fotogramas de capÃ­tulo con la nota incrustada. Rellena el pÃ³ster de los tÃ­tulos de tus otras fuentes y no reproduce nada.",
   "author": "gregorysteventt-source",
   "homepage": "https://github.com/gregorysteventt-source/kino-rpdb-catalog",
   "hosts": ["api.ratingposterdb.com", "openposterdb.com"],
@@ -24,7 +24,7 @@
     },
     {
       "key": "service",
-      "label": "Servidor de imágenes",
+      "label": "Servidor de imÃ¡genes",
       "type": "select",
       "default": "openposterdb",
       "options": [
@@ -37,29 +37,30 @@
       "label": "Clave del servidor",
       "type": "password",
       "default": "t0-free-rpdb",
-      "hint": "La clave pública gratuita, ya puesta"
+      "hint": "La clave pÃºblica gratuita, ya puesta"
     },
     {
       "key": "posterSec",
-      "label": "Póster (en la tele)",
+      "label": "PÃ³ster (en la tele)",
       "type": "section"
     },
     {
       "key": "posterRatings",
-      "label": "Qué notas",
+      "label": "QuÃ© notas",
       "type": "select",
       "default": "imdbRtMc",
       "options": [
         { "value": "imdb", "label": "Solo IMDb (estricto)" },
         { "value": "imdbRt", "label": "IMDb y Rotten Tomatoes" },
+        { "value": "imdbRtMal", "label": "IMDb y RT (+ MAL en anime)" },
         { "value": "imdbRtMc", "label": "IMDb, RT y Metacritic" },
         { "value": "imdbFallback", "label": "IMDb y si no hay, TMDB" },
-        { "value": "auto", "label": "Automático (hasta 3)" }
+        { "value": "auto", "label": "AutomÃ¡tico (hasta 3)" }
       ]
     },
     {
       "key": "posterBadgeSize",
-      "label": "Tamaño de la nota",
+      "label": "TamaÃ±o de la nota",
       "type": "select",
       "default": "sharp",
       "hint": "Con tres notas se encoge solo",
@@ -71,40 +72,41 @@
     },
     {
       "key": "posterTextless",
-      "label": "Póster sin el título",
+      "label": "PÃ³ster sin el tÃ­tulo",
       "type": "toggle",
       "default": false
     },
     {
       "key": "posterType",
-      "label": "Tipo de póster",
+      "label": "Tipo de pÃ³ster",
       "type": "text",
       "default": "poster-default",
       "hint": "poster-default; con RPDB, poster-imdb-rated"
     },
     {
       "key": "backdropSec",
-      "label": "Fondo y capítulos (en la tele)",
+      "label": "Fondo y capÃ­tulos (en la tele)",
       "type": "section"
     },
     {
       "key": "backdropRatings",
-      "label": "Qué notas",
+      "label": "QuÃ© notas",
       "type": "select",
       "default": "imdbRtMc",
-      "hint": "Pueden ser distintas de las del póster",
+      "hint": "Pueden ser distintas de las del pÃ³ster",
       "options": [
         { "value": "imdb", "label": "Solo IMDb (estricto)" },
         { "value": "imdbRt", "label": "IMDb y Rotten Tomatoes" },
+        { "value": "imdbRtMal", "label": "IMDb y RT (+ MAL en anime)" },
         { "value": "imdbRtMc", "label": "IMDb, RT y Metacritic" },
         { "value": "all", "label": "Todas las que haya (hasta 8)" },
         { "value": "imdbFallback", "label": "IMDb y si no hay, TMDB" },
-        { "value": "auto", "label": "Automático (hasta 3)" }
+        { "value": "auto", "label": "AutomÃ¡tico (hasta 3)" }
       ]
     },
     {
       "key": "backdropBadgeSize",
-      "label": "Tamaño de la nota",
+      "label": "TamaÃ±o de la nota",
       "type": "select",
       "default": "sharp",
       "options": [
@@ -115,12 +117,12 @@
     },
     {
       "key": "backdropPosition",
-      "label": "Dónde va la nota",
+      "label": "DÃ³nde va la nota",
       "type": "select",
       "default": "auto",
       "hint": "Solo el fondo",
       "options": [
-        { "value": "auto", "label": "Como está (esquina arriba derecha)" },
+        { "value": "auto", "label": "Como estÃ¡ (esquina arriba derecha)" },
         { "value": "bc", "label": "Abajo, centrada" },
         { "value": "tc", "label": "Arriba, centrada" },
         { "value": "l", "label": "A la izquierda" },
@@ -133,12 +135,12 @@
     },
     {
       "key": "diag",
-      "label": "Diagnóstico",
+      "label": "DiagnÃ³stico",
       "type": "section"
     },
     {
       "key": "serverStatus",
-      "label": "Qué funciona",
+      "label": "QuÃ© funciona",
       "type": "status"
     },
     {

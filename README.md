@@ -175,14 +175,21 @@ En *Qué notas*, dentro de cada bloque (**Póster** y **Fondo y capítulos**), e
 | --- | --- | --- |
 | `Solo IMDb (estricto)` | IMDb | 1 |
 | `IMDb y Rotten Tomatoes` | IMDb, RT | 2 |
+| `IMDb y RT (+ MAL en anime)` | IMDb, RT y **MyAnimeList** cuando es anime | hasta 3 |
 | `IMDb, RT y Metacritic` | IMDb, RT, MC | 3 |
 | `IMDb y si no hay, TMDB` | IMDb o TMDB | 1 |
 | `Automático (hasta 3)` | Las que tenga el servidor | hasta 3 |
 
 Merece la pena saber por qué existe esta lista. El servidor tiene su **propio orden de prioridad**, que
-empieza por **MyAnimeList y Letterboxd**: en "automático" una película normal sale con IMDb, Letterboxd y
-Rotten Tomatoes — con la nota de Letterboxd sobre 5, que no pega con las demás. Eligiendo la opción, las
-notas son las que tú quieres y ninguna más.
+empieza por **MyAnimeList y Letterboxd**:
+
+- **MyAnimeList solo puntúa anime**, así que en una película o una serie simplemente no existe y pasa a la
+  siguiente. Eso está bien hecho: en anime sale `MAL` primero, que es lo suyo.
+- **Letterboxd sí puntúa todo, pero sobre 5.** Por eso en "automático" una película salía con `IMDb 6.8`,
+  `3.5` y `RT 86%`: **tres escalas distintas** en la misma fila. Ahí está la inconsistencia.
+
+De ahí `IMDb y RT (+ MAL en anime)`: quita Letterboxd y deja lo demás, con MyAnimeList delante para que el
+anime lo traiga. En una película queda `IMDb` + `RT` (+ `Metacritic` si hace falta llenar la tercera).
 
 ### El diagnóstico: por qué no se ven las notas
 

@@ -104,6 +104,31 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### MyAnimeList no puntúa todo (1.17.0)
+
+Otra corrección que llegó de una foto de la tele. En la 1.13.0 escribí, y quedó en el README, que el orden
+del servidor empieza por MyAnimeList y Letterboxd y que por eso «una película normal sale con IMDb,
+Letterboxd y Rotten Tomatoes». **La segunda mitad era falsa**: MyAnimeList **solo puntúa anime**, así que en
+una película no existe y el servidor pasa directo a IMDb. Lo que se ve en la tele es:
+
+| | Lo que sale con «Automático» |
+| --- | --- |
+| Anime | `MAL 9.20` · `IMDb 8.9` · `3.5` |
+| Película o serie | `IMDb 6.8` · `3.5` · `RT 86%` |
+
+Lo de MyAnimeList primero **está bien y no hay que tocarlo**. Lo que sí es un problema, y se ve en las dos
+filas, es el **`3.5`**: es Letterboxd, que puntúa **sobre 5** mientras las otras van sobre 10 o en
+porcentaje — tres escalas en la misma fila.
+
+De ahí la opción nueva `imdbRtMal` — **`IMDb y RT (+ MAL en anime)`**: orden `mal,imdb,rt,mc`, tope de tres,
+y **Letterboxd, la audiencia de RT, TMDB, Trakt, MDBList y Roger Ebert excluidos**. En anime da
+`MAL` + `IMDb` + `RT`; en una película, `IMDb` + `RT` + `Metacritic`.
+
+Es la tercera vez en este proyecto que **mirar el resultado de verdad** corrige algo que la documentación
+—o yo leyéndola— daba por bueno: pasó con la tabla de notas del póster, con las tarjetas de los ajustes y
+ahora con MyAnimeList. El patrón es siempre el mismo: la documentación describe lo que el sistema **puede**
+hacer; lo que **conviene** solo se ve mirándolo.
+
 ### Las tarjetas, probadas y descartadas (1.16.0)
 
 En la 1.15.0 subí a apiVersion 9 para usar `settingsLayout`: cuatro **tarjetas** con su explicación dentro y
