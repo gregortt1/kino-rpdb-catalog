@@ -1,14 +1,15 @@
 {
   "id": "rpdb-catalog",
   "name": "OpenPoster",
-  "version": "1.14.0",
-  "apiVersion": 6,
+  "version": "1.15.0",
+  "apiVersion": 9,
   "entry": "plugin.js",
   "catalogOnly": true,
   "discoverable": false,
+  "categories": ["movies", "series"],
   "section": { "label": "OpenPoster" },
   "theme": { "highlight": "#F5C518" },
-  "description": "Catálogo de TMDB (tendencias, populares, mejor valoradas, anime, documentales, géneros y búsqueda) con los pósters, los fondos y los fotogramas de capítulo con la nota incrustada, y rellena el póster de los títulos de tus otras fuentes. La llave de TMDB la pone Kino; la del servidor de imágenes es tuya y es opcional.",
+  "description": "Catálogo de TMDB (tendencias, populares, mejor valoradas, anime, documentales y géneros) con los pósters, los fondos y los fotogramas de capítulo con la nota incrustada. Rellena el póster de los títulos de tus otras fuentes y no reproduce nada.",
   "author": "gregorysteventt-source",
   "homepage": "https://github.com/gregorysteventt-source/kino-rpdb-catalog",
   "hosts": ["api.ratingposterdb.com", "openposterdb.com"],
@@ -16,12 +17,6 @@
   "color": "#F5C518",
   "icon": "icon.png",
   "settings": [
-    {
-      "key": "servidor",
-      "label": "Servidor",
-      "type": "section",
-      "hint": "De aquí salen todas las imágenes con nota"
-    },
     {
       "key": "service",
       "label": "Servidor de imágenes",
@@ -39,12 +34,6 @@
       "type": "password",
       "default": "t0-free-rpdb",
       "hint": "Viene puesta la clave pública gratuita de OpenPosterDB"
-    },
-    {
-      "key": "posterSec",
-      "label": "Póster (en la tele)",
-      "type": "section",
-      "hint": "Es vertical: la nota va abajo, centrada, y no se mueve"
     },
     {
       "key": "posterRatings",
@@ -85,12 +74,6 @@
       "type": "text",
       "default": "poster-default",
       "hint": "poster-default; con RatingPosterDB, poster-imdb-rated…"
-    },
-    {
-      "key": "backdropSec",
-      "label": "Fondo y capítulos (en la tele)",
-      "type": "section",
-      "hint": "Son apaisados, y caben más notas que en un póster"
     },
     {
       "key": "backdropRatings",
@@ -138,12 +121,6 @@
       ]
     },
     {
-      "key": "diag",
-      "label": "Diagnóstico",
-      "type": "section",
-      "hint": "Comprueba qué imágenes sirve tu servidor"
-    },
-    {
       "key": "serverStatus",
       "label": "Qué funciona",
       "type": "status"
@@ -152,6 +129,42 @@
       "key": "testServer",
       "label": "Probar el servidor",
       "type": "action"
+    }
+  ],
+  "settingsLayout": [
+    {
+      "type": "card",
+      "title": "Servidor",
+      "children": [
+        { "type": "text", "text": "De aquí salen todas las imágenes con nota." },
+        { "type": "row", "children": [{ "setting": "service" }, { "setting": "key" }] }
+      ]
+    },
+    {
+      "type": "card",
+      "title": "Póster",
+      "children": [
+        { "type": "text", "text": "Es vertical: la nota va abajo, centrada, y no se mueve. Solo en la tele." },
+        { "type": "row", "children": [{ "setting": "posterRatings" }, { "setting": "posterBadgeSize" }] },
+        { "type": "row", "children": [{ "setting": "posterTextless" }, { "setting": "posterType" }] }
+      ]
+    },
+    {
+      "type": "card",
+      "title": "Fondo y capítulos",
+      "children": [
+        { "type": "text", "text": "Son apaisados y caben más notas. Solo en la tele." },
+        { "type": "row", "children": [{ "setting": "backdropRatings" }, { "setting": "backdropBadgeSize" }] },
+        { "setting": "backdropPosition" }
+      ]
+    },
+    {
+      "type": "card",
+      "title": "Diagnóstico",
+      "children": [
+        { "type": "text", "text": "Comprueba qué imágenes sirve tu servidor." },
+        { "type": "row", "children": [{ "setting": "serverStatus" }, { "setting": "testServer" }] }
+      ]
     }
   ]
 }

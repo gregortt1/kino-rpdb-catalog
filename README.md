@@ -75,13 +75,11 @@ servidor de imágenes, que se guarda cifrada en tu aparato y nunca sale de él.
 
 ## Configurarlo
 
-La configuración está en **cuatro bloques**, y **ya viene puesta para funcionar**: no tienes que escribir
-nada.
+La configuración va en **cuatro tarjetas** —**Servidor**, **Póster**, **Fondo y capítulos** y
+**Diagnóstico**— y **ya viene puesta para funcionar**: no tienes que escribir nada.
 
-> **¿Por qué bloques y no pestañas?** Porque Kino no las admite: los tipos de ajuste que acepta son
-> campos, interruptores, listas, encabezados (`section`), líneas de estado y botones — y **no hay un tipo
-> de pestañas**. El encabezado es la única forma de agrupar, así que se usa a fondo: los cuatro bloques
-> son lo más cerca que se puede estar de unas pestañas.
+> **Requiere Kino 0.9.55 o superior** (apiVersion 9): es la versión que sabe dibujar las tarjetas. En un
+> Kino anterior verías la misma lista de ajustes de siempre, en orden, sin las tarjetas.
 
 **Servidor** — de dónde salen las imágenes:
 

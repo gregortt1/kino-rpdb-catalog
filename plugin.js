@@ -611,9 +611,13 @@ function item(m, kind) {
 }
 
 // A ref is opaque to Kino and may come back from the person's library long after it was handed out,
-// so it is parsed once and each caller takes only what it needs.
+// so it is parsed once and each caller takes only what it needs. The limit is Kino's: a ref may be up to
+// 4096 characters (2048 is the cursor's limit, a different thing), and a ref kept in the person's library
+// must not be dropped for being longer than a cursor.
+const REF_MAX = 4096;
+
 function parseRef(ref) {
-  if (typeof ref !== "string" || ref === "" || ref.length > 2048) return null;
+  if (typeof ref !== "string" || ref === "" || ref.length > REF_MAX) return null;
   let spec;
   try {
     spec = JSON.parse(ref);
@@ -809,7 +813,8 @@ export async function episodes(ref) {
   await ensureStillProbe();
   const seasons = (Array.isArray(show.seasons) ? show.seasons : [])
     .filter((s) => Number(s.season_number) > 0)
-    .slice(0, 10);
+    // Kino admits up to 50 seasons per answer, so there is no reason to cut at ten and lose seasons 11+.
+    .slice(0, 50);
   const loaded = await Promise.all(
     seasons.map((s) => tmdb(path + "/season/" + s.season_number).catch(() => null))
   );
@@ -848,7 +853,10 @@ export async function meta(query) {
   if (!key) return null;
   const picked = pickId(query && query.ids);
   if (!picked) return null;
-  await ensureProbe();
+  // Kino gives a meta() call SIX seconds. The probe's normal patience is ten, so on a cold sandbox the
+  // probe would eat the whole call and the poster would never be answered — and three timeouts in a row
+  // switch the plugin off. Hence the short leash, like settingsStatus().
+  await ensureProbe(2000);
   if (keyRejected) return null;
   // A bare TMDB id would make RPDB guess between films and series; `query.type` says which it is.
   const idValue = picked.idType === "tmdb" ? tmdbIdValue(query && query.type, picked.id) : picked.id;

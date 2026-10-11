@@ -104,6 +104,61 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### La documentación, espejada: `explore/docs.mjs` (1.15.0)
+
+**Un error de método, no de código.** Durante varias versiones fui leyendo la página que necesitaba en
+cada momento, y por eso se me pasó entera la de *Home por categorías* — quien usa el plugin tuvo que
+señalármela. Se arregla con una herramienta:
+
+```
+node kino/explore/docs.mjs          # descarga los 38 apartados y dice qué cambió
+node kino/explore/docs.mjs --full   # además imprime los títulos de sección de cada página
+```
+
+Guarda `kino/docs/<apartado>.txt` y `kino/docs/_indice.json` con el hash de cada página, así que en la
+próxima actualización **el diff dice qué páginas cambiaron** en vez de confiar en la memoria. También hay
+`node kino/explore/get-contract9.mjs`, que saca el `contract.json` **real** (apiVersion 9) de la página de
+Referencia, y `find-contract.mjs`, que fue como descubrí que los repositorios publicados solo llegan a
+apiVersion 8.
+
+**El kit se actualiza cambiando el contrato.** El `sdk/` que trae el repositorio de plantilla lee
+`contract.json` y valida desde ahí: bastó con sustituir ese archivo por el de apiVersion 9 para que
+`validate.mjs` entendiera `settingsLayout`, `categories` y la apiVersion 9. El original quedó en
+`contract-v6.json.bak`.
+
+### Lo que dijo la auditoría (1.15.0)
+
+Con las 38 páginas en local, tres auditorías en paralelo (manifiesto+contrato, límites+pruebas+publicación,
+referencia+recetario+personalización) encontraron esto. Lo aplicado:
+
+- **`settingsLayout` con tarjetas (apiVersion 9).** En la 1.13.0 dije que agrupar los ajustes «no se
+  puede» y que los encabezados eran el techo. **Era falso**: desde apiVersion 9 el manifiesto admite un
+  diseño de **filas, columnas y tarjetas**, y una `card` con `title` es la versión rica del `section`. Las
+  cuatro cabeceras se sustituyeron por cuatro tarjetas con su explicación dentro (`text`) y filas de dos
+  ajustes, que en pantalla ancha van en paralelo y en angosta se apilan.
+- **`meta()` podía no responder nunca.** Kino da **6 s** a `meta()`, y la sonda usaba el tiempo por
+  defecto de `kino.fetch`: **10 s**. En un sandbox frío la sonda se comía la llamada entera y el póster no
+  salía; y *«tres tiempos agotados seguidos desactivan el plugin»*. Ahora `meta()` la llama con 2 s, y hay
+  un test que vigila ese número.
+- **`ref` hasta 4096, no 2048.** Se rechazaba cualquier `ref` de más de 2048 caracteres, pero 2048 es el
+  límite del **cursor**; el `ref` admite 4096. Un `ref` guardado en la biblioteca se perdía por confundir
+  los dos números.
+- **Temporadas: 10 → 50.** El `slice(0, 10)` escondía de la temporada 11 en adelante, y Kino admite 50.
+- **`description` de 326 caracteres.** Se corta a 300, así que la frase quedaba a medias en la hoja de
+  instalación. El propio `validate.mjs` no lo revisaba.
+- **`categories: ["movies", "series"]`.** Sin ese campo Kino archiva el plugin en «Utilidades».
+
+Pendiente, con su valor, para decidir:
+
+| Idea | Qué daría |
+| --- | --- |
+| `scopedSearch` + `query.within` (apiVersion 6) | Que «Buscar en esta categoría» pregunte a TMDB en vez de filtrar solo lo ya cargado. Ojo: TMDB no tiene «buscar dentro de un género», así que sería buscar y **filtrar** por el género del `ref`. |
+| `validateSettings` (apiVersion 6) | Rechazar un `posterType` mal escrito **antes** de guardar, en vez de caer al valor de fábrica en silencio. |
+| `kino.storage` | Recordar entre sesiones qué sirve el servidor (clave, fondos, fotogramas) y no repetir las sondas. Las claves de `storage` sobreviven a un cambio de ajustes, así que hay que separarlas por servidor. |
+| Kit: `--run`, `--record/--replay`, `KINO_TMDB_FIXTURE`, `--device tv` | Probar `section` y `categories` con el propio kit, y poder grabar respuestas reales de TMDB en vez de escribirlas a mano. |
+| `key` como `text` en vez de `password` | Quitaría el aviso «Este plugin usa tu usuario y contraseña» (que exagera para una clave pública), pero dejaría de guardarse cifrada. Se queda en `password`. |
+| Limpiar `explore/published/` | Tiene un manifiesto viejo (1.0.4) con `api.themoviedb.org` en `hosts`; confunde al leer el proyecto. |
+
 ### El Home por categorías: `genres` en cada ítem (1.14.0)
 
 **Esta sección corrige un error mío.** En la 1.13.0 afirmé, y quedó escrito en el README, que las
