@@ -182,8 +182,11 @@ así que solo vale la pena si de verdad tienes 4K.
 
 Sin afiliación con RatingPosterDB, OpenPosterDB, TMDB ni Kino.
 
+- La app es **Kino**.
 - Las fichas, las sinopsis y las imágenes que el servidor no sirva son de **TMDB**, a través de Kino.
 - Las imágenes con nota son de **RatingPosterDB** o de **OpenPosterDB**, con tu clave.
-- La app es **Kino**.
+- El plugin lo escribió **DeepSeek**, un agente de programación de inteligencia artificial, trabajando con
+  quien lo publica: el código, las pruebas, estas notas y las decisiones que hay detrás salieron de esas
+  sesiones. Los errores que aparecieron por el camino también.
 
 Respeta los términos de cada servicio y no compartas tu clave con nadie.

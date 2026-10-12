@@ -91,8 +91,8 @@ const TMDB = {
 };
 
 /** The kino globals, as Kino gives them. Returns what the plugin asked for. */
-function setKino({ config = {}, lang = "es-CO", device, fetchImpl, withTmdb = true, tmdbImpl } = {}) {
-  const asked = { tmdb: [], fetch: [] };
+function setKino({ config = {}, lang = "es-CO", device, fetchImpl, withTmdb = true, tmdbImpl, storage = true, store = new Map() } = {}) {
+  const asked = { tmdb: [], fetch: [], store: new Map() };
   globalThis.kino = {
     lang,
     device,                       // "tv" o undefined: cualquier otra cosa es un celular
@@ -104,6 +104,17 @@ function setKino({ config = {}, lang = "es-CO", device, fetchImpl, withTmdb = tr
       return fetchImpl ? fetchImpl(String(url), options) : { ok: true, status: 200, headers: {} };
     },
   };
+  // El almacén del plugin: sobrevive al sandbox, así que un Map que se pasa entre sesiones lo imita.
+  // `storage: false` imita a un Kino sin almacén (la API es de apiVersion 6, pero conviene que el plugin
+  // no dependa de que esté).
+  if (storage) {
+    globalThis.kino.storage = {
+      get: (k) => (store.has(k) ? store.get(k) : null),
+      set: (k, v, options) => { store.set(k, v); asked.store.set(k, { value: v, ttlMs: options && options.ttlMs }); },
+      remove: (k) => { store.delete(k); },
+      keys: () => [...store.keys()],
+    };
+  }
   if (withTmdb) {
     globalThis.kino.tmdb = async (path, params) => {
       asked.tmdb.push({ path, params: params || {} });
@@ -585,6 +596,77 @@ test("con respuestas REALES de TMDB los títulos salen completos", async () => {
   const pelis = populares.rows.find((r) => r.id === "sec-pop-movies");
   assert.ok(pelis && pelis.items.length === 20, "la fila de películas populares sale con datos reales");
   assert.ok(pelis.items.every((i) => i.ids.tmdb && i.poster));
+});
+
+test("lo comprobado se recuerda: un tiempo agotado ya no deja sin notas toda la sesión", async () => {
+  const store = new Map();
+
+  // --- Sesión 1: todo responde, así que el servidor queda confirmado y se guarda.
+  let plugin = await freshPlugin();
+  setKino({ config: { key: KEY, service: "openposterdb" }, device: "tv", fetchImpl: okFetch, store });
+  const primera = await plugin.home();
+  await plugin.episodes(JSON.stringify({ kind: "tv", id: 1399, list: true }));
+  assert.ok(film0(primera).backdrop.includes("backdrop-default"), "la sesión 1 usa el fondo con nota");
+  assert.equal(store.size, 1, "queda UNA entrada, con el servidor y la huella de la clave");
+  const guardado = JSON.parse([...store.values()][0]);
+  assert.ok(guardado.backdrop && guardado.still && guardado.tuning, "se guardaron las tres: " + JSON.stringify(guardado));
+
+  // --- Sesión 2: Kino cerró el sandbox (lo hace tras cinco minutos, al cambiar un ajuste, al actualizar)
+  // y AHORA el servidor va lento justo en las tres comprobaciones de capacidad. Antes, con fallar en
+  // cerrado, eso significaba perder las notas durante toda la sesión.
+  const lento = (url) =>
+    /backdrop-default|episode-default/.test(String(url)) || /badge_size/.test(String(url))
+      ? Promise.reject(new Error("se agotó el tiempo"))
+      : { ok: true, status: 200, headers: {} };
+
+  plugin = await freshPlugin();
+  const asked = setKino({ config: { key: KEY, service: "openposterdb" }, device: "tv", fetchImpl: lento, store });
+  const segunda = await plugin.home();
+  const caps = await plugin.episodes(JSON.stringify({ kind: "tv", id: 1399, list: true }));
+
+  assert.ok(film0(segunda).backdrop.includes("backdrop-default"), "el fondo conserva su nota");
+  assert.match(film0(segunda).poster, /badge_size=/, "y el ajuste fino sigue aplicándose");
+  assert.ok(caps.episodes[0].still.includes("episode-default"), "y el fotograma también");
+  assert.equal(asked.fetch.length, 1, "solo se comprobó la clave: " + asked.fetch.length + " peticiones, no cuatro");
+
+  // --- Un "no" NO se guarda: si lo que falló fue el tiempo, la próxima sesión vuelve a preguntar.
+  const store2 = new Map();
+  let otra = await freshPlugin();
+  setKino({ config: { key: KEY, service: "openposterdb" }, device: "tv", fetchImpl: postersOnlyFetch, store: store2 });
+  await otra.home();
+  assert.ok(!JSON.parse([...store2.values()][0] || "{}").backdrop, "el fondo no se guardó: no funcionó");
+  otra = await freshPlugin();
+  const reintento = setKino({ config: { key: KEY, service: "openposterdb" }, device: "tv", fetchImpl: postersOnlyFetch, store: store2 });
+  await otra.home();
+  assert.ok(reintento.fetch.some((f) => /backdrop-default/.test(f.url)), "la próxima sesión lo vuelve a comprobar");
+
+  // --- Cambiar la clave o el servidor invalida lo guardado: el almacén NO se borra al guardar ajustes.
+  const store3 = new Map();
+  let uno = await freshPlugin();
+  setKino({ config: { key: KEY, service: "openposterdb" }, device: "tv", fetchImpl: okFetch, store: store3 });
+  await uno.home();
+  let dos = await freshPlugin();
+  const conOtraClave = setKino({ config: { key: "otra-clave", service: "openposterdb" }, device: "tv", fetchImpl: okFetch, store: store3 });
+  await dos.home();
+  assert.ok(conOtraClave.fetch.some((f) => /backdrop-default/.test(f.url)), "con otra clave se comprueba de nuevo");
+  assert.ok(guardado.backdrop === true && JSON.parse([...store3.values()][0]).backdrop === true, "y quedan dos entradas distintas: " + store3.size);
+
+  // --- El botón "Probar el servidor" comprueba DE CERO: responder con una nota de hace doce horas sería
+  // mentir justo cuando alguien está diagnosticando.
+  plugin = await freshPlugin();
+  const conBoton = setKino({ config: { key: KEY, service: "openposterdb" }, device: "tv", fetchImpl: postersOnlyFetch, store });
+  await plugin.action("testServer");
+  assert.ok(conBoton.fetch.some((f) => /backdrop-default/.test(f.url)), "el botón no se fía de lo guardado");
+  const despuesDelBoton = JSON.parse([...store.values()][0] || "{}");
+  assert.ok(!despuesDelBoton.backdrop, "el fondo falló: no puede quedar guardado de antes");
+  assert.equal(despuesDelBoton.tuning, true, "y lo que sí funcionó se guarda de nuevo");
+
+  // --- Y sin almacén (un Kino que no lo tuviera) todo funciona igual, solo que sin recordar.
+  plugin = await freshPlugin();
+  const sinAlmacen = setKino({ config: { key: KEY, service: "openposterdb" }, device: "tv", fetchImpl: okFetch, storage: false });
+  const sinNada = await plugin.home();
+  assert.ok(film0(sinNada).backdrop.includes("backdrop-default"));
+  assert.ok(sinAlmacen.fetch.length >= 2, "comprueba igual: " + sinAlmacen.fetch.length + " peticiones");
 });
 
 test("validateSettings rechaza lo que se guardaría y luego se ignoraría en silencio", async () => {

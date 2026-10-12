@@ -104,6 +104,41 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### Recordar entre sesiones lo que ya se comprobó (1.25.0)
+
+**El problema.** Kino cierra el sandbox del plugin a menudo: tras cinco minutos sin usarlo, tras cualquier
+tiempo agotado, al cambiar cualquier ajuste y al actualizar el plugin. La memoria normal se va con él, así
+que las **tres comprobaciones de capacidad** (fondos, fotogramas, ajuste de notas) se repetían antes de la
+primera imagen de cada sesión.
+
+Y había algo peor que la lentitud: las comprobaciones **fallan en cerrado** —solo un 2xx confirmado enciende
+una imagen con nota—, que es la decisión que arregló las tarjetas en blanco. El efecto secundario es que
+**un solo tiempo agotado dejaba el servidor por inservible durante toda la sesión**, y la persona perdía
+las notas sin ninguna explicación en pantalla.
+
+**La solución.** `kino.storage` sobrevive a todo eso, así que un «sí» reciente se recuerda y la
+comprobación no se repite. La pregunta deja de ser «¿funciona ahora mismo?» y pasa a ser «¿funcionaba hace
+poco?». Medido en la prueba: en la segunda sesión, con el servidor agotando el tiempo en las tres
+comprobaciones, las notas siguen puestas y se hizo **una petición en vez de cuatro**.
+
+Dos reglas hacen que esto no sea una forma de mentirse:
+
+- **Solo se guarda lo que funcionó.** Un «no» no se guarda nunca: si lo que falló fue el tiempo, la próxima
+  sesión vuelve a preguntar en vez de arrastrar la condena doce horas.
+- **La clave del almacén lleva el servidor y una huella de la clave** (un checksum sin vuelta atrás).
+  Cambiar cualquiera de los dos invalida lo guardado, que es la trampa que avisa la documentación: **el
+  almacén NO se borra al cambiar los ajustes**.
+
+**Decisiones de detalle.**
+
+| Decisión | Por qué |
+| --- | --- |
+| La comprobación de la **clave** no se recuerda | Es una sola petición, y una clave revocada dejaría imágenes rotas durante horas |
+| TTL de **12 horas** | Dentro del tope de 30 días, y suficiente para cubrir una tarde de uso |
+| El botón **«Probar el servidor» borra lo guardado** y comprueba de cero | Responder con una nota de hace doce horas sería mentir justo cuando alguien está diagnosticando |
+| La línea de **Diagnóstico** sí puede responder desde lo guardado | Dice lo que el plugin va a hacer, que es lo que esa línea promete; el botón es el que prueba de verdad |
+| Sin `kino.storage` todo sigue igual | El plugin no depende de que esté: solo deja de recordar |
+
 ### El kit nuevo y las pruebas con datos reales (1.24.0)
 
 **El kit que traía el proyecto era viejo, y no solo el contrato.** Ya había cambiado `contract.json` por el

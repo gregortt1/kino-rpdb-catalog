@@ -501,6 +501,83 @@ function serverReady() {
   return rpdbKey() !== "" && !keyRejected;
 }
 
+// --- Lo que se recuerda entre sesiones ---------------------------------------------------------------
+//
+// Kino cierra el sandbox del plugin a menudo: tras cinco minutos sin usarlo, tras cualquier tiempo
+// agotado, al cambiar un ajuste y al actualizar el plugin. La memoria normal se va con él, así que las
+// tres comprobaciones de capacidad se repetían antes de la primera imagen de cada sesión.
+//
+// El almacén del plugin sí sobrevive. Guardar un "sí" reciente tiene un premio que no es la velocidad:
+// las comprobaciones fallan en cerrado, y eso es correcto, pero significa que UN tiempo agotado deja el
+// servidor por inservible durante toda la sesión y la persona pierde las notas sin saber por qué. Con lo
+// guardado, la pregunta deja de ser «¿funciona ahora mismo?» y pasa a ser «¿funcionaba hace poco?».
+//
+// Dos reglas hacen que esto no sea una forma de mentirse:
+//   - SOLO se guarda lo que funcionó. Un "no" no se guarda nunca: si fue un tiempo agotado, la próxima
+//     sesión vuelve a preguntar en vez de arrastrar la condena.
+//   - La clave del almacén lleva el servidor y una huella de la clave, porque el almacén NO se borra al
+//     cambiar los ajustes (lo avisa la documentación). Cambiar cualquiera de los dos invalida lo guardado.
+//
+// La comprobación de la CLAVE no se recuerda: es una sola petición, y una clave revocada dejaría imágenes
+// rotas durante horas.
+const STORE_PREFIX = "probes:";
+const STORE_TTL_MS = 12 * 60 * 60 * 1000;   // 12 h: bien dentro del tope de 30 días
+
+let storedRead = false;
+
+function storeKey() {
+  // Una huella no reversible basta: solo hay que notar que la clave cambió, no recuperarla.
+  const key = rpdbKey();
+  let huella = 0;
+  for (let i = 0; i < key.length; i++) huella = (huella * 31 + key.charCodeAt(i)) >>> 0;
+  return STORE_PREFIX + String(posterServer()).replace(/^https?:\/\//, "") + ":" + key.length + ":" + huella.toString(36);
+}
+
+function storeAvailable() {
+  return !!kino.storage && typeof kino.storage.get === "function";
+}
+
+// Se lee una vez por runtime, y solo rellena lo que el servidor ya confirmó alguna vez.
+function loadStoredVerdicts() {
+  if (storedRead) return;
+  storedRead = true;
+  if (!storeAvailable()) return;
+  let saved = null;
+  try {
+    saved = JSON.parse(kino.storage.get(storeKey()) || "null");
+  } catch (e) {
+    log("no pude leer lo comprobado antes: " + (e && e.message ? e.message : e));
+    return;
+  }
+  if (!saved || typeof saved !== "object") return;
+  if (saved.backdrop === true) { probedKinds.backdrop = true; backdropsOn = true; }
+  if (saved.still === true) { probedKinds.still = true; stillsOn = true; }
+  if (saved.tuning === true) { probedKinds.tuning = true; tuningOff = false; }
+  log("recordaba de la sesi\u00f3n anterior: " + Object.keys(saved).filter((k) => saved[k] === true).join(", "));
+}
+
+function saveVerdict(kind) {
+  if (!storeAvailable()) return;
+  try {
+    const raw = kino.storage.get(storeKey());
+    const saved = raw ? JSON.parse(raw) : {};
+    saved[kind] = true;
+    kino.storage.set(storeKey(), JSON.stringify(saved), { ttlMs: STORE_TTL_MS });
+  } catch (e) {
+    // Un almacén lleno o ausente no puede romper una llamada: el plugin sigue igual, solo sin recordar.
+    log("no pude guardar lo comprobado: " + (e && e.message ? e.message : e));
+  }
+}
+
+function forgetStoredVerdicts() {
+  if (!storeAvailable()) return;
+  try {
+    kino.storage.remove(storeKey());
+  } catch (e) {
+    log("no pude borrar lo guardado: " + (e && e.message ? e.message : e));
+  }
+}
+
 async function probeKind(kind, url, what, blame, timeoutMs) {
   if (probedKinds[kind] !== undefined) return probedKinds[kind];
   let ok = false;
@@ -511,24 +588,29 @@ async function probeKind(kind, url, what, blame, timeoutMs) {
     log("no pude comprobar " + what + ": " + (e && e.message ? e.message : e));
   }
   probedKinds[kind] = ok;
-  if (!ok) log(blame || "el servidor no sirve " + what + ": esa imagen la pone TMDB");
+  if (ok) saveVerdict(kind);
+  else log(blame || "el servidor no sirve " + what + ": esa imagen la pone TMDB");
   return ok;
 }
 
-// Forgets every verdict, so the "probar el servidor" button really tests what was just chosen.
+// Forgets every verdict, so the "probar el servidor" button really tests what was just chosen. Also
+// forgets what was stored: a button that answers from a twelve-hour-old note would be lying.
 function resetProbes() {
   probed = false;
   keyRejected = false;
   backdropsOn = false;
   stillsOn = false;
   tuningOff = false;
+  storedRead = false;
   for (const kind of Object.keys(probedKinds)) delete probedKinds[kind];
+  forgetStoredVerdicts();
 }
 
 // Rated backdrops are one of RPDB's paid tiers, so this is the probe that matters: with a free key it
 // fails and every backdrop falls back to TMDB, which is free and always available.
 async function ensureBackdropProbe(timeoutMs) {
   if (!serverReady()) return;
+  loadStoredVerdicts();
   backdropsOn = await probeKind("backdrop", artUrl(rpdbKey(), "imdb", "backdrop-default", PROBE_ID, "none", "backdrop"), "fondos con nota", null, timeoutMs);
 }
 
@@ -536,7 +618,9 @@ async function ensureBackdropProbe(timeoutMs) {
 // the whole image is lost, so the tuned URL is probed once per runtime too, and a failure drops the
 // tuning (leaving the plain image) instead of leaving holes everywhere.
 async function ensureTuningProbe(timeoutMs) {
-  if (!tuningWanted() || probedKinds.tuning !== undefined) return;
+  if (!tuningWanted()) return;
+  loadStoredVerdicts();
+  if (probedKinds.tuning !== undefined) return;
   const ok = await probeKind(
     "tuning",
     artUrl(rpdbKey(), "imdb", posterType(), PROBE_ID, "force", "poster"),
@@ -549,6 +633,7 @@ async function ensureTuningProbe(timeoutMs) {
 
 async function ensureStillProbe(timeoutMs) {
   if (!serverReady()) return;
+  loadStoredVerdicts();
   const id = "episode-" + STILL_PROBE.id + "-S" + STILL_PROBE.season + "E" + STILL_PROBE.episode;
   stillsOn = await probeKind("still", artUrl(rpdbKey(), "tmdb", "episode-default", id, "none", "still"), "fotogramas con nota", null, timeoutMs);
 }
