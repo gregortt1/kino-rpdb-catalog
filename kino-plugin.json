@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "PosterX",
-  "version": "1.21.0",
+  "version": "1.23.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
@@ -57,7 +57,7 @@
     {
       "key": "key",
       "label": "Clave del servidor",
-      "type": "password",
+      "type": "text",
       "default": "t0-free-rpdb",
       "hint": "La clave p\u00fablica gratuita, ya puesta"
     },

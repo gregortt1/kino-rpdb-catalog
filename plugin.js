@@ -30,6 +30,9 @@ const PROBE_ID = "tt0133093";                 // The Matrix: an id RPDB has alwa
 const STILL_PROBE = { id: 1399, season: 1, episode: 1 };   // Game of Thrones, S1E1
 const DEFAULT_POSTER = "poster-default";
 const DEFAULT_BACKDROP = "backdrop-default";
+// The free public key of OpenPosterDB: it is the manifest's default, and validateSettings refuses to save
+// it together with RatingPosterDB. Keep the two in step.
+const FREE_KEY = "t0-free-rpdb";
 const ID_RULES = { imdb: /^tt\d{5,10}$/, tmdb: /^[1-9]\d{0,9}$/ };
 const TYPE_RULE = /^[a-z][a-z0-9-]{2,40}$/;
 const PATH_RULE = /^\/[A-Za-z0-9/_-]{0,120}$/;
@@ -969,4 +972,35 @@ export async function action(key) {
   } catch (e) {
     return { message: "No se pudo consultar el servidor: " + (e && e.message ? e.message : e) };
   }
+}
+
+// Kino runs this BEFORE saving (20 s) and shows each returned message under its field. Optional: it needs
+// no manifest field, the export is enough.
+//
+// Why it exists: every one of these three cases saves happily and is then ignored. The person thinks it
+// worked and, later, that the plugin is broken — the worst kind of failure, because nothing says anything.
+// Returning null accepts; a map of keys to messages refuses and NOTHING is saved, so the person keeps what
+// they typed and can fix it.
+export async function validateSettings(values) {
+  const v = values && typeof values === "object" ? values : {};
+  const problems = {};
+
+  // A poster type with a space or an accent is not a valid type: at runtime the plugin falls back to
+  // poster-default and the person never learns why their type was ignored. Capitals are fine — the plugin
+  // lowercases them — and an empty value is fine too: it means the factory default.
+  if (typeof v.posterType === "string" && v.posterType.trim() !== "" && !TYPE_RULE.test(v.posterType.trim().toLowerCase())) {
+    problems.posterType = "Usa min\u00fasculas, n\u00fameros y guiones, como poster-default";
+  }
+
+  const key = typeof v.key === "string" ? v.key.trim() : "";
+  // The free key belongs to OpenPosterDB. With RatingPosterDB the server refuses it, the probe notices and
+  // every image falls back to TMDB: no ratings anywhere, and no explanation on screen.
+  if (String(v.service || "").toLowerCase() === "rpdb" && key === FREE_KEY) {
+    problems.key = "Esa es la clave gratuita de OpenPosterDB. En RatingPosterDB pon la tuya, o cambia el servidor";
+  } else if (/\s/.test(key)) {
+    // A key with a space is refused by the server, and the message it gives says nothing useful.
+    problems.key = "La clave no puede tener espacios";
+  }
+
+  return Object.keys(problems).length ? problems : null;
 }

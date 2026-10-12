@@ -104,6 +104,59 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### La clave deja de ser una "contraseña" (1.23.0)
+
+El ajuste de la clave estaba declarado `password`, y eso hace que **la hoja de consentimiento diga "Este
+plugin usa tu usuario y contraseña"**. Para el autor del plugin daba igual —ya lo había aceptado—, pero
+desde que está en la tienda **es lo primero que lee un desconocido antes de instalar**, y para el 99 % de
+los casos es falso: la clave que viene puesta es **pública y gratuita**, y además **viaja dentro de la
+dirección de cada imagen**, así que la protección era cosmética.
+
+Ahora es `text` y la hoja de consentimiento solo avisa de los dos servidores de imágenes.
+
+El coste, que está escrito en el README para que nadie se lleve una sorpresa: **una clave personal se
+guarda como un ajuste más, sin cifrar** (y los ajustes se sincronizan entre los aparatos de la cuenta). No
+es un problema para la clave pública, y quien pague RatingPosterDB ya sabe que su clave es suya.
+
+Detalle práctico del cambio: un `password` vive en el **Keystore** del aparato, así que al pasar a `text`
+la clave guardada puede quedar huérfana. Da igual: el manifiesto trae `t0-free-rpdb` por defecto, y quien
+tuviera una clave propia solo tiene que volver a escribirla una vez.
+
+### Validar antes de guardar, y un README para quien lo instala (1.22.0)
+
+**`validateSettings`.** Kino lo llama **antes** de guardar (20 s) y muestra cada mensaje bajo su campo;
+devolver `null` acepta, y un rechazo **no guarda nada**, así que la persona conserva lo que escribió. Es
+opcional: no hay campo en el manifiesto, basta el export.
+
+Existe por un patrón que se repite: **un ajuste que se guarda y luego se ignora en silencio**. La persona
+cree que funcionó y, más tarde, que el plugin está roto. Se cortan tres casos:
+
+| Caso | Qué pasaba sin esto |
+| --- | --- |
+| Un tipo de póster con espacios o tildes | Se guardaba y el plugin caía a `poster-default` sin decir nada |
+| La clave gratuita de OpenPosterDB **con RatingPosterDB** | El servidor la rechaza, la sonda lo nota, y **todas** las imágenes vuelven a TMDB: ni una nota, sin explicación |
+| Una clave con espacios | El servidor la rechaza con un mensaje que no ayuda a nadie |
+
+Detalles que costaron una vuelta: **una mayúscula no es un problema** (`Poster-Default` funciona, porque el
+plugin normaliza a minúsculas) y **un valor vacío tampoco** (significa el de fábrica). Lo dijo la primera
+versión del test, que esperaba rechazos donde no los hay: el test estaba mal, no el código.
+
+**El README, para quien lo instala.** Había crecido hasta 21 KB y tenía cosas que **no le sirven a nadie
+que lo instale**:
+
+- **Dirigidas al autor**, no al lector: *«la serie que probaste»*, *«dime y te lo añado»*, *«es lo que
+  pediste»*. En un README público eso sobra entero.
+- **Datos ya falsos**: la lista de opciones de notas (faltaba una), «nueve sitios» para la posición (son
+  ocho), y «nada de esto toca el celular» cuando el celular ya recibe el idioma, la posición y el
+  interruptor del título.
+- **Tablas de medición** (la de 1/2/3 notas y 3 tamaños, y la de por qué el tamaño se encoge): eso es para
+  quien mantiene el plugin, y ya está aquí, en estas notas.
+- **Decisiones internas** (que se probaron las tarjetas de apiVersion 9 y se descartaron).
+
+Quedó en **9,8 KB**, ordenado por lo que alguien quiere saber en el orden en que lo quiere saber: qué es,
+qué añade, cómo se instala, cómo se configura, qué servidor elegir, qué imágenes llevan nota, y qué hacer
+si algo no va. Lo técnico se queda en este archivo, que no lee quien instala.
+
 ### La nota del fondo, centrada, y el plugin a la tienda (1.20.0)
 
 **La posición del fondo.** Reportado con una foto del celular: en las tarjetas de fondo las notas caían en
