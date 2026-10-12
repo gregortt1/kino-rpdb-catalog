@@ -104,6 +104,59 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### El kit nuevo y las pruebas con datos reales (1.24.0)
+
+**El kit que traía el proyecto era viejo, y no solo el contrato.** Ya había cambiado `contract.json` por el
+de apiVersion 9 para que `validate.mjs` entendiera `settingsLayout`, pero al intentar ejecutar el plugin
+contra TMDB de verdad con `KINO_TMDB_KEY` salió esto:
+
+> `[kino.log] TMDB no disponible (unavailable): el Inicio no aporta filas`
+
+Y la causa: **nuestro `sdk/run.mjs` no sabe nada de `kino.tmdb`** — ni `KINO_TMDB_KEY`, ni
+`KINO_TMDB_FIXTURE`, ni una sola mención. Se comprobó en los tres repositorios de plantilla:
+
+| Plantilla | `run.mjs` | ¿Sabe de `kino.tmdb`? |
+| --- | --- | --- |
+| `kino-plugin-archive` (apiVersion 6) | 25.489 B | **no** ← el nuestro |
+| `kino-plugin-own-server` (apiVersion 7) | 29.467 B | **no** |
+| `kino-plugin-archive-audio` (apiVersion 8) | 43.952 B | **sí** |
+
+Así que se trajo el kit del repositorio de audio (apiVersion 8, el más nuevo publicado) **conservando
+nuestro `contract.json` de apiVersion 9**, que es el que entiende `settingsLayout`. Copia del viejo en
+`kino/tmp/sdk-v6/`. El cambio se nota en la validación: ahora además dice *«Solo catálogo: no reproduce
+videos»* y recuerda que `resolve` debe fallar con `not_found` — que es lo que hace.
+
+**Lo que dijo TMDB de verdad.** Primero se ejecutó el plugin contra la API real
+(`KINO_TMDB_KEY=… node sdk/run.mjs --raw . home`) y se analizó la respuesta:
+
+| Comprobación | Resultado |
+| --- | --- |
+| Filas | 11, con sus nombres correctos |
+| Títulos | 184, y **0 sin póster**, **0 sin año** |
+| **Con géneros** | **173 de 184 (94 %)** |
+| Géneros distintos | 19 (acción, animación, aventura, bélica, ciencia ficción, comedia, crimen, drama, entretenimiento, familia, fantasía, historia, misterio, musical, reality, romance, suspenso, terror, western) |
+| Las direcciones | `…&lang=es-MX&position=bc&fallback=true` y `…&position=r&fallback=true`, como se diseñó |
+
+O sea: **el `genre_ids` que sostiene todo el Home por categorías llega de verdad**, y las sinopsis vienen
+en español porque se pide `es-MX`. Eso era exactamente lo que hasta hoy se daba por bueno «porque lo dice
+la documentación».
+
+**Y se quedó grabado.** `explore/grabar-tmdb.mjs` guarda tres respuestas **reales** de TMDB en
+`test/tmdb-real.json` (la llave no está ahí: va en la URL, no en el cuerpo), y hay una prueba que mete esos
+cuerpos por el camino normal del plugin. Es la prueba que **cazaría un cambio de TMDB**: un campo que se
+llame distinto, o que deje de venir. Las demás pruebas siguen usando fixtures inventados —está bien, son
+pruebas de lógica— pero ya no son las únicas.
+
+**Dos cosas del kit que conviene saber** (y que no se pueden hacer, para no buscarlas en balde):
+
+- `validate.mjs --run` **solo acepta funciones que estén en `capabilities`**. Para `settingsStatus`,
+  `categories`, `theme` o `validateSettings` hay que usar `run.mjs` directamente.
+- El kit **no ejecuta `meta`**: no está en su lista. La regla de los 6 segundos la cubre la prueba propia
+  que comprueba que la sonda pide 2 s.
+
+La llave de TMDB para estas pruebas vive en `kino/tmp/tmdb-key.txt`, **fuera de la carpeta que se publica**.
+El plugin no la usa ni la necesita: en la app, TMDB va por la puerta de Kino.
+
 ### La clave deja de ser una "contraseña" (1.23.0)
 
 El ajuste de la clave estaba declarado `password`, y eso hace que **la hoja de consentimiento diga "Este

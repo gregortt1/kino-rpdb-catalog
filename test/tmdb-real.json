@@ -1,0 +1,1379 @@
+{
+ "_comment": "Respuestas reales de TMDB, grabadas para que las pruebas no usen datos inventados. La llave no está aquí.",
+ "anime": {
+  "path": "/discover/tv",
+  "params": {
+   "with_genres": 16,
+   "with_original_language": "ja",
+   "sort_by": "popularity.desc"
+  },
+  "body": {
+   "page": 1,
+   "results": [
+    {
+     "adult": false,
+     "backdrop_path": "/4kQiFnWtwndtCyKMszVJNPEE1kY.jpg",
+     "genre_ids": [
+      16,
+      18
+     ],
+     "id": 70998,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "僧侶と交わる色欲の夜に…",
+     "overview": "En una reunión de antiguos compañeros de instituto, Mio Fukatani se reencuentra con Takahide Kujou, un chico amable al que siempre había querido conocer mejor. Al descubrir que se ha convertido en monje y dirige el templo familiar, cree que cualquier posibilidad romántica se ha esfumado. Tras beber para olvidar, camina ebria hacia casa y se topa de nuevo con Kujou, quien la ayuda a llegar.\n\nUna vez dentro, el deseo reprimido de ambos aflora y pasan una noche de pasión. A partir de entonces, entre estos dos amantes tan poco convencionales comienza a desarrollarse una relación intensa y secreta, llena de encuentros nocturnos.",
+     "popularity": 468.569,
+     "poster_path": "/nX6G2UWqGqBNU1hOA1yOLB1APTi.jpg",
+     "first_air_date": "2017-04-03",
+     "softcore": false,
+     "name": "Souryo to Majiwaru Shikiyoku no Yoru ni...",
+     "vote_average": 5.5,
+     "vote_count": 15
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/c2oiRa7V3bQzof4wVGzLXtWJ5QU.jpg",
+     "genre_ids": [
+      10759,
+      16,
+      35,
+      10765,
+      10762,
+      10751
+     ],
+     "id": 65733,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "ドラえもん",
+     "overview": "Doraemon es un gato robot cósmico que viene del futuro, es amigo de Novita, un niño muy despistado y algo torpe, al cual ayudara con sus grandiosos inventos futuristas los cuales saca de su bolsillo mágico, de este modo tratara de evitar los problemas que él ha provocado en el futuro.",
+     "popularity": 320.9867,
+     "poster_path": "/9YqdMXlPTQGLIG67vqZdsPdPC4T.jpg",
+     "first_air_date": "2005-04-22",
+     "softcore": false,
+     "name": "Doraemon, el gato cósmico",
+     "vote_average": 8.1,
+     "vote_count": 249
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/xIioKjaioyNLW38OMugFmn15DI6.jpg",
+     "genre_ids": [
+      16
+     ],
+     "id": 207840,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "ハーレムきゃんぷっ！",
+     "overview": "Una noche, Kensuke está disfrutando de una acampada en solitario cuando un misterioso chico, Haruki, aparece ante él con un harén de tres chicas. Celoso de Haruki y aprovechándose de él, Kensuke le gasta una broma a Aioi, una de las chicas del harén.\n\nUna aventura de una noche en una tienda de campaña a oscuras... Aio le da la espalda y se resiste en silencio. La respiración de Aio se vuelve cada vez más agitada, y el calor de su piel palpitante es demasiado para soportarlo. Cuando Kensuke la mira a la cara para cruzar la línea, ¿qué ve?",
+     "popularity": 181.5193,
+     "poster_path": "/dsaYRfBviInhrulwtHOyg1KB4ct.jpg",
+     "first_air_date": "2022-10-03",
+     "softcore": false,
+     "name": "Harem Camp!",
+     "vote_average": 7.037,
+     "vote_count": 27
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/vuajwjep1FxphPhMEWKv4bfrCnf.jpg",
+     "genre_ids": [
+      16,
+      35
+     ],
+     "id": 57775,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "ちびまる子ちゃん",
+     "overview": "",
+     "popularity": 172.8041,
+     "poster_path": "/auruoMM9a9c4diotHvI5v7dKFbF.jpg",
+     "first_air_date": "1990-01-07",
+     "softcore": false,
+     "name": "ちびまる子ちゃん",
+     "vote_average": 7.8,
+     "vote_count": 24
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/5F0HVEgkgP99fEWDjPyikGt9jQi.jpg",
+     "genre_ids": [
+      16,
+      10759,
+      10765
+     ],
+     "id": 46260,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "ナルト",
+     "overview": "Narra la historia de un ninja adolescente hiperactivo, impredecible y ruidoso llamado Naruto Uzumaki, quien aspira a convertirse afanosamente en Hokage, el máximo grado ninja en su aldea, con el propósito de ser reconocido como alguien importante dentro de la misma.",
+     "popularity": 168.4202,
+     "poster_path": "/oOkvQ1anSMvdYbUGGf7NAnfwHUt.jpg",
+     "first_air_date": "2002-10-03",
+     "softcore": false,
+     "name": "Naruto",
+     "vote_average": 8.363,
+     "vote_count": 6148
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/o0NsbcIvsllg6CJX0FBFY8wWbsn.jpg",
+     "genre_ids": [
+      10759,
+      16,
+      10765
+     ],
+     "id": 30984,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "BLEACH",
+     "overview": "La serie narra las aventuras de Ichigo Kurosaki, un adolescente que tiene la facultad de interactuar con los espíritus. Una noche, Ichigo se encuentra con una Cegador —personificación japonesa del Dios de la muerte— llamada Rukia Kuchiki, quien se sorprende que pueda verla. Sin embargo, su conversación es interrumpida por la aparición de un Hueco, un espíritu maligno. Después de que Rukia fuera gravemente herida al tratar de proteger a Ichigo, esta intenta traspasarle parte de sus poderes a Ichigo para que pueda enfrentarse al Hueco en igualdad de condiciones. No obstante, Ichigo sin darse cuenta los absorbe casi por completo y logra vencer con facilidad al espíritu.",
+     "popularity": 161.7426,
+     "poster_path": "/rsv116o9M983WvInXztEiwc6WRD.jpg",
+     "first_air_date": "2004-10-05",
+     "softcore": false,
+     "name": "Bleach",
+     "vote_average": 8.354,
+     "vote_count": 2291
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/j9fRIimor0AMFJR9kjZubXcABzZ.jpg",
+     "genre_ids": [
+      10759,
+      16,
+      10765
+     ],
+     "id": 94664,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "無職転生 ～異世界行ったら本気だす～",
+     "overview": "Cuando un autobús atropella a un joven de 34 años que no ha logrado mucho en su vida, su historia no termina ahí. Habiendo reencarnado en un niño, Rudy aprovechará cada oportunidad para vivir la vida que siempre quiso. ¡Con la ayuda de sus amigos, unas habilidades mágicas recién adquiridas, y el coraje para hacer las cosas que siempre ha soñado, se embarca en una aventura épica, con su experiencia pasada intacta!",
+     "popularity": 158.3885,
+     "poster_path": "/tn2mxPYSSUPHgfcAe5SCga1DO0i.jpg",
+     "first_air_date": "2021-01-11",
+     "softcore": false,
+     "name": "Mushoku Tensei Jobless Reincarnation",
+     "vote_average": 8.4,
+     "vote_count": 1776
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/yYpQV25I7XB6S0POJOScPjxYWV5.jpg",
+     "genre_ids": [
+      16,
+      10759,
+      10765
+     ],
+     "id": 60572,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "ポケットモンスター",
+     "overview": "La serie narra las aventuras del joven entrenador Pokemon de diez años Ash Ketchum, que decide comenzar su aventura para llegar a convertirse un día en un gran Maestro de Pokemon. Para ello deberá recorrer distintas regiones, capturar cuantos más Pokemon pueda, y conseguir las medallas de gimnasio necesarias y así participar en la Liga Pokemon, ganarla y así estar un paso más cerca de convertirse en Maestro Pokemon. Para ello cuenta con la ayuda de Pikachu, su primer Pokemon, que obtuvo de manos del Profesor Oak. En su recorrido conocerá y hará nuevos amigos, que le acompañarán y ayudarán para conseguir alcanzar su sueño.",
+     "popularity": 152.1604,
+     "poster_path": "/w57GROjoeTJktLIlINOMYjMJmnZ.jpg",
+     "first_air_date": "1997-04-01",
+     "softcore": false,
+     "name": "Pokémon",
+     "vote_average": 7.989,
+     "vote_count": 2279
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/ydf1CeiBLfdxiyNTpskM0802TKl.jpg",
+     "genre_ids": [
+      16,
+      10765,
+      10759
+     ],
+     "id": 12971,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "ドラゴンボールゼット",
+     "overview": "Sigue las aventuras de Goku y sus amigos mientras enfrentan nuevas amenazas que ponen en peligro a la Tierra. Entre intensas batallas, increíbles transformaciones y grandes dosis de humor, Goku deberá superar sus propios límites para proteger a quienes más quiere.",
+     "popularity": 151.1118,
+     "poster_path": "/ogH4r9HsimigseBNLzHn4uVNOxh.jpg",
+     "first_air_date": "1989-04-26",
+     "softcore": false,
+     "name": "Dragon Ball Z",
+     "vote_average": 8.38,
+     "vote_count": 5032
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/4fVwc77cov2q9i0szzYhlkAaqza.jpg",
+     "genre_ids": [
+      35,
+      10759,
+      10762,
+      16,
+      10751
+     ],
+     "id": 34860,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "忍たま乱太郎",
+     "overview": "",
+     "popularity": 135.5895,
+     "poster_path": "/fzNiSp0HhCthOTYu9IYWlPPa7fU.jpg",
+     "first_air_date": "1993-04-10",
+     "softcore": false,
+     "name": "忍たま乱太郎",
+     "vote_average": 6.8,
+     "vote_count": 23
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/7ZruEnSnHD6Jx5mF0hBt1E306Vt.jpg",
+     "genre_ids": [
+      16,
+      9648,
+      10759,
+      10765
+     ],
+     "id": 65942,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "Re:ゼロから始める異世界生活",
+     "overview": "Natsuki Subaru, un estudiante de secundaria ordinario, está en camino a casa desde la tienda de conveniencia cuando se encuentra transportado a otro mundo. Como está perdido y confundido en un mundo nuevo en el que ni siquiera sabe de izquierda a derecha, la única persona que le alcanzó fue una hermosa niña con cabello plateado. Determinada a pagarle de alguna manera por salvarlo de su propia desesperación, Subaru acepta ayudar a la niña a encontrar algo que está buscando.",
+     "popularity": 122.4638,
+     "poster_path": "/ccG0ZfXOQ0834bIus4SwZrXtkyM.jpg",
+     "first_air_date": "2016-04-04",
+     "softcore": false,
+     "name": "Re:ZERO -Starting Life in Another World-",
+     "vote_average": 8.12,
+     "vote_count": 800
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/bzlZwirOq5SDC0bCWAXGBx4XDg9.jpg",
+     "genre_ids": [
+      16
+     ],
+     "id": 95897,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "おーばーふろぉ",
+     "overview": "Kazushi Sudō, un estudiante universitario, y las hermanas Shirakawa, sus amigas de la infancia, terminan bañándose juntos por accidente, desatando una cómica historia romántica.",
+     "popularity": 122.3325,
+     "poster_path": "/8RtwL5gxUvh9YViqjhNlVRvJpum.jpg",
+     "first_air_date": "2020-01-06",
+     "softcore": false,
+     "name": "Overflow",
+     "vote_average": 7.5,
+     "vote_count": 99
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/5mUYDoFjDlPmDvnUWSknhYjGBBh.jpg",
+     "genre_ids": [
+      16,
+      10759,
+      10765
+     ],
+     "id": 45790,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "ジョジョの奇妙な冒険",
+     "overview": "En la Gran Bretaña de finales del siglo XIX, el joven Jonathan Joestar conoce a su nuevo hermano adoptivo, Dio Brando, quien únicamente quiere usurparle el puesto de heredero de la familia Joestar a Jonathan. No obstante, su plan fracasa y decide usar una máscara de piedra de origen mesoamericano que lo convierte en un vampiro, obteniendo la inmortalidad y poderes sobrenaturales. Jonathan, junto a su maestro del Hamon Will A. Zeppeli y a un matón callejero llamado Robert E.O. Speedwagon, deberá detener y destruir a Dio ahora que su objetivo es dominar a todo el mundo. Serie basada en el famoso manga de mismo nombre. La primera temporada abarca dos arcos argumentales diferentes \"Phantom Blood\" y \"Battle Tendency\".",
+     "popularity": 118.9078,
+     "poster_path": "/2Sc0veFPh9CcHMtNqMyiQqIW9ZF.jpg",
+     "first_air_date": "2012-10-06",
+     "softcore": false,
+     "name": "JoJo's Bizarre Adventure",
+     "vote_average": 8.547,
+     "vote_count": 1673
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/gffVOVZ2Y9cmVIZ26Gt9ByMGCYH.jpg",
+     "genre_ids": [
+      16,
+      18,
+      9648
+     ],
+     "id": 220542,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "薬屋のひとりごと",
+     "overview": "Maomao llevaba una vida tranquila ayudando a su padre, un boticario. Todo cambia el día que la venden como sirvienta al palacio del emperador, pero la vida entre nobles y realeza no es para ella. Cuando la familia imperial enferma, ella decide intervenir para encontrar una cura, lo que llama la atención de Jinshi, un guapo oficial de palacio que decide ascenderla como dama de compañía de una de las concubinas del emperador. ¡Su habilidad con la medicina la hará conocida en el palacio por ayudar a resolver muchos misterios!",
+     "popularity": 122.639,
+     "poster_path": "/bYPACmBf5Nomw3I2IEGGTNwgvWj.jpg",
+     "first_air_date": "2023-10-22",
+     "softcore": false,
+     "name": "Los diarios de la boticaria",
+     "vote_average": 8.7,
+     "vote_count": 665
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/qpin8cASXEVtwhzNsprHYFiOAGk.jpg",
+     "genre_ids": [
+      16,
+      10765,
+      10759
+     ],
+     "id": 95479,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "呪術廻戦",
+     "overview": "La vida de Itadori cambia para siempre cuando, para salvar a un compañero de clase, se come el dedo de Ryomen Sukuna y absorbe una poderosa maldición.",
+     "popularity": 119.2657,
+     "poster_path": "/zKFkzRn1UyE11Jv9CJjVmvmQFvR.jpg",
+     "first_air_date": "2020-10-03",
+     "softcore": false,
+     "name": "Jujutsu Kaisen",
+     "vote_average": 8.578,
+     "vote_count": 4688
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/e1R4kNrWvSfb8AVViMp0okVJfuk.jpg",
+     "genre_ids": [
+      16,
+      18
+     ],
+     "id": 45247,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "ちはやふる",
+     "overview": "Toda su vida Chihaya ha soñado con ver a su hermana mayor convertirse en la modelo Nº1 de Japón. Eso hasta que un estudiante nuevo llamado Arata le explica que un sueño es aquel en el cual uno mismo trabaja. Esta afirmación cambia el pensamiento de Chihaya y gracias a el descubre su verdadero sueño y pasión, el \"Karuta\" un juego de cartas tradicional de Japón. Ella descubre que tiene un talento innato para este juego y ahora su sueño será ser la mejor jugadora del mundo.",
+     "popularity": 110.1582,
+     "poster_path": "/w1oIhPunv4HIMPvMW8SJB04RNTS.jpg",
+     "first_air_date": "2011-10-05",
+     "softcore": false,
+     "name": "Chihayafuru",
+     "vote_average": 7.6,
+     "vote_count": 68
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/gH3HCoEBuiLqzZii0sOMfMyXSR8.jpg",
+     "genre_ids": [
+      16
+     ],
+     "id": 204269,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "森のくまさん、冬眠中。",
+     "overview": "",
+     "popularity": 103.687,
+     "poster_path": "/mGMO3bW9ByTj4xkqCaBQyti4QHm.jpg",
+     "first_air_date": "2022-07-04",
+     "softcore": false,
+     "name": "森のくまさん、冬眠中。",
+     "vote_average": 5.9,
+     "vote_count": 7
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/bFKKyCI89Xq98Gul8cGox8K3sZa.jpg",
+     "genre_ids": [
+      16,
+      10759,
+      10765
+     ],
+     "id": 46298,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "HUNTER×HUNTER",
+     "overview": "Gon Frecks, un niño de 12 años, vive con su tía Mito y su abuela en Isla Ballena, huérfano de madre y según su tía también de padre. Un día Gon es atacado por un oso del bosque, pero es salvado por un cazador quien le explica que está en busca de su maestro para así convertirse en un cazador, él es quien le dice que su padre Gin está vivo. Enterado de esto Gon decide convertirse en cazador para poder encontrar a su padre.",
+     "popularity": 103.4073,
+     "poster_path": "/43wEsSJxuV8SZuipKpolOsuGVRZ.jpg",
+     "first_air_date": "2011-10-02",
+     "softcore": false,
+     "name": "Hunter × Hunter",
+     "vote_average": 8.662,
+     "vote_count": 2226
+    },
+    {
+     "adult": false,
+     "backdrop_path": null,
+     "genre_ids": [
+      16
+     ],
+     "id": 211608,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "るり色プリンセス",
+     "overview": "",
+     "popularity": 93.2779,
+     "poster_path": "/rJXOs6H0bm0YTLAKsPU12afewDo.jpg",
+     "first_air_date": "1992-06-01",
+     "softcore": false,
+     "name": "るり色プリンセス",
+     "vote_average": 4,
+     "vote_count": 1
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/z67lpMtm8YGykJO4p89meuNMvj8.jpg",
+     "genre_ids": [
+      16,
+      80,
+      9648,
+      35
+     ],
+     "id": 30983,
+     "origin_country": [
+      "JP"
+     ],
+     "original_language": "ja",
+     "original_name": "名探偵コナン",
+     "overview": "Shinichi Kudo es un joven detective que consigue esclarecer cualquier misterio, por difícil que sea. Un día, nuestro protagonista descubre los maléficos planes de una peligrosa organización criminal y es envenenado. Sin embargo, el veneno no lo mata, sino que por accidente, lo encoge y lo convierte en un niño de apenas 6 años. Atrapado en este cuerpo, Shinichi, bajo el seudónimo de Conan Edogawa, deberá resolver los casos más difíciles mientras intenta encontrar un antídoto que lo devuelva a la normalidad y hacer lo posible para que su amiga, Ran Mouri, no sospeche quién es realmente el sabiondo Conan...",
+     "popularity": 98.8734,
+     "poster_path": "/gW14n6xxONXrya8CIDhRe5Ada7U.jpg",
+     "first_air_date": "1996-01-08",
+     "softcore": false,
+     "name": "Detective Conan",
+     "vote_average": 8,
+     "vote_count": 793
+    }
+   ],
+   "total_pages": 274,
+   "total_results": 5471
+  }
+ },
+ "populares": {
+  "path": "/movie/popular",
+  "params": {},
+  "body": {
+   "page": 1,
+   "results": [
+    {
+     "adult": false,
+     "backdrop_path": "/4tjxYg2AbOzzG9G1YuiT2NzYhlH.jpg",
+     "genre_ids": [
+      878,
+      28,
+      12
+     ],
+     "id": 969681,
+     "title": "Spider-Man: Un nuevo día",
+     "original_language": "en",
+     "original_title": "Spider-Man: Brand New Day",
+     "overview": "A medida qué Spider-Man está en la cima de su carrera protegiendo la ciudad de Nueva York, una serie de crímenes inusuales lo arrastran a una red de misterios más grande de lo que jamás haya enfrentado.",
+     "popularity": 1024.5071,
+     "poster_path": "/fBFjaDWfNslvrs6bJjknmG27wOS.jpg",
+     "release_date": "2026-07-29",
+     "softcore": false,
+     "video": false,
+     "vote_average": 8.441,
+     "vote_count": 5163
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/3icyRAqgakNcQn6aDVz9libFmBA.jpg",
+     "genre_ids": [
+      27,
+      878,
+      12
+     ],
+     "id": 1423191,
+     "title": "Resident Evil: Noche cero",
+     "original_language": "en",
+     "original_title": "Resident Evil",
+     "overview": "Un desafortunado mensajero, encargado de entregar un paquete a un hospital remoto, se ve atrapado en medio de un brote y debe luchar contra hordas de criaturas mutantes para sobrevivir.",
+     "popularity": 667.2432,
+     "poster_path": "/ntmaNFJ7O60n45E1E6HZlXeSV5e.jpg",
+     "release_date": "2026-09-16",
+     "softcore": false,
+     "video": false,
+     "vote_average": 7.318,
+     "vote_count": 883
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/p40lmrdI4blcAPZQMTPaiy5v5Ym.jpg",
+     "genre_ids": [
+      27,
+      53
+     ],
+     "id": 1291595,
+     "title": "La noche del demonio: Están entre nosotros",
+     "original_language": "en",
+     "original_title": "Insidious: Out of the Further",
+     "overview": "Un trío de acosadores se infiltra en un tranquilo suburbio y obliga a una nueva familia a entrar en el plano astral, donde descubren una verdad aterradora: el Más Allá se está filtrando al mundo real.",
+     "popularity": 552.5952,
+     "poster_path": "/icc5Tjg14CZH94b0CDBQ2PP8YjH.jpg",
+     "release_date": "2026-08-19",
+     "softcore": false,
+     "video": false,
+     "vote_average": 7.699,
+     "vote_count": 638
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/twiVn9oFXOVR0uoYgawyEBlnFu8.jpg",
+     "genre_ids": [
+      12,
+      28,
+      14
+     ],
+     "id": 1368337,
+     "title": "La Odisea",
+     "original_language": "en",
+     "original_title": "The Odyssey",
+     "overview": "Odiseo, el legendario rey de Ítaca, emprende un largo y peligroso viaje de regreso a casa tras la guerra de Troya. A lo largo de su travesía, se ve obligado a enfrentarse a los caprichos de los dioses, a monstruos mitológicos y a pruebas que ponen a prueba su astucia y su humanidad hasta el límite.",
+     "popularity": 420.3055,
+     "poster_path": "/mKPGRRyXIwN8JOLhAbWnxV1gNrS.jpg",
+     "release_date": "2026-07-15",
+     "softcore": false,
+     "video": false,
+     "vote_average": 8.011,
+     "vote_count": 4099
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/4N2Ur9ald3D1rncUzmskcwe9PCK.jpg",
+     "genre_ids": [
+      28,
+      35,
+      12
+     ],
+     "id": 1148365,
+     "title": "Matchbox: La película",
+     "original_language": "en",
+     "original_title": "Matchbox the Movie",
+     "overview": "Cuando un grupo de antiguos amigos de la infancia reconecta, su reunión da un giro inesperado al descubrir un complot internacional y darse cuenta de que deben salvar al mundo.",
+     "popularity": 354.5083,
+     "poster_path": "/ev2GnYar3LUyui8sOu4gqeMXvLi.jpg",
+     "release_date": "2026-10-05",
+     "softcore": false,
+     "video": false,
+     "vote_average": 7.899,
+     "vote_count": 222
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/yBDxqDB29kpH9VojTytjGWBgmdJ.jpg",
+     "genre_ids": [
+      53
+     ],
+     "id": 1101412,
+     "title": "Vértigo 2: Punto muerto",
+     "original_language": "en",
+     "original_title": "Fall 2: Deadpoint",
+     "overview": "Tras sobrevivir a una experiencia extrema, un nuevo grupo de jóvenes se enfrenta a un desafío aún más peligroso en un entorno remoto en Tailandia. A cientos de metros de altura, sin escapatoria y con condiciones impredecibles, deberán luchar contra el miedo, el tiempo y sus propios límites para sobrevivir.",
+     "popularity": 301.3891,
+     "poster_path": "/xQlESgkDM7rczAWySdB0WBomh39.jpg",
+     "release_date": "2026-09-01",
+     "softcore": false,
+     "video": false,
+     "vote_average": 7.3,
+     "vote_count": 446
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/yT8EkAvEkJDFeAxK7s7HlIPELRT.jpg",
+     "genre_ids": [
+      28,
+      53
+     ],
+     "id": 1228834,
+     "title": "The Fix",
+     "original_language": "en",
+     "original_title": "The Fix",
+     "overview": "Un grupo de exoperadores de la CIA, marcados por las secuelas de la guerra en Afganistán y el abandono de su gobierno, decide embarcarse en una peligrosa e ilegal misión de rescate en Teherán. Mientras se adentran en territorio hostil, la desconfianza mutua y los fantasmas de su pasado amenazan con sabotear una operación donde la redención y la supervivencia son su única salida.",
+     "popularity": 295.0375,
+     "poster_path": "/5uB1PWP3QHEcgMXKChsaYmtTUkQ.jpg",
+     "release_date": "2026-09-10",
+     "softcore": false,
+     "video": false,
+     "vote_average": 6.784,
+     "vote_count": 58
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/iXR79oKsLHwLno9jdzxxeFP21sy.jpg",
+     "genre_ids": [
+      28,
+      35
+     ],
+     "id": 1377237,
+     "title": "Entrega al límite",
+     "original_language": "en",
+     "original_title": "Runner",
+     "overview": "Hank es un mensajero encargado de transportar un órgano que puede salvarle la vida a un joven receptor. Pero la misión se vuelve una carrera contra el tiempo cuando un despiadado jefe del crimen hará lo que sea necesario para quedarse con él.",
+     "popularity": 287.3767,
+     "poster_path": "/gxrGVQdFmc3xxVn6UyY31ZjqM0s.jpg",
+     "release_date": "2026-09-07",
+     "softcore": false,
+     "video": false,
+     "vote_average": 8.319,
+     "vote_count": 492
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/yKx5gYrYgakKZuUWAsuFDStBroy.jpg",
+     "genre_ids": [
+      27
+     ],
+     "id": 1712451,
+     "title": "Resident Dead",
+     "original_language": "en",
+     "original_title": "Resident Dead",
+     "overview": "",
+     "popularity": 232.4824,
+     "poster_path": "/qKhMVWwFikSUzOpkhOl35GBLkGH.jpg",
+     "release_date": "2026-09-04",
+     "softcore": false,
+     "video": false,
+     "vote_average": 6.313,
+     "vote_count": 8
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/tzoarEu7TsG959upiELyYPm5kO9.jpg",
+     "genre_ids": [
+      53,
+      18
+     ],
+     "id": 1236045,
+     "title": "Animales",
+     "original_language": "en",
+     "original_title": "Animals",
+     "overview": "Cuando secuestran a su hijo, un candidato a alcalde y su esposa buscan desesperadamente reunir dinero para el rescate, pero sus decisiones podrían destruirles la vida.",
+     "popularity": 240.3403,
+     "poster_path": "/hhycOr6ji35RMGHnstHN4UKAvR4.jpg",
+     "release_date": "2026-10-09",
+     "softcore": false,
+     "video": false,
+     "vote_average": 7.519,
+     "vote_count": 239
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/wYtEvBmpBRXPdwGgr1gcWiwJSI7.jpg",
+     "genre_ids": [
+      28,
+      27,
+      878
+     ],
+     "id": 460458,
+     "title": "Resident Evil: Bienvenidos a Raccoon City",
+     "original_language": "en",
+     "original_title": "Resident Evil: Welcome to Raccoon City",
+     "overview": "Raccoon City, antaño la floreciente sede del gigante farmacéutico Umbrella, es ahora una ciudad del Medio Oeste en vías de extinción. El éxodo de la compañía ha dejado la ciudad convertida en un páramo... con un gran mal que se está gestando bajo la superficie. Cuando ese mal se desata, los habitantes de la ciudad cambian para siempre... y un pequeño grupo de supervivientes debe colaborar para descubrir la verdad sobre Umbrella y sobrevivir a la noche.",
+     "popularity": 195.7779,
+     "poster_path": "/oRIoAzRLtoNO9adWRW0jeGfMr0N.jpg",
+     "release_date": "2021-11-24",
+     "softcore": false,
+     "video": false,
+     "vote_average": 5.949,
+     "vote_count": 2875
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/viZqGq9TNvQ5uXSD4ahg2RpRONT.jpg",
+     "genre_ids": [
+      35,
+      12,
+      10751
+     ],
+     "id": 1204680,
+     "title": "Coyote vs. Acme",
+     "original_language": "en",
+     "original_title": "Coyote vs. Acme",
+     "overview": "Luego de que los productos Acme le fallan demasiadas veces en su tenaz búsqueda del Correcaminos, Wile E. Coyote decide contratar a un abogado especializado en vallas publicitarias para demandar a Acme Corporation.",
+     "popularity": 179.1918,
+     "poster_path": "/e4P8CIoffzsyjTm9e6U87Mng2CU.jpg",
+     "release_date": "2026-08-17",
+     "softcore": false,
+     "video": false,
+     "vote_average": 7.49,
+     "vote_count": 729
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/iRIhPqqoUHiFBxn8oYf3gCQnaKk.jpg",
+     "genre_ids": [
+      28,
+      53
+     ],
+     "id": 1294189,
+     "title": "The Mongoose",
+     "original_language": "en",
+     "original_title": "The Mongoose",
+     "overview": "Acusado de un delito que no cometió y sin nada que perder, un héroe de guerra llamado Ryan «Fang» Flanagan se enfrenta a las agresivas fuerzas del orden en una persecución en coche por todo el país, con la ayuda de sus compañeros de armas y de un público comprensivo que anima su huida.",
+     "popularity": 189.6988,
+     "poster_path": "/eSS5mvSG84UUuvtbHel5Yu3Wik4.jpg",
+     "release_date": "2026-10-29",
+     "softcore": false,
+     "video": false,
+     "vote_average": 0,
+     "vote_count": 0
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/b9q9VmbXDvJmTziRqkwdEmFdwhr.jpg",
+     "genre_ids": [
+      878,
+      9648,
+      53
+     ],
+     "id": 1101383,
+     "title": "El final de la Calle Oak",
+     "original_language": "en",
+     "original_title": "The End of Oak Street",
+     "overview": "Tras un misterioso suceso cósmico que arranca Oak Street de sus suburbios y transporta su vecindario a un lugar desconocido, la familia Platt pronto se adaptarán a un entorno ahora irreconocible.",
+     "popularity": 177.6834,
+     "poster_path": "/jPBfFTwmgco94oS9ikdt9tqHsxm.jpg",
+     "release_date": "2026-08-12",
+     "softcore": false,
+     "video": false,
+     "vote_average": 7.089,
+     "vote_count": 1997
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/qjTqY5coNiz6sVtPng40IzltsoN.jpg",
+     "genre_ids": [
+      16,
+      10751,
+      35,
+      12
+     ],
+     "id": 1084244,
+     "title": "Toy Story 5",
+     "original_language": "en",
+     "original_title": "Toy Story 5",
+     "overview": "Cuando Woody logra regresar con Buzz, Jessie y el resto de la pandilla, descubren una nueva amenaza: la tecnología. Un nuevo tiempo de juego para los niños.",
+     "popularity": 165.0943,
+     "poster_path": "/zkQmhKTszD48vEcjIfwAlqLnGSr.jpg",
+     "release_date": "2026-06-17",
+     "softcore": false,
+     "video": false,
+     "vote_average": 8.282,
+     "vote_count": 2578
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/k22XyPbce7zvzzf5OnT4uaY8ZD1.jpg",
+     "genre_ids": [
+      878,
+      18,
+      53
+     ],
+     "id": 1751701,
+     "title": "After Impact",
+     "original_language": "en",
+     "original_title": "After Impact",
+     "overview": "",
+     "popularity": 203.0966,
+     "poster_path": "/yzDuAQCY2n6zzOlBkn6JzhLhY3k.jpg",
+     "release_date": "2026-09-15",
+     "softcore": false,
+     "video": false,
+     "vote_average": 6,
+     "vote_count": 25
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/ncm7djsVTHQQMX2HEbEVxMUFchG.jpg",
+     "genre_ids": [
+      27
+     ],
+     "id": 1400837,
+     "title": "Madre siniestra",
+     "original_language": "en",
+     "original_title": "Other Mommy",
+     "overview": "Bela, una niña de 8 años que vive en un hogar con problemas matrimoniales, enfrenta a una entidad siniestra que sale de su clóset. La presencia, a quien llama “Otra Mamá”, se vuelve cada vez más amenazante para ella y su familia.",
+     "popularity": 149.7372,
+     "poster_path": "/5yUwsjgWlYCIF5ck1NaUr5zEGg7.jpg",
+     "release_date": "2026-10-07",
+     "softcore": false,
+     "video": false,
+     "vote_average": 5.8,
+     "vote_count": 72
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/flo7Xmyxz2wDUjr5Ff0VrxaVwlY.jpg",
+     "genre_ids": [
+      27,
+      18,
+      53
+     ],
+     "id": 1339274,
+     "title": "No dejes a los niños solos",
+     "original_language": "es",
+     "original_title": "No dejes a los niños solos",
+     "overview": "Por una emergencia de trabajo, Catalina Camacho, una joven y reciente viuda, se ve obligada a dejar a sus hijos a solas por unas cuantas horas. Esa noche, y con la casa para ellos solos, Matías y Emiliano (de diez y siete años) se dan vuelo desempacando cajas para desenterrar su preciada consola de videojuegos, sin saber que algo les hará creer, a cada quién por separado, que su hermano lo quiere matar para volverse el hijo único y favorito. (GIFF)",
+     "popularity": 181.9324,
+     "poster_path": "/w01yTCLE2nCSj8IMxUjrc8vIwQ9.jpg",
+     "release_date": "2026-05-14",
+     "softcore": false,
+     "video": false,
+     "vote_average": 6.885,
+     "vote_count": 113
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/xenXu6gt6iTJBNH80CNr7kg5q2z.jpg",
+     "genre_ids": [
+      27,
+      14,
+      9648
+     ],
+     "id": 1232569,
+     "title": "Pinocho: Sin cuerdas",
+     "original_language": "en",
+     "original_title": "Pinocchio: Unstrung",
+     "overview": "Un niño llamado James visita a su abuelo, Geppetto, quien le presenta a Pinocho, una marioneta de madera aparentemente mágica, para convertirse en su mejor amigo. Sin embargo, ignorando la ingenuidad de Pinocho, James lo presenta al mundo, lo que lleva al títere a emprender una cruzada para eliminar todo lo \"malo\" junto con su amigo y compañero Pepe el Grillo.",
+     "popularity": 154.5082,
+     "poster_path": "/7NpaoOzGDRKJ53znEucFpF2IszT.jpg",
+     "release_date": "2026-07-22",
+     "softcore": false,
+     "video": false,
+     "vote_average": 6.512,
+     "vote_count": 130
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/b7t3r39Oll5qPxBKzLZ8eHMBD7l.jpg",
+     "genre_ids": [
+      35,
+      18
+     ],
+     "id": 1248832,
+     "title": "Digger",
+     "original_language": "en",
+     "original_title": "Digger",
+     "overview": "El hombre más poderoso del mundo se embarca en una misión frenética para demostrar que es el salvador de la humanidad antes de que el desastre que ha desatado lo destruya todo.",
+     "popularity": 125.5344,
+     "poster_path": "/txe65aR0g5JiYnHKPjX3E49M5td.jpg",
+     "release_date": "2026-09-28",
+     "softcore": false,
+     "video": false,
+     "vote_average": 7.533,
+     "vote_count": 318
+    }
+   ],
+   "total_pages": 1001,
+   "total_results": 20001
+  }
+ },
+ "series-tendencia": {
+  "path": "/trending/tv/week",
+  "params": {},
+  "body": {
+   "page": 1,
+   "results": [
+    {
+     "adult": false,
+     "backdrop_path": "/w3agwUSMpJ4X9t1jGrDtqqRPjDQ.jpg",
+     "id": 123542,
+     "name": "LINK CLICK",
+     "original_name": "时光代理人",
+     "overview": "Usando superpoderes para ingresar las fotos de sus clientes una por una, Cheng Xiaoshi y Lu Guang toman en serio su trabajo en «Time Photo Studio», una pequeña tienda de fotografía ubicada en el contexto de una metrópolis moderna.",
+     "poster_path": "/8uBae3fsFRhYNrNBxuWJCXlBFKE.jpg",
+     "media_type": "tv",
+     "original_language": "zh",
+     "genre_ids": [
+      16,
+      10765,
+      9648,
+      18
+     ],
+     "popularity": 54.3771,
+     "first_air_date": "2021-04-30",
+     "softcore": false,
+     "vote_average": 8.2,
+     "vote_count": 134,
+     "origin_country": [
+      "CN"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/9yCJtipMeDe8uAdSJKvw8BnYfRz.jpg",
+     "id": 288673,
+     "name": "Carrie",
+     "original_name": "Carrie",
+     "overview": "Tras la repentina y prematura muerte de su padre, Carrie se ve obligada a enfrentarse al despiadado mundo de la preparatoria pública. Además de lidiar con un caso de acoso que se vuelve viral por toda su comunidad y la era de las redes sociales, llena de presión constante y crueldad cotidiana, también descubre los misteriosos poderes telequinésicos que despiertan junto con su adolescencia.",
+     "poster_path": "/eXjk4W4robXs7l1YXwaXMv4f2qb.jpg",
+     "media_type": "tv",
+     "original_language": "en",
+     "genre_ids": [
+      9648,
+      18,
+      10765
+     ],
+     "popularity": 305.573,
+     "first_air_date": "2026-10-07",
+     "softcore": false,
+     "vote_average": 8.4,
+     "vote_count": 183,
+     "origin_country": [
+      "CA",
+      "US"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/wJjnJbVUwPz0GADAgpFt9nWtzUu.jpg",
+     "id": 95350,
+     "name": "Linternas",
+     "original_name": "Lanterns",
+     "overview": "El nuevo recluta John Stewart y la leyenda Hal Jordan, dos policías intergalácticos, se ven envueltos en un oscuro misterio terrestre mientras investigan un asesinato en el corazón de Estados Unidos.",
+     "poster_path": "/t6Ub9GTbw6uwphRZQQiQlKim0vO.jpg",
+     "media_type": "tv",
+     "original_language": "en",
+     "genre_ids": [
+      18,
+      9648,
+      10765
+     ],
+     "popularity": 243.6838,
+     "first_air_date": "2026-08-16",
+     "softcore": false,
+     "vote_average": 8.296,
+     "vote_count": 715,
+     "origin_country": [
+      "US"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/cn0feYcDvVzVjUDoXa1O8sRgzz.jpg",
+     "id": 285322,
+     "name": "Bajo la superficie",
+     "original_name": "Below",
+     "overview": "Cuando una misteriosa criatura marina aterroriza a un pueblo costero canadiense, un recio pescador y su familia luchan por proteger a su comunidad.",
+     "poster_path": "/mieCT53TaHGVVRdeq8Bx3VwtgIW.jpg",
+     "media_type": "tv",
+     "original_language": "en",
+     "genre_ids": [
+      18,
+      9648
+     ],
+     "popularity": 157.6087,
+     "first_air_date": "2026-10-08",
+     "softcore": false,
+     "vote_average": 7.269,
+     "vote_count": 80,
+     "origin_country": [
+      "CA",
+      "GB"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/8phLVFEXOe02JgFmH9ldn3j4tXW.jpg",
+     "id": 312359,
+     "name": "Dragon Ball Super: Beerus",
+     "original_name": "ドラゴンボール超 ビルス",
+     "overview": "Edición «mejorada» de Dragon Ball Super que incluye una gran cantidad de escenas nuevas y redibujadas, una narrativa reconstruida y un apartado visual actualizado para ofrecer una representación más fiel e inmersiva del manga original de Akira Toriyama.",
+     "poster_path": "/sGuCmIy8kEmx3FWZyMj654rF6g8.jpg",
+     "media_type": "tv",
+     "original_language": "ja",
+     "genre_ids": [
+      16,
+      10759,
+      10765
+     ],
+     "popularity": 61.4619,
+     "first_air_date": "2026-10-11",
+     "softcore": false,
+     "vote_average": 9.8,
+     "vote_count": 86,
+     "origin_country": [
+      "JP"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/qu9epTZh29fGUkY7ZYc9PVsv0Ig.jpg",
+     "id": 73223,
+     "name": "Black Clover",
+     "original_name": "ブラッククローバー",
+     "overview": "Asta y Yuno son dos huérfanos que fueron criados juntos desde su nacimiento en una iglesia en las afueras del Reino de Clover. En un mundo donde todos tienen poder mágico, Asta nació sin ningún tipo de poder. A diferencia de él, Yuno nació como un prodigio con inmenso poder mágico y gran talento para controlarlo. La historia sigue a los dos hermanos adoptivos mientras compiten para ver cuál de ellos se convertirá en el Rey Mago, el Caballero Mágico más fuerte del Reino de Clover.",
+     "poster_path": "/zObHoFAX6P7DirR2dybN3cVC1Ms.jpg",
+     "media_type": "tv",
+     "original_language": "ja",
+     "genre_ids": [
+      16,
+      10759,
+      10765
+     ],
+     "popularity": 67.4575,
+     "first_air_date": "2017-10-03",
+     "softcore": false,
+     "vote_average": 8.513,
+     "vote_count": 2235,
+     "origin_country": [
+      "JP"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/cv102XnL9r7M9jFr0hsMeqzpAWW.jpg",
+     "id": 333101,
+     "name": "Treasure Island",
+     "original_name": "Treasure Island",
+     "overview": "",
+     "poster_path": "/rnTcsrrDckwC2QmEQ1M7YfJDMN7.jpg",
+     "media_type": "tv",
+     "original_language": "en",
+     "genre_ids": [
+      10759
+     ],
+     "popularity": 43.3263,
+     "first_air_date": "2026-10-11",
+     "softcore": false,
+     "vote_average": 4.727,
+     "vote_count": 11,
+     "origin_country": [
+      "US"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/mDYIV71RL3mkaW8IfSGNthuVB7l.jpg",
+     "id": 293610,
+     "name": "닥터X: 하얀 마피아의 시대",
+     "original_name": "닥터X: 하얀 마피아의 시대",
+     "overview": "",
+     "poster_path": "/yIJO1M4sbYLa1HlmurXikO9TQm2.jpg",
+     "media_type": "tv",
+     "original_language": "ko",
+     "genre_ids": [
+      9648,
+      18,
+      80
+     ],
+     "popularity": 110.4925,
+     "first_air_date": "2026-10-09",
+     "softcore": false,
+     "vote_average": 8.5,
+     "vote_count": 6,
+     "origin_country": [
+      "KR"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/h0OC7ouop8YLwbAVfS3UUE2Lw4T.jpg",
+     "id": 247718,
+     "name": "Tierra de Mafia",
+     "original_name": "MobLand",
+     "overview": "El poder está en juego cuando dos familias criminales rivales se enfrentan y arriesgan sus imperios y sus vidas. En el fuego cruzado está Harry Da Souza, un astuto \"solucionador\" que sabe dónde están las lealtades cuando las fuerzas opuestas chocan.",
+     "poster_path": "/s7ye2BFq4HjGMi0dGkzGu5c2fyz.jpg",
+     "media_type": "tv",
+     "original_language": "en",
+     "genre_ids": [
+      80,
+      18
+     ],
+     "popularity": 310.6735,
+     "first_air_date": "2025-03-30",
+     "softcore": false,
+     "vote_average": 8.5,
+     "vote_count": 1013,
+     "origin_country": [
+      "GB",
+      "US"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/t2KFGH07Al4XuIZLHRlF1Hj9IJB.jpg",
+     "id": 284833,
+     "name": "Avatar: Los Siete Refugios",
+     "original_name": "Avatar: Seven Havens",
+     "overview": "Tras un cataclismo global una niña descubre que es el nuevo Avatar - ahora señalada como la Destructora, no una salvadora. Cazada por humanos y espíritus, ella y su gemela perdida deben descubrir sus orígenes y salvar a la humanidad del colapso.",
+     "poster_path": "/iMs2rnOGZm37pdGkWGbEtNewvJv.jpg",
+     "media_type": "tv",
+     "original_language": "en",
+     "genre_ids": [
+      16,
+      10759,
+      10765,
+      10751
+     ],
+     "popularity": 144.7219,
+     "first_air_date": "2026-10-09",
+     "softcore": false,
+     "vote_average": 8.911,
+     "vote_count": 45,
+     "origin_country": [
+      "US"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/rN9xHDp83kZ3cOr82JR1b4rFIFk.jpg",
+     "id": 289423,
+     "name": "La chispa del amor",
+     "original_name": "나를 충전해줘",
+     "overview": "Cuando un heredero con un corazón artificial conoce a una mujer —literalmente— eléctrica, hacen un trato que hará latir su corazón en más de un sentido.",
+     "poster_path": "/2KLblBXNDX05ZqLwubCyjeokGvZ.jpg",
+     "media_type": "tv",
+     "original_language": "ko",
+     "genre_ids": [
+      10765,
+      35
+     ],
+     "popularity": 124.9537,
+     "first_air_date": "2026-10-09",
+     "softcore": false,
+     "vote_average": 8,
+     "vote_count": 9,
+     "origin_country": [
+      "KR"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/70RZX7kNjA0Qjn6HigB1oMvFJ8R.jpg",
+     "id": 258165,
+     "name": "Al este del Edén",
+     "original_name": "East of Eden",
+     "overview": "A principios del siglo XX, una mujer fuerte e independiente abre una brecha entre dos hermanos... y marca el comienzo de una saga que se extenderá a la siguiente generación.",
+     "poster_path": "/ck2VRrRpGG3W5wkpFovYlGVLYke.jpg",
+     "media_type": "tv",
+     "original_language": "en",
+     "genre_ids": [
+      18
+     ],
+     "popularity": 87.544,
+     "first_air_date": "2026-10-01",
+     "softcore": false,
+     "vote_average": 8,
+     "vote_count": 64,
+     "origin_country": [
+      "US"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/nE94ejEbzNCU48bW1oju0dqBONz.jpg",
+     "id": 97546,
+     "name": "Ted Lasso",
+     "original_name": "Ted Lasso",
+     "overview": "Ted Lasso, un ingenuo entrenador de fútbol americano que decide probar suerte en un club de fútbol inglés aunque no tiene idea de ese deporte. Su inexperiencia despierta recelo y desdén entre jugadores y aficionados. Con un equipo y una ciudad que lo mira con sospecha, ¿Logrará tener éxito?",
+     "poster_path": "/6YUzArR2TElmGMj1HmnnfVlgunL.jpg",
+     "media_type": "tv",
+     "original_language": "en",
+     "genre_ids": [
+      18,
+      35
+     ],
+     "popularity": 268.3642,
+     "first_air_date": "2020-08-14",
+     "softcore": false,
+     "vote_average": 8.362,
+     "vote_count": 2748,
+     "origin_country": [
+      "US"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/3SvKCITqMtjgPIhFBjRc4yTAc4H.jpg",
+     "id": 293607,
+     "name": "100일의 거짓말",
+     "original_name": "100일의 거짓말",
+     "overview": "",
+     "poster_path": "/zOSAKuyQfj3HmnvH4HU6GLu9cU8.jpg",
+     "media_type": "tv",
+     "original_language": "ko",
+     "genre_ids": [
+      10759,
+      18
+     ],
+     "popularity": 64.413,
+     "first_air_date": "2026-10-10",
+     "softcore": false,
+     "vote_average": 0,
+     "vote_count": 0,
+     "origin_country": [
+      "KR"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/gffVOVZ2Y9cmVIZ26Gt9ByMGCYH.jpg",
+     "id": 220542,
+     "name": "Los diarios de la boticaria",
+     "original_name": "薬屋のひとりごと",
+     "overview": "Maomao llevaba una vida tranquila ayudando a su padre, un boticario. Todo cambia el día que la venden como sirvienta al palacio del emperador, pero la vida entre nobles y realeza no es para ella. Cuando la familia imperial enferma, ella decide intervenir para encontrar una cura, lo que llama la atención de Jinshi, un guapo oficial de palacio que decide ascenderla como dama de compañía de una de las concubinas del emperador. ¡Su habilidad con la medicina la hará conocida en el palacio por ayudar a resolver muchos misterios!",
+     "poster_path": "/bYPACmBf5Nomw3I2IEGGTNwgvWj.jpg",
+     "media_type": "tv",
+     "original_language": "ja",
+     "genre_ids": [
+      16,
+      18,
+      9648
+     ],
+     "popularity": 122.639,
+     "first_air_date": "2023-10-22",
+     "softcore": false,
+     "vote_average": 8.7,
+     "vote_count": 665,
+     "origin_country": [
+      "JP"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/v38qp4bySLTXYu3MF8r5GD51FN3.jpg",
+     "id": 37854,
+     "name": "One Piece",
+     "original_name": "ワンピース",
+     "overview": "Esta historia se sitúa en el momento más álgido de la Gran Era de los Piratas, cuando el joven Monkey D. Luffy quiere llegar a ser el Rey de los Piratas y hacerse al fin con un legendario tesoro, el One Piece.",
+     "poster_path": "/8f33Q5AuM2G5ZqFeusbIqDjr3cI.jpg",
+     "media_type": "tv",
+     "original_language": "ja",
+     "genre_ids": [
+      10759,
+      35,
+      16
+     ],
+     "popularity": 95.6655,
+     "first_air_date": "1999-10-20",
+     "softcore": false,
+     "vote_average": 8.752,
+     "vote_count": 5591,
+     "origin_country": [
+      "JP"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/yGJGwt7DdIWTUXuahLfhcH1gi7G.jpg",
+     "id": 290856,
+     "name": "Marshals: Una historia de Yellowstone",
+     "original_name": "Marshals",
+     "overview": "Tras abandonar el rancho Yellowstone, Kayce Dutton se une a los Marshals Federales. Usa su habilidad como vaquero y agente SEAL para llevar justicia a Montana. Los Marshals son la última línea de defensa en la guerra contra la violencia regional.",
+     "poster_path": "/dlQIl9xzWcSb3d0Sn56x1bFbOJw.jpg",
+     "media_type": "tv",
+     "original_language": "en",
+     "genre_ids": [
+      18,
+      80,
+      10759
+     ],
+     "popularity": 100.5278,
+     "first_air_date": "2026-03-01",
+     "softcore": false,
+     "vote_average": 7.9,
+     "vote_count": 388,
+     "origin_country": [
+      "US"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/kQ58qbyCGkdmqKZtxMZbLNpgSxX.jpg",
+     "id": 231620,
+     "name": "现在就出发",
+     "original_name": "现在就出发",
+     "overview": "",
+     "poster_path": "/uEoAOCIm4W275u00vx6UmhW6ruA.jpg",
+     "media_type": "tv",
+     "original_language": "zh",
+     "genre_ids": [
+      10764,
+      35
+     ],
+     "popularity": 62.535,
+     "first_air_date": "2023-08-13",
+     "softcore": false,
+     "vote_average": 7.5,
+     "vote_count": 6,
+     "origin_country": [
+      "CN"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/8p39Ud6ZKMixBQ7R4frg2o3idzc.jpg",
+     "id": 207347,
+     "name": "La caja azul",
+     "original_name": "アオのハコ",
+     "overview": "Esta serie sigue a Taiki Inomata, un adolescente que asiste a la escuela Eimei y juega en el equipo de bádminton. Todas las mañanas, entrena junto con Chinatsu Kano, una chica que lo tiene enamorado, está en un curso superior y juega en el equipo de baloncesto. Cuando los padres de Chinatsu se mudan al exterior por trabajo, ella va a vivir con la familia de Taiki. Ahora que comparten el mismo techo, él tratará de profundizar el vínculo que los une mientras ambos se esfuerzan por llegar al campeonato nacional con sus respectivos equipos.",
+     "poster_path": "/dDypuyZkEWWEKffTxHjrCcpNZ3z.jpg",
+     "media_type": "tv",
+     "original_language": "ja",
+     "genre_ids": [
+      16,
+      18
+     ],
+     "popularity": 52.5625,
+     "first_air_date": "2024-10-03",
+     "softcore": false,
+     "vote_average": 7.9,
+     "vote_count": 104,
+     "origin_country": [
+      "JP"
+     ]
+    },
+    {
+     "adult": false,
+     "backdrop_path": "/5mUYDoFjDlPmDvnUWSknhYjGBBh.jpg",
+     "id": 45790,
+     "name": "JoJo's Bizarre Adventure",
+     "original_name": "ジョジョの奇妙な冒険",
+     "overview": "En la Gran Bretaña de finales del siglo XIX, el joven Jonathan Joestar conoce a su nuevo hermano adoptivo, Dio Brando, quien únicamente quiere usurparle el puesto de heredero de la familia Joestar a Jonathan. No obstante, su plan fracasa y decide usar una máscara de piedra de origen mesoamericano que lo convierte en un vampiro, obteniendo la inmortalidad y poderes sobrenaturales. Jonathan, junto a su maestro del Hamon Will A. Zeppeli y a un matón callejero llamado Robert E.O. Speedwagon, deberá detener y destruir a Dio ahora que su objetivo es dominar a todo el mundo. Serie basada en el famoso manga de mismo nombre. La primera temporada abarca dos arcos argumentales diferentes \"Phantom Blood\" y \"Battle Tendency\".",
+     "poster_path": "/2Sc0veFPh9CcHMtNqMyiQqIW9ZF.jpg",
+     "media_type": "tv",
+     "original_language": "ja",
+     "genre_ids": [
+      16,
+      10759,
+      10765
+     ],
+     "popularity": 118.9078,
+     "first_air_date": "2012-10-06",
+     "softcore": false,
+     "vote_average": 8.547,
+     "vote_count": 1673,
+     "origin_country": [
+      "JP"
+     ]
+    }
+   ],
+   "total_pages": 500,
+   "total_results": 10000
+  }
+ }
+}
