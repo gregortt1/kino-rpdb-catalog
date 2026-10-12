@@ -104,6 +104,41 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### La nota del fondo, centrada, y el plugin a la tienda (1.20.0)
+
+**La posición del fondo.** Reportado con una foto del celular: en las tarjetas de fondo las notas caían en
+la **esquina superior derecha**, pegadas al borde de la pantalla. La causa era doble:
+
+- El valor por defecto era **`auto`**, que quiere decir «no mandes el parámetro» — y medido, **sin
+  `position` el servidor pone `tr`**, la esquina superior derecha. O sea: el defecto era justo lo que se
+  veía mal.
+- Y la posición **solo se enviaba en la tele**, así que en el celular no había forma de cambiarla.
+
+Arreglado con dos decisiones:
+
+1. El defecto pasa a **`r`** (centrada a la derecha) y **`auto` desaparece de las opciones**: no tiene
+   sentido ofrecer «como está» cuando «como está» es justo lo que se quiere evitar.
+2. La posición pasa al grupo que va en **todos los aparatos**. El razonamiento: es una propiedad de la
+   **imagen**, no de la pantalla — el fondo es la misma foto 16:9 en un celular y en un televisor, así que
+   una esquina pegada al borde es fea en los dos. El **tamaño** de la nota sigue siendo de la tele, porque
+   ese sí depende de lo pequeño que se dibuje la tarjeta (470 px en la tele).
+
+En el póster nada cambia: va fijo abajo, centrado.
+
+**A la tienda.** El requisito que bloqueaba era uno solo, y estaba en el manifiesto: `"discoverable": false`
+hace que Kino imprima *«No aparecerá en la búsqueda de Kino»*. Quitado. Lo demás ya se cumplía o se ajustó:
+
+| Requisito | Estado |
+| --- | --- |
+| Repositorio público y **no un fork** | ✓ |
+| `kino-plugin.json` en la raíz, válido, y sin la línea de «No aparecerá…» | ✓ (y hay un test que lo vigila) |
+| `id` propio, no el de la plantilla ni el de un plugin recomendado | ✓ `rpdb-catalog` |
+| `apiVersion` lo más bajo posible, para llegar a Kinos viejos | ✓ 6 (Kino 0.9.50+) |
+| Nombre y descripción en español, con qué hay y si pide algo | ✓ («no pide cuenta ni registro») |
+| `icon` cuadrado de hasta 128 KB | ✓ 512×512, 20 KB |
+| `categories` para el chip de la tienda | ✓ `["movies", "series"]` |
+| **El topic `kino-plugin` en GitHub** | ✗ **pendiente**: es lo único que no puede hacer el plugin, y es la única forma en que Kino encuentra un repositorio |
+
 ### El mojibake real: mi comando de PowerShell (1.19.0)
 
 La 1.18.0 se publicó con los escapes `\uXXXX` puestos… **escapando texto corrompido**. El manifiesto
@@ -360,9 +395,12 @@ suman muchas más.
 
 ### El nombre, el `genre` y los ajustes por imagen (1.12.0)
 
-**El nombre.** Pasa de «Catálogo con notas» a **OpenPoster**, a petición de quien lo usa. El **`id` no se
-toca** (`rpdb-catalog`): cambiarlo haría que Kino lo viera como otro plugin y se perderían los ajustes
-guardados y el consentimiento. El `name` es libre, el `id` no.
+**El nombre.** Ha llevado tres, y cada cambio tuvo su motivo: «Catálogo con notas» era largo y feo, se
+acortó a **OpenPoster** — que resultó ser el nombre del **servicio** de imágenes, y con el plugin ya en la
+tienda eso invita a pensar que es su plugin oficial, que no lo es — y quedó en **PosterX**, que dice lo que
+hace sin pisar el nombre de nadie. El **`id` nunca se ha tocado** (`rpdb-catalog`): cambiarlo haría que Kino
+lo viera como otro plugin y se perderían los ajustes guardados y el consentimiento. El `name` es libre, el
+`id` no.
 
 **El `genre` de las filas.** La guía lo dice en una línea que es fácil pasar por alto: `genre` no es
 `peliculas`/`series`, es una **lista cerrada de diez** (`peliculas`, `series`, `anime`, `infantil`,

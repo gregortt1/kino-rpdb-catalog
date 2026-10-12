@@ -1,4 +1,4 @@
-# Catálogo con notas
+# PosterX
 
 Un catálogo de películas y series para **Kino** cuyas imágenes llevan la **nota incrustada** (IMDb,
 Rotten Tomatoes, Metacritic, Trakt, Letterboxd…), gracias a
@@ -155,11 +155,14 @@ Cada imagen tiene su sitio, y **no se mezclan**:
 | --- | --- | --- |
 | **Póster** (vertical) | Abajo, centrada | No, fija |
 | **Fotograma** de capítulo | Arriba a la derecha | No, fija |
-| **Fondo** (las tarjetas de la tele) | Donde tú digas | **Sí** |
+| **Fondo** (las tarjetas del Inicio) | **Centrada a la derecha** por defecto | **Sí**, entre ocho sitios |
 
-Tiene sentido que solo el fondo se elija: es el único que Kino recorta a lo ancho en una tele, y el póster
-y el fotograma ya tienen su encuadre natural. Antes un solo ajuste movía las tres cosas a la vez, que no
-es lo que quiere nadie.
+El fondo viene **centrada a la derecha**: en una esquina las notas quedan pegadas al borde de la pantalla,
+y en un celular se nota mucho. Esa posición **se aplica en los dos aparatos**, porque el fondo es la misma
+foto 16:9 en todos; el **tamaño** de la nota, en cambio, es solo de la tele, que es donde la tarjeta se
+dibuja pequeña (unos 470 píxeles de ancho).
+
+Las otras siete: centrada a la izquierda, abajo o arriba centrada, y las cuatro esquinas.
 
 ### Cuántas notas, y que quepan en una fila
 

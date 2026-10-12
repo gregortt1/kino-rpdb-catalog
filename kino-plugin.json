@@ -1,22 +1,21 @@
 {
   "id": "rpdb-catalog",
-  "name": "OpenPoster",
-  "version": "1.19.0",
+  "name": "PosterX",
+  "version": "1.21.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
-  "discoverable": false,
   "categories": [
     "movies",
     "series"
   ],
   "section": {
-    "label": "OpenPoster"
+    "label": "PosterX"
   },
   "theme": {
     "highlight": "#F5C518"
   },
-  "description": "Cat\u00e1logo de TMDB (tendencias, populares, mejor valoradas, anime, documentales y g\u00e9neros) con los p\u00f3sters, los fondos y los fotogramas de cap\u00edtulo con la nota incrustada. Rellena el p\u00f3ster de los t\u00edtulos de tus otras fuentes y no reproduce nada.",
+  "description": "Cat\u00e1logo de TMDB con la nota incrustada en los p\u00f3sters, los fondos y los fotogramas de cap\u00edtulo: tendencias, populares, mejor valoradas, anime, documentales, infantil, doramas y g\u00e9neros. Rellena el p\u00f3ster de los t\u00edtulos de tus otras fuentes, no reproduce nada y no pide cuenta ni registro.",
   "author": "gregorysteventt-source",
   "homepage": "https://github.com/gregorysteventt-source/kino-rpdb-catalog",
   "hosts": [
@@ -199,12 +198,16 @@
       "key": "backdropPosition",
       "label": "D\u00f3nde va la nota",
       "type": "select",
-      "default": "auto",
+      "default": "r",
       "hint": "Solo el fondo",
       "options": [
         {
-          "value": "auto",
-          "label": "Como est\u00e1 (esquina arriba derecha)"
+          "value": "r",
+          "label": "Centrada a la derecha (recomendado)"
+        },
+        {
+          "value": "l",
+          "label": "Centrada a la izquierda"
         },
         {
           "value": "bc",
@@ -213,14 +216,6 @@
         {
           "value": "tc",
           "label": "Arriba, centrada"
-        },
-        {
-          "value": "l",
-          "label": "A la izquierda"
-        },
-        {
-          "value": "r",
-          "label": "A la derecha"
         },
         {
           "value": "bl",

@@ -349,17 +349,25 @@ function badgeSize(kind, chosen) {
 let tuningOff = false;
 
 // Where the badge sits on the image. The server takes eight anchors; measured on the live service, all
-// eight give a different image, and NOT asking for one leaves backdrops at the top-right corner.
+// eight give a different image, and NOT asking for one leaves backdrops at the top-right CORNER — which
+// is what it did until now, reported as ugly on a phone, where the corner is against the screen edge.
 //
-// Only the BACKDROP is the person's to choose. A poster is vertical and its badge has always been at the
-// bottom centre, and an episode tile is 16:9 with the badge top-right: mixing one setting across the three
-// changed the posters and the episode tiles too, which is not what was asked for. Those two are fixed.
+// Two things changed with that report:
+//   - The default is `r`, centred on the right, instead of "let the server decide" (which means the top
+//     right corner).
+//   - The position is sent on EVERY device, not only on a television. It is a property of the IMAGE, not
+//     of the screen: the backdrop is the same 16:9 picture everywhere. The badge SIZE still belongs to
+//     the television, because that depends on how small the card is drawn.
+//
+// A poster and an episode still keep a fixed position: a poster is vertical with its badge at the bottom,
+// and a still is 16:9 with it top-right.
 const POSITIONS = ["bc", "tc", "l", "r", "tl", "tr", "bl", "br"];
 const FIXED_POSITION = { poster: "bc", still: "tr" };
+const DEFAULT_POSITION = "r";
 
 function badgePosition() {
-  const stored = String(setting("backdropPosition", "auto")).trim().toLowerCase();
-  return POSITIONS.indexOf(stored) === -1 ? "" : stored;
+  const stored = String(setting("backdropPosition", DEFAULT_POSITION)).trim().toLowerCase();
+  return POSITIONS.indexOf(stored) === -1 ? DEFAULT_POSITION : stored;
 }
 
 function positionFor(kind) {
@@ -412,6 +420,10 @@ function tuningQuery(mode, kind) {
     // prints its own title: without the text, the notes stop fighting with it. Verified against the live
     // service (a documented boolean): when there is no textless version it serves the normal one.
     if (kind === "poster" && isOn("posterTextless")) parts.push("textless=true");
+    // Where the badge sits. Every device: the image is the same 16:9 picture on a phone and on a
+    // television, so a corner that is against the screen edge is ugly in both.
+    const position = positionFor(kind);
+    if (position) parts.push("position=" + position);
   }
 
   // From here on, only a television, and only while the server accepts the tuning.
@@ -424,8 +436,6 @@ function tuningQuery(mode, kind) {
   parts.push("badge_size=" + badgeSize(kind, q.badge));
   // imageSize only means something on a wide image; a poster is not scaled by it.
   if (q.size && kind !== "poster") parts.push("imageSize=" + q.size);
-  const position = positionFor(kind);
-  if (position) parts.push("position=" + position);
   // Which notes, and how many. `ratings_order` alone only sorts and falls through to another source
   // (measured on Lanterns, where IMDb has a rating for episode 1 only), so the sources that are not
   // wanted are excluded outright — except in "automático", where the server picks.
