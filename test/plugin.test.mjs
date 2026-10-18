@@ -152,7 +152,9 @@ test("el manifiesto es el que Kino instala", async () => {
   // tele las tarjetas se ven recargadas, y la documentación recomienda declarar el número MÁS BAJO que
   // tenga lo que usas, para que el plugin corra también en Kinos viejos.
   assert.equal(manifest.apiVersion, 6);
-  assert.equal(manifest.catalogOnly, true);     // lista y describe, nunca reproduce
+  // PRUEBA (1.27.0): sin `catalogOnly`, para ver si la lupa de la cabecera de la sección aparece. Si el
+  // experimento dice que sí, se decide si compensa; si dice que no, se vuelve a poner.
+  assert.equal(manifest.catalogOnly, undefined);
   assert.deepEqual(manifest.capabilities.sort(), ["browse", "episodes", "home", "meta", "resolve", "scopedSearch", "search"]);
   // Un solo host: TMDB va por kino.tmdb, que no necesita declararlo.
   // Los dos servidores van declarados: así la persona los elige de una lista y ninguno necesita un
