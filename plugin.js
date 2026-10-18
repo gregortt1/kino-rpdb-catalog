@@ -924,6 +924,20 @@ export async function search(query) {
   await ensureTuningProbe();
   await ensureBackdropProbe();
   const page = Math.max(1, parseInt(query && query.cursor, 10) || 1);
+
+  // scopedSearch: la persona escribe en la lupa de una página "Ver más" (un género, una fila temática).
+  // Sin esto, Kino solo filtra los títulos que ya tiene cargados, así que buscar «naruto» dentro de Anime
+  // solo encontraba algo si Naruto estaba entre las primeras tarjetas. Con esto se le pregunta a TMDB.
+  const within = query && typeof query.within === "string" ? query.within : "";
+  if (within) {
+    const spec = scopedSpec(within);
+    if (!spec) return null;   // Kino filtra lo que tiene: mejor que devolver la página entera.
+    const data = await tmdb(spec.path, Object.assign({}, spec.params, { with_text_query: q, page }));
+    const items = results(data).map((m) => item(m, spec.kind)).filter(Boolean);
+    const next = nextCursor(data, page);
+    return next ? { items, next } : items;
+  }
+
   const data = await tmdb("/search/multi", { query: q, include_adult: false, page });
   const items = results(data)
     .filter((m) => m.media_type === "movie" || m.media_type === "tv")
@@ -931,6 +945,23 @@ export async function search(query) {
     .filter(Boolean);
   const next = nextCursor(data, page);
   return next ? { items, next } : items;
+}
+
+// The ref of a "Ver más" page, if a text filter makes sense on it.
+//
+// Only the `/discover` paths take `with_text_query`; on `/movie/popular` or `/trending/...` TMDB ignores
+// it and the "search" would answer the whole page, which is worse than not offering it. Measured against
+// the real API: `with_text_query` matches the LOCALIZED title too ("interestelar" finds Interestelar,
+// "juego de tronos" finds Juego De Tronos), so a search inside a genre really works for a Spanish user.
+//
+// The path says the kind (`/discover/tv` is series), and a ref where they disagree would build posters
+// with the wrong media prefix: `movie-` on a series card is another title's poster. Refused, not guessed.
+function scopedSpec(within) {
+  const spec = listRef(parseRef(within));
+  if (!spec) return null;
+  const kindOfPath = /^\/discover\/(movie|tv)$/.exec(spec.path);
+  if (!kindOfPath || kindOfPath[1] !== spec.kind) return null;
+  return spec;
 }
 
 export async function episodes(ref) {

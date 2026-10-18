@@ -104,6 +104,39 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### La lupa dentro de una categoría (1.26.0)
+
+Reportado por alguien que usa el plugin desde la tienda: *«Me gustaría que tuviera una lupa para poder
+buscar mejor»*. Lo primero fue comprobar que la lupa **ya existía**: el plugin declara `search` y la
+sección tiene su búsqueda. Lo que faltaba era la de dentro.
+
+**Lo que pasaba.** La página "Ver más" de un mosaico (un género) **ya tiene su lupa**, pero sin
+`scopedSearch` la contesta Kino y **solo filtra los títulos que tiene cargados**. En Anime, cargados son
+veinte títulos: buscar "naruto" no encontraba nada si Naruto no estaba entre esas veinte tarjetas.
+
+**Lo que hace ahora.** Con `scopedSearch` la contesta el plugin, y le pregunta a TMDB con el **género de
+la página y el texto a la vez** (`with_text_query`), así que encuentra en todo el género.
+
+Ese parámetro se midió antes de diseñar nada:
+
+| Prueba contra TMDB | Resultado |
+| --- | --- |
+| Acción: `with_text_query=tiburon` | 20.001 títulos en el género → **27** con "tiburon" |
+| **¿Acierta con el título en español?** `interestelar` | **Interestelar** ✓ (el original es *Interstellar*) |
+| `juego de tronos` | **Juego De Tronos** ✓ |
+| `el señor de los anillos` | las tres películas ✓ |
+| `tiburon`, sin la tilde | **Tiburón blanco** ✓ (tolera las tildes: importa en un teclado de tele) |
+
+**Dos cosas que hubo que cerrar.** El parámetro solo lo entienden las rutas `/discover`: en `/movie/popular`
+o en `/trending` TMDB lo ignora y la "búsqueda" devolvería la página entera, que es peor que no ofrecerla.
+Ahí se devuelve **`null`** y Kino filtra lo que tiene. Y la ruta dice el tipo (`/discover/tv` son series): una
+`ref` en la que ruta y tipo no cuadren construiría los pósters con el prefijo equivocado (`movie-` en una
+tarjeta de serie es el póster de otro título), así que se rechaza en vez de adivinar. Lo cazó una prueba
+escrita a propósito, no una revisión.
+
+Probado contra la API real con el kit: "naruto" dentro de Anime devuelve **Naruto (2002), Naruto
+Shippuden (2007), Boruto (2017)** y el SD (2012).
+
 ### Recordar entre sesiones lo que ya se comprobó (1.25.0)
 
 **El problema.** Kino cierra el sandbox del plugin a menudo: tras cinco minutos sin usarlo, tras cualquier

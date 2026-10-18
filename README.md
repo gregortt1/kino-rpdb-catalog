@@ -20,7 +20,9 @@ ofrece **"Buscar dónde verlo"** y lo busca en tus otras fuentes.
 - **Sus categorías en el Inicio**: sus títulos aparecen en las filas de categoría de Kino —**Anime**,
   **Infantil**, **Documentales** y las de género (Acción, Comedia, Drama, Terror…)—, junto a los de tus
   otras fuentes.
-- **Búsqueda propia** en todo el catálogo de TMDB, con "Ver más" para seguir mirando.
+- **Búsqueda propia** en todo el catálogo de TMDB. Y **lupa dentro de cada categoría**: si estás en Anime
+  y buscas "naruto", encuentra Naruto aunque no estuviera entre las tarjetas cargadas — antes solo se
+  buscaba en lo que ya había en pantalla.
 - **Fichas completas**: sinopsis, nota, año, temporadas y capítulos.
 - **Imágenes con nota**: el póster, el fondo y los fotogramas de capítulo.
 - **Rellena el póster de un título ajeno** cuando su fuente no trae ninguno.

@@ -153,7 +153,7 @@ test("el manifiesto es el que Kino instala", async () => {
   // tenga lo que usas, para que el plugin corra también en Kinos viejos.
   assert.equal(manifest.apiVersion, 6);
   assert.equal(manifest.catalogOnly, true);     // lista y describe, nunca reproduce
-  assert.deepEqual(manifest.capabilities.sort(), ["browse", "episodes", "home", "meta", "resolve", "search"]);
+  assert.deepEqual(manifest.capabilities.sort(), ["browse", "episodes", "home", "meta", "resolve", "scopedSearch", "search"]);
   // Un solo host: TMDB va por kino.tmdb, que no necesita declararlo.
   // Los dos servidores van declarados: así la persona los elige de una lista y ninguno necesita un
   // ajuste de tipo `url` escrito a mano.
@@ -596,6 +596,50 @@ test("con respuestas REALES de TMDB los títulos salen completos", async () => {
   const pelis = populares.rows.find((r) => r.id === "sec-pop-movies");
   assert.ok(pelis && pelis.items.length === 20, "la fila de películas populares sale con datos reales");
   assert.ok(pelis.items.every((i) => i.ids.tmdb && i.poster));
+});
+
+test("la lupa dentro de una página busca en TMDB, y solo donde se puede", async () => {
+  // scopedSearch: la persona escribe en la lupa de un "Ver más". Sin esto, Kino solo filtra los títulos
+  // que ya tiene cargados, así que buscar «naruto» dentro de Anime solo encontraba algo si Naruto estaba
+  // entre las primeras tarjetas.
+  const animeRef = JSON.stringify({
+    path: "/discover/tv",
+    kind: "tv",
+    params: { with_genres: 16, with_original_language: "ja", sort_by: "popularity.desc" },
+    list: true,
+  });
+
+  const plugin = await freshPlugin();
+  const asked = setKino({ config: { key: KEY, service: "openposterdb" }, device: "tv", fetchImpl: okFetch });
+  await plugin.search({ q: "naruto", within: animeRef });
+
+  // Se le preguntó a TMDB con el género Y el texto: la búsqueda es DENTRO del género.
+  const pedido = asked.tmdb.find((c) => c.path === "/discover/tv" && c.params.with_text_query === "naruto");
+  assert.ok(pedido, "tiene que pedir /discover/tv con with_text_query");
+  assert.equal(pedido.params.with_genres, 16, "respetando el género de la página");
+  assert.equal(pedido.params.with_original_language, "ja", "y el resto de parámetros de esa página");
+  assert.equal(pedido.params.language, "es-MX");
+
+  // Una página que NO sabe filtrar por texto devuelve null, y Kino filtra lo que tiene cargado: devolver
+  // la página entera sería peor que no ofrecer la búsqueda.
+  for (const ref of [
+    JSON.stringify({ path: "/movie/popular", kind: "movie", list: true }),
+    JSON.stringify({ path: "/trending/tv/week", kind: "tv", list: true }),
+    "no es una ref",
+    JSON.stringify({ path: "/discover/movie", kind: "tv", list: true }),
+  ]) {
+    const otra = await freshPlugin();
+    const pedidos = setKino({ config: { key: KEY, service: "openposterdb" }, device: "tv", fetchImpl: okFetch });
+    const r = await otra.search({ q: "algo", within: ref });
+    assert.equal(r, null, "debe devolver null: " + ref);
+    assert.ok(!pedidos.tmdb.some((c) => c.params.with_text_query), "y no debe preguntar por texto");
+  }
+
+  // Sin `within` la búsqueda es la de siempre, en todo el catálogo.
+  const global = await freshPlugin();
+  const pedidosGlobal = setKino({ config: { key: KEY, service: "openposterdb" }, device: "tv", fetchImpl: okFetch });
+  await global.search({ q: "matrix" });
+  assert.ok(pedidosGlobal.tmdb.some((c) => c.path === "/search/multi" && c.params.query === "matrix"));
 });
 
 test("lo comprobado se recuerda: un tiempo agotado ya no deja sin notas toda la sesión", async () => {
