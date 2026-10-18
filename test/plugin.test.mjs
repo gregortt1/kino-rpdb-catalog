@@ -152,8 +152,11 @@ test("el manifiesto es el que Kino instala", async () => {
   // tele las tarjetas se ven recargadas, y la documentación recomienda declarar el número MÁS BAJO que
   // tenga lo que usas, para que el plugin corra también en Kinos viejos.
   assert.equal(manifest.apiVersion, 6);
-  // PRUEBA (1.27.0): sin `catalogOnly`, para ver si la lupa de la cabecera de la sección aparece. Si el
-  // experimento dice que sí, se decide si compensa; si dice que no, se vuelve a poner.
+  // Sin `catalogOnly` a propósito (1.27.0). Con el campo dentro, Kino NO muestra la lupa en la cabecera de
+  // la sección: la reserva a los plugins que reproducen, y un catálogo no lo es. Buscar el catálogo desde
+  // la sección es lo que pidió una persona que usa el plugin, y se comprobó en el aparato: con el campo
+  // fuera la lupa aparece y funciona; con él dentro, no. El precio, aceptado: PosterX aparece como fuente
+  // en "Buscar dónde verlo" y al tocarla su resolve dice que es un catálogo y manda a las otras fuentes.
   assert.equal(manifest.catalogOnly, undefined);
   assert.deepEqual(manifest.capabilities.sort(), ["browse", "episodes", "home", "meta", "resolve", "scopedSearch", "search"]);
   // Un solo host: TMDB va por kino.tmdb, que no necesita declararlo.

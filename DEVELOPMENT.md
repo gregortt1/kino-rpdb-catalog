@@ -104,6 +104,43 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### La lupa de la cabecera y `catalogOnly` (1.27.0)
+
+**El reporte.** Un usuario de la tienda: *«Me gustaría que tuviera una lupa para poder buscar mejor»*. Y una
+captura, porque el plugin **no** mostraba la lupa en la cabecera de su sección, mientras que otro plugin
+(«PelisYSeries») sí la mostraba en la de él.
+
+**Lo que se descartó, con la documentación delante.**
+
+| Candidato | Por qué no |
+| --- | --- |
+| La versión de Kino | Falso: su Kino mostraba la lupa del otro plugin |
+| `scopedSearch` | Se añadió (1.26.0) y la lupa **siguió sin aparecer** en el aparato. Además, 14 plugins de la tienda tienen sección y búsqueda sin él |
+| `browser: "pages"` | No es la lupa: es la vista web oculta, añade el aviso «Puede abrir páginas web ocultas» y exige **volver a aprobar** el plugin |
+| `download` | El contrato lo **prohíbe** en un catálogo |
+| `signature`, `telemetry`, `color`, `hosts`, `settings` | Sin relación con la búsqueda |
+
+**La causa, y se confirmó en el aparato: `catalogOnly`.** El contrato dice que un plugin de solo catálogo
+*«nunca se lista como fuente de un título (search, Ver otras fuentes, Buscar dónde verlo, el Servidor del
+reproductor)»*. Si Kino no incluye sus títulos en la búsqueda, **la lupa de la cabecera no tiene a dónde
+llevar** y no la muestra. PelisYSeries sí reproduce, así que para él sí tiene sentido.
+
+**El experimento.** Se publicó la 1.27.0 sin `catalogOnly` y la persona que lo usa lo probó: **la lupa
+aparecía y funcionaba**. Con el campo dentro, no. Causa confirmada, no una hipótesis.
+
+**La decisión: dejarlo fuera.** Es lo que se pidió, y es el único reporte hasta ahora. El precio, escrito
+aquí y en el README para que nadie se lleve una sorpresa:
+
+- PosterX ahora **aparece como fuente en «Buscar dónde verlo»** ✗. Al tocarla, su `resolve` lanza
+  `not_found` con *«Este catálogo no reproduce títulos: busca dónde verlo en tus otras fuentes»*, que era el
+  mensaje que ya tenía y ahora por fin se puede ver.
+- Se pierde la nota *«Solo catálogo: no reproduce videos»* de la validación, que era cierta y ya no se puede
+  declarar.
+
+**Si algún día molesta**, el camino de vuelta es poner `"catalogOnly": true` y la lupa desaparece otra vez.
+La prueba del manifiesto lo dice con esas palabras, para que nadie lo revierta sin saber lo que está
+cambiando.
+
 ### La lupa dentro de una categoría (1.26.0)
 
 Reportado por alguien que usa el plugin desde la tienda: *«Me gustaría que tuviera una lupa para poder
