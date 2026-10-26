@@ -104,6 +104,40 @@ arma el código (títulos de fila, `userMessage`) sí siguen `kino.lang`, que en
 **`meta` reutiliza la misma clave y la misma sonda** que el catálogo, así que no hay dos comprobaciones.
 Solo devuelve `poster`: el fondo de un título ajeno es de su fuente, y este plugin no pide fondos a RPDB.
 
+### Revisión de novedades: Kino 0.9.74 (26/10/2026)
+
+Se revisó la documentación completa: **35 de 45 páginas cambiaron y hay seis nuevas** (`bytes`, `catalog`,
+`images`, `nuvio-plugins`, `qr`, `resolver`, `sync-providers`). Lo que importa para un catálogo:
+
+**Publicado hoy (0.9.71, apiVersion 11): nada que usar.** Sus novedades son de plugins que reproducen —
+playlists (0.9.65), apps resolutoras externas (0.9.66), scrapers de Nuvio (0.9.71) — y un catálogo no toca
+nada de eso.
+
+**En desarrollo (0.9.74, apiVersion 12 y 13): una sola cosa nos afecta, y se aplica sola.**
+
+| Novedad | ¿Para nosotros? |
+| --- | --- |
+| **`genre` abierto en las filas** | **Sí** — ver abajo |
+| `catalog` + `kino.catalog` | No: es una base SQLite local para bibliotecas de hasta 100.000 ítems. Nuestra fuente es TMDB en vivo, no una biblioteca |
+| `imageSource` + el export `image` | No: es para imágenes **sin URL pública** (la miniatura de un archivo de Telegram, una portada detrás de un login). La documentación lo dice: «una URL pública sigue siendo mejor cuando existe» |
+| `storageLarge` (16 MB) | No: guardamos unos 200 bytes |
+| `socket`, `qrScan`, `byteSource` | No: no reproducimos, no tenemos canales y no hay nada que escanear |
+| `"sync": false` en un ajuste `password` | Opcional: la clave se quedaría solo en este aparato. Hoy va como `text` a propósito, para no tener el aviso «usa tu usuario y contraseña» |
+
+**El `genre` abierto, que es lo único que cambia un resultado.** Antes una fila aceptaba **diez** ids
+cerrados; desde 0.9.74 acepta cualquier categoría, guardada como slug (`[a-z0-9-]`, hasta 40 caracteres).
+Y ahí estaba la nuestra: `rpdb-doramas` (y `sec-shows-doramas`) declaran `genre: "doramas"`, que **no está
+entre los diez** — así que hoy esa fila se ve en Inicio pero sus títulos **no caen en una categoría
+Doramas**; desde 0.9.74 sí, **sin tocar una línea de código**. Es la primera vez que una versión de Kino
+mejora el plugin sin publicar nada.
+
+Hmm. Anotado para cuando salga: con el vocabulario abierto se abren filas temáticas nuevas (por ejemplo
+"novelas" o "k-dramas") sin depender de TMDB para el `genre` de la fila.
+
+**El contrato.** El kit validaba contra `contract.json` de apiVersion 9; ahora contra el **11**, el de la
+versión publicada — validar contra lo que la gente tiene, no contra lo que viene. Copia del anterior en
+`kino/tmp/contract-apiVersion-9-backup.json`. Sigue en verde: `✓ Kino would accept this plugin`, 38 pruebas.
+
 ### La lupa de la cabecera y `catalogOnly` (1.27.0)
 
 **El reporte.** Un usuario de la tienda: *«Me gustaría que tuviera una lupa para poder buscar mejor»*. Y una
