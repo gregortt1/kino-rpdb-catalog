@@ -152,12 +152,15 @@ test("el manifiesto es el que Kino instala", async () => {
   // tele las tarjetas se ven recargadas, y la documentación recomienda declarar el número MÁS BAJO que
   // tenga lo que usas, para que el plugin corra también en Kinos viejos.
   assert.equal(manifest.apiVersion, 6);
-  // Sin `catalogOnly` a propósito (1.27.0). Con el campo dentro, Kino NO muestra la lupa en la cabecera de
-  // la sección: la reserva a los plugins que reproducen, y un catálogo no lo es. Buscar el catálogo desde
-  // la sección es lo que pidió una persona que usa el plugin, y se comprobó en el aparato: con el campo
-  // fuera la lupa aparece y funciona; con él dentro, no. El precio, aceptado: PosterX aparece como fuente
-  // en "Buscar dónde verlo" y al tocarla su resolve dice que es un catálogo y manda a las otras fuentes.
-  assert.equal(manifest.catalogOnly, undefined);
+  // `catalogOnly` está, y se probó a quitarlo: la 1.27.0 lo quitó y un tercer usuario reportó que Kino
+  // trataba el catálogo «como si fuera de transmisión»: el botón de la ficha decía "Reproducir" y llevaba a
+  // un "no reproduce nada". Un catálogo no finge ser una fuente.
+  //
+  // El precio, que se midió: con `catalogOnly` Kino no muestra la lupa en la cabecera de la sección. Pero la
+  // búsqueda NO se pierde, y lo dice el contrato: «dentro de sus propias páginas (su sección, "Ver más", la
+  // búsqueda dentro de un "Ver más") su catálogo se recorre y se busca como siempre». Eso es `scopedSearch`
+  // (1.26.0), que sigue declarado. Buscar se busca en cada categoría; lo que no hay es el atajo de arriba.
+  assert.equal(manifest.catalogOnly, true);
   assert.deepEqual(manifest.capabilities.sort(), ["browse", "episodes", "home", "meta", "resolve", "scopedSearch", "search"]);
   // Un solo host: TMDB va por kino.tmdb, que no necesita declararlo.
   // Los dos servidores van declarados: así la persona los elige de una lista y ninguno necesita un

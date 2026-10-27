@@ -1,9 +1,10 @@
 {
   "id": "rpdb-catalog",
   "name": "PosterX",
-  "version": "1.27.0",
+  "version": "1.28.0",
   "apiVersion": 6,
   "entry": "plugin.js",
+  "catalogOnly": true,
   "categories": [
     "movies",
     "series"

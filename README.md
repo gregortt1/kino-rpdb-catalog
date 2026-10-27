@@ -164,8 +164,9 @@ así que solo vale la pena si de verdad tienes 4K.
 
 - **No cambia las imágenes de tus otras fuentes.** Aporta su propio catálogo. Eso sí: si un título ajeno no
   trae póster ninguno, este plugin se lo rellena.
-- **No reproduce.** Sus títulos van a "Buscar dónde verlo", en tus otras fuentes. Si PosterX aparece como
-  fuente en esa lista, no esperes un video: al tocarla te dice que es un catálogo y te manda a las otras.
+- **No reproduce, y lo dice su manifiesto.** El botón de la ficha de un título es **"Buscar dónde verlo"**,
+  no "Reproducir", y PosterX **nunca aparece como fuente** en esa lista: Kino lo trata como catálogo y manda
+  el título a tus otros plugins.
 - **No pone logos.** Kino no tiene ese campo para un título.
 - **No trae la clave del servidor.** La pones tú (y viene una gratuita puesta).
 - **No añade canales en vivo.**

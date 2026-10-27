@@ -138,6 +138,36 @@ Hmm. Anotado para cuando salga: con el vocabulario abierto se abren filas temát
 versión publicada — validar contra lo que la gente tiene, no contra lo que viene. Copia del anterior en
 `kino/tmp/contract-apiVersion-9-backup.json`. Sigue en verde: `✓ Kino would accept this plugin`, 38 pruebas.
 
+### Vuelve `catalogOnly`: un catálogo no finge ser una fuente (1.28.0)
+
+Un tercer usuario, con una captura de la ficha de una película: *«Aprovechando el plugin de PosterX lo
+detecta como si fueran uno de transmisión en vez de solo catálogo… Fuera bueno corregirlo»*. En su captura
+el botón de la ficha decía **"▶ Reproducir"**.
+
+Y tenía razón: era **el precio que aceptamos en la 1.27.0**. Sin `catalogOnly`, Kino trata el plugin como
+una fuente que puede reproducir: pone "Reproducir", lo ofrece en "Buscar dónde verlo" y lo mete en el
+"Servidor" del reproductor. Al tocarlo no hay nada, y el mensaje que aparece es el nuestro —honesto, pero
+llega tarde.
+
+**Se revierte: `"catalogOnly": true` vuelve.** El contrato dice lo que hace, y dos frases suyas deciden:
+
+> *"El botón principal de la ficha dice «Buscar dónde verlo» en vez de «Reproducir»… Nunca es fuente de un
+> título."*
+
+> *"**Dentro de sus propias páginas** (su sección, «Ver más», **la búsqueda dentro de un «Ver más»**) su
+> catálogo **se recorre y se busca como siempre**."*
+
+**Lo que se pierde y lo que no.** Se pierde —medido en el aparato, dos veces— la **lupa de la cabecera** de
+la sección: Kino la esconde en un plugin que no reproduce. **No se pierde la búsqueda**: la de dentro de
+cada categoría sigue entera (`scopedSearch`, 1.26.0), y el contrato dice que ahí funciona como siempre.
+Buscar se busca entrando en una categoría; lo que no hay es el atajo de arriba.
+
+**La lección, para no repetirla.** La lupa de la cabecera y "no soy una fuente" son **incompatibles**, y las
+pidieron dos usuarios distintos. No hay campo que las separe: se revisó el contrato de apiVersion 13 y solo
+existe `catalogOnly`. Cuando dos pedidos chocan así, gana el que no **miente** sobre lo que el plugin es: un
+botón "Reproducir" que no reproduce es un defecto; una búsqueda que se abre desde la categoría es una
+molestia.
+
 ### La lupa de la cabecera y `catalogOnly` (1.27.0)
 
 **El reporte.** Un usuario de la tienda: *«Me gustaría que tuviera una lupa para poder buscar mejor»*. Y una
