@@ -176,12 +176,21 @@ test("el manifiesto es el que Kino instala", async () => {
   assert.equal(manifest.settings.find((s) => s.key === "backdropPosition").default, "r");
   // La descripción se corta a 300 caracteres: pasarse deja la frase a medias en la hoja de instalación.
   assert.ok(manifest.description.length <= 300, "description: " + manifest.description.length);
-  // Los ajustes con valor y, entre ellos, cuatro encabezados (`section`), una línea de estado y un botón.
+  // Los ajustes con valor y, entre ellos, cinco encabezados (`section`), una línea de estado y un botón.
   assert.deepEqual(
     manifest.settings.map((s) => s.key),
     ["servidor", "service", "key", "posterSec", "posterRatings", "posterBadgeSize", "posterTextless", "posterType",
-     "backdropSec", "backdropRatings", "backdropBadgeSize", "backdropPosition", "diag", "serverStatus", "testServer"]
+     "backdropSec", "backdropRatings", "backdropBadgeSize", "backdropPosition", "diag", "serverStatus", "testServer",
+     "comoBuscar"]
   );
+  // El último encabezado explica dónde está la búsqueda, porque Kino no da lupa de cabecera a un catálogo y la
+  // gente la busca ahí. Es la única forma de texto libre que tiene un formulario en apiVersion 6: el `hint` de
+  // una `section`, que admite 300 caracteres (los de un campo, solo 80).
+  const comoBuscar = manifest.settings.find((s) => s.key === "comoBuscar");
+  assert.equal(comoBuscar.type, "section");
+  assert.ok(comoBuscar.hint && comoBuscar.hint.length <= 300, "hint: " + (comoBuscar.hint || "").length);
+  assert.match(comoBuscar.hint, /G\u00e9neros|Géneros/, "tiene que decir por dónde se entra");
+  assert.match(comoBuscar.hint, /Buscar en esta categor/, "y el nombre del botón que se va a encontrar");
   // El póster sin texto es opcional y viene apagado: cambia el arte de TODOS los pósters.
   assert.equal(manifest.settings.find((s) => s.key === "posterTextless").type, "toggle");
   assert.equal(manifest.settings.find((s) => s.key === "posterTextless").default, false);
@@ -192,7 +201,7 @@ test("el manifiesto es el que Kino instala", async () => {
   assert.ok(backdropOptions.includes("all"), "el fondo sí");
   assert.deepEqual(
     manifest.settings.filter((s) => ["section", "status", "action"].includes(s.type)).map((s) => s.type),
-    ["section", "section", "section", "section", "status", "action"]
+    ["section", "section", "section", "section", "status", "action", "section"]
   );
   assert.equal(manifest.settings[1].type, "select");
   // La clave va como TEXTO, no como contraseña: es una clave pública y gratuita la que viene puesta, y
@@ -207,10 +216,16 @@ test("el manifiesto es el que Kino instala", async () => {
   // Sin `settingsLayout`: el formulario es la lista de siempre. Se probaron las tarjetas y en una tele se
   // veían recargadas, así que no se declara el campo.
   assert.equal(manifest.settingsLayout, undefined);
-  // Y las pistas se recortaron a las que aportan algo: cada línea de gris es peso visual.
+  // Y las pistas se recortaron a las que aportan algo: cada línea de gris es peso visual. Son seis: las
+  // cinco de los campos que no se entienden solos, más la de "Cómo buscar" al final — la única forma de
+  // contarle a la persona dónde está la búsqueda, porque Kino no le da lupa de cabecera a un catálogo.
   const conPista = manifest.settings.filter((s) => s.hint);
-  assert.ok(conPista.length <= 5, "pistas: " + conPista.length);
-  for (const s of conPista) assert.ok(s.hint.length <= 80, s.key + ": " + s.hint.length);
+  assert.ok(conPista.length <= 6, "pistas: " + conPista.length);
+  for (const s of conPista) {
+    // Una `section` admite 300; un campo, 80. Pasarse del tope deja el texto cortado a media frase.
+    const tope = s.type === "section" ? 300 : 80;
+    assert.ok(s.hint.length <= tope, s.key + ": " + s.hint.length + " > " + tope);
+  }
 });
 
 test("home() arma las filas de TMDB y cada ítem lleva su póster con nota", async () => {

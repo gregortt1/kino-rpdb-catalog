@@ -138,6 +138,31 @@ Hmm. Anotado para cuando salga: con el vocabulario abierto se abren filas temát
 versión publicada — validar contra lo que la gente tiene, no contra lo que viene. Copia del anterior en
 `kino/tmp/contract-apiVersion-9-backup.json`. Sigue en verde: `✓ Kino would accept this plugin`, 38 pruebas.
 
+### La explicación, dentro de la app (1.29.0)
+
+El arreglo de la 1.28.0 dejaba a la gente con la misma pregunta: *¿y por qué no hay lupa arriba?* La respuesta
+la teníamos en un chat ✗, que es donde nadie va a buscarla.
+
+**Dónde vive ahora.** En la propia pestaña de ajustes del plugin, como último bloque **«Cómo buscar»**, con
+este texto (244 de los 300 caracteres que caben):
+
+> Aquí no hay lupa arriba: Kino solo la muestra a los plugins que reproducen, y este es un catálogo. Se busca
+> dentro de cada categoría: entra en Géneros, abre un género y toca «Buscar en esta categoría». También en el
+> «Ver más» de cualquier fila.
+
+**Por qué un `section` y no otra cosa.** En apiVersion 6 solo hay dos tipos de ajuste que no guardan valor y
+sirven para hablar: `section` (un título con `hint`) y `status` (una línea que llena `settingsStatus()`). El
+`status` ya es el Diagnóstico. Así que la explicación va en un `section`, y su `hint` es el **único texto libre
+largo** que tiene un formulario en v6: **300 caracteres**, frente a los 80 de un campo cualquiera. Ese límite
+es la razón de que el texto esté medido y tenga test.
+
+**Lo que llegará y lo hará mejor.** apiVersion 12 (Kino 0.9.74, sin publicar) trae el tipo de ajuste `help`:
+un botón **«Ayuda»** que abre las instrucciones del plugin en una ventana. Cuando salga, el texto largo se
+muda ahí y el formulario se queda sin este bloque. Anotado, no hecho: hoy no existe en ningún Kino publicado.
+
+Y en el README va también, en la tabla de «Si algo no va», con dos filas: por qué no hay lupa y por qué el
+botón dice «Buscar dónde verlo» en vez de «Reproducir».
+
 ### Vuelve `catalogOnly`: un catálogo no finge ser una fuente (1.28.0)
 
 Un tercer usuario, con una captura de la ficha de una película: *«Aprovechando el plugin de PosterX lo

@@ -180,6 +180,8 @@ así que solo vale la pena si de verdad tienes 4K.
 | En el televisor las tarjetas salen vacías | Desinstala y vuelve a instalar, para partir de ajustes limpios. Con el plugin recién instalado, el fondo se comprueba solo. |
 | No aparecen las filas en Inicio | Ajustes ▸ Plugins ▸ **Actualizar**. Si siguen sin salir, activa **Modo debug** en la pestaña del plugin y mira el **Registro**. |
 | Un póster no es el de ese título | TMDB usa listas de ids distintas para películas y series, y pueden coincidir en el mismo número. El plugin ya distingue de cuál se trata. Si vieras alguno mal, avisa a quien mantiene el plugin. |
+| No aparece lupa arriba en PosterX | Es a propósito: **Kino solo muestra la lupa de la cabecera a los plugins que reproducen**, y este es un catálogo. Se busca dentro de cada categoría: **Géneros ▸ un género ▸ «Buscar en esta categoría»**, y también en el «Ver más» de cualquier fila. Busca en todo TMDB, no solo en lo cargado. |
+| El botón de la ficha no dice "Reproducir" | Correcto: dice **"Buscar dónde verlo"**, porque el plugin no reproduce. Kino manda el título a tus otras fuentes. |
 | El plugin desaparece de la lista | Lo habrás desactivado o desinstalado: vuelve a agregarlo con la dirección de arriba. |
 
 ## Créditos

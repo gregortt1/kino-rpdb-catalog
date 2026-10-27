@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "PosterX",
-  "version": "1.28.0",
+  "version": "1.29.0",
   "apiVersion": 6,
   "entry": "plugin.js",
   "catalogOnly": true,
@@ -250,6 +250,12 @@
       "key": "testServer",
       "label": "Probar el servidor",
       "type": "action"
+    },
+    {
+      "key": "comoBuscar",
+      "label": "C\u00f3mo buscar",
+      "type": "section",
+      "hint": "Aqu\u00ed no hay lupa arriba: Kino solo la muestra a los plugins que reproducen, y este es un cat\u00e1logo. Se busca dentro de cada categor\u00eda: entra en G\u00e9neros, abre un g\u00e9nero y toca \u00abBuscar en esta categor\u00eda\u00bb. Tambi\u00e9n en el \u00abVer m\u00e1s\u00bb de cualquier fila."
     }
   ]
 }
