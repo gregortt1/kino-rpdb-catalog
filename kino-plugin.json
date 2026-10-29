@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "PosterX",
-  "version": "1.30.0",
+  "version": "1.31.0",
   "apiVersion": 9,
   "entry": "plugin.js",
   "catalogOnly": true,
