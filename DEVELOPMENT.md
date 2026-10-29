@@ -138,6 +138,41 @@ Hmm. Anotado para cuando salga: con el vocabulario abierto se abren filas temát
 versión publicada — validar contra lo que la gente tiene, no contra lo que viene. Copia del anterior en
 `kino/tmp/contract-apiVersion-9-backup.json`. Sigue en verde: `✓ Kino would accept this plugin`, 38 pruebas.
 
+### Kino 0.9.74 y el formulario bilingüe (1.30.0)
+
+**El estado de Kino, comprobado el 29/10/2026.** Cambiaron **48 de 54 páginas** y hay seis nuevas. Lo
+publicado es **0.9.74**, que trae **apiVersion 12**: tipos de ajuste `link` y `help`, `setSettings`,
+`devices`, proveedores de sincronización y "¿Eres tú?". Quedan **sin publicar** la 13 (`catalog` —una base
+SQLite local para bibliotecas de 100.000 ítems—, `imageSource`, `bytes`, `sockets`, `qr`) y la 14
+(**pantallas** propias, `rooms`).
+
+**Lo único que se puede usar sin dejar fuera a nadie.** Casi todo lo nuevo exige subir el apiVersion, y un
+apiVersion más alto **hace desaparecer el plugin** para quien tenga un Kino anterior. Revisado uno por uno:
+
+| Función | Necesita | Decisión |
+| --- | --- | --- |
+| `labelEn`, `hintEn` | 9 (0.9.55) | **Sí**: el formulario era solo español para un Kino en inglés |
+| `help`, `link`, `devices` | 12 (0.9.74) | No: salió esta semana, y se dejaría sin plugin a quien no actualice |
+| `enhancements` | 14 | No: solo lo lee un Kino que ya conoce el campo, y la 14 no está publicada |
+| `screens` | 14 | No, por lo mismo. Es lo que más cambiaría el plugin y no hay dónde estrenarlo |
+| `catalog`, `imageSource`, `bytes`, `sockets`, `qr` | 13 | No: siguen sin ser para un catálogo |
+
+**Y una que se estrena sola.** El `genre` de las filas ya acepta cualquier categoría (0.9.74), así que
+`rpdb-doramas` —que declara `genre: "doramas"`, fuera de los diez ids cerrados— **empieza a agrupar sus
+títulos en la categoría Doramas sin tocar una línea**. Es lo que se anticipó en la revisión del 26/10.
+
+**El cambio de esta versión: apiVersion 6 → 9.** El plugin ya tenía todos sus textos en inglés (`TEXT.en`)
+para el Kino en inglés, pero los ajustes salían solo en español: una mezcla. Desde 0.9.55 Kino acepta
+`labelEn` y `hintEn`; por debajo de 9 **se ignoran sin revisarlos**, así que el precio es declarar 9. Y el
+precio tiene nombre: **un Kino 0.9.50 a 0.9.54 ya no instala el plugin** (dirá que necesita una versión más
+nueva, y la tienda se lo oculta). 0.9.55 tiene meses; es el mínimo razonable.
+
+**Lo que quedó preparado.** Cuando la 0.9.74 esté extendida, subir a 12 da dos cosas: el botón **"Ayuda"**
+—una ventana de hasta **2.000 caracteres**, el sitio definitivo para la explicación de la búsqueda y para un
+manual corto— y `devices: ["tv"]`, para ocultar en el celular los cuatro ajustes que solo hacen algo en la
+tele. No se hizo hoy porque el coste es que **desaparece para quien no haya actualizado**, y eso lo decide
+quien publica, no el plugin.
+
 ### La explicación, dentro de la app (1.29.0)
 
 El arreglo de la 1.28.0 dejaba a la gente con la misma pregunta: *¿y por qué no hay lupa arriba?* La respuesta

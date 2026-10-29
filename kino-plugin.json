@@ -1,8 +1,8 @@
 {
   "id": "rpdb-catalog",
   "name": "PosterX",
-  "version": "1.29.0",
-  "apiVersion": 6,
+  "version": "1.30.0",
+  "apiVersion": 9,
   "entry": "plugin.js",
   "catalogOnly": true,
   "categories": [
@@ -16,8 +16,8 @@
     "highlight": "#F5C518"
   },
   "description": "Cat\u00e1logo de TMDB con la nota incrustada en los p\u00f3sters, los fondos y los fotogramas de cap\u00edtulo: tendencias, populares, mejor valoradas, anime, documentales, infantil, doramas y g\u00e9neros. Rellena el p\u00f3ster de los t\u00edtulos de tus otras fuentes, no reproduce nada y no pide cuenta ni registro.",
-  "author": "gregorysteventt-source",
-  "homepage": "https://github.com/gregorysteventt-source/kino-rpdb-catalog",
+  "author": "gregortt1",
+  "homepage": "https://github.com/gregortt1/kino-rpdb-catalog",
   "hosts": [
     "api.ratingposterdb.com",
     "openposterdb.com"
@@ -37,7 +37,8 @@
     {
       "key": "servidor",
       "label": "Servidor",
-      "type": "section"
+      "type": "section",
+      "labelEn": "Server"
     },
     {
       "key": "service",
@@ -53,19 +54,23 @@
           "value": "rpdb",
           "label": "RatingPosterDB"
         }
-      ]
+      ],
+      "labelEn": "Image server"
     },
     {
       "key": "key",
       "label": "Clave del servidor",
       "type": "text",
       "default": "t0-free-rpdb",
-      "hint": "La clave p\u00fablica gratuita, ya puesta"
+      "hint": "La clave p\u00fablica gratuita, ya puesta",
+      "labelEn": "Server key",
+      "hintEn": "The free public key, already set"
     },
     {
       "key": "posterSec",
       "label": "P\u00f3ster (en la tele)",
-      "type": "section"
+      "type": "section",
+      "labelEn": "Poster (on TV)"
     },
     {
       "key": "posterRatings",
@@ -97,7 +102,8 @@
           "value": "auto",
           "label": "Autom\u00e1tico (hasta 3)"
         }
-      ]
+      ],
+      "labelEn": "Which ratings"
     },
     {
       "key": "posterBadgeSize",
@@ -118,25 +124,31 @@
           "value": "normal",
           "label": "Medianas"
         }
-      ]
+      ],
+      "labelEn": "Rating badge size",
+      "hintEn": "Three ratings shrink it by themselves"
     },
     {
       "key": "posterTextless",
       "label": "P\u00f3ster sin el t\u00edtulo",
       "type": "toggle",
-      "default": false
+      "default": false,
+      "labelEn": "Poster without its title"
     },
     {
       "key": "posterType",
       "label": "Tipo de p\u00f3ster",
       "type": "text",
       "default": "poster-default",
-      "hint": "poster-default; con RPDB, poster-imdb-rated"
+      "hint": "poster-default; con RPDB, poster-imdb-rated",
+      "labelEn": "Poster type",
+      "hintEn": "poster-default; with RPDB, poster-imdb-rated"
     },
     {
       "key": "backdropSec",
       "label": "Fondo y cap\u00edtulos (en la tele)",
-      "type": "section"
+      "type": "section",
+      "labelEn": "Backdrop and episodes (on TV)"
     },
     {
       "key": "backdropRatings",
@@ -173,7 +185,9 @@
           "value": "auto",
           "label": "Autom\u00e1tico (hasta 3)"
         }
-      ]
+      ],
+      "labelEn": "Which ratings",
+      "hintEn": "Can differ from the poster's"
     },
     {
       "key": "backdropBadgeSize",
@@ -193,7 +207,8 @@
           "value": "normal",
           "label": "Medianas"
         }
-      ]
+      ],
+      "labelEn": "Rating badge size"
     },
     {
       "key": "backdropPosition",
@@ -234,28 +249,35 @@
           "value": "tr",
           "label": "Esquina arriba derecha"
         }
-      ]
+      ],
+      "labelEn": "Where the rating goes",
+      "hintEn": "Backdrop only"
     },
     {
       "key": "diag",
       "label": "Diagn\u00f3stico",
-      "type": "section"
+      "type": "section",
+      "labelEn": "Diagnostics"
     },
     {
       "key": "serverStatus",
       "label": "Qu\u00e9 funciona",
-      "type": "status"
+      "type": "status",
+      "labelEn": "What works"
     },
     {
       "key": "testServer",
       "label": "Probar el servidor",
-      "type": "action"
+      "type": "action",
+      "labelEn": "Test the server"
     },
     {
       "key": "comoBuscar",
       "label": "C\u00f3mo buscar",
       "type": "section",
-      "hint": "Aqu\u00ed no hay lupa arriba: Kino solo la muestra a los plugins que reproducen, y este es un cat\u00e1logo. Se busca dentro de cada categor\u00eda: entra en G\u00e9neros, abre un g\u00e9nero y toca \u00abBuscar en esta categor\u00eda\u00bb. Tambi\u00e9n en el \u00abVer m\u00e1s\u00bb de cualquier fila."
+      "hint": "Aqu\u00ed no hay lupa arriba: Kino solo la muestra a los plugins que reproducen, y este es un cat\u00e1logo. Se busca dentro de cada categor\u00eda: entra en G\u00e9neros, abre un g\u00e9nero y toca \u00abBuscar en esta categor\u00eda\u00bb. Tambi\u00e9n en el \u00abVer m\u00e1s\u00bb de cualquier fila.",
+      "labelEn": "How to search",
+      "hintEn": "No magnifier up here: Kino only shows it to plugins that play, and this is a catalogue. Search inside a category: open Genres, pick one and tap \u00abSearch in this category\u00bb. Also in the \u00abSee more\u00bb of any row."
     }
   ]
 }

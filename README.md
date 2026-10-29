@@ -40,7 +40,7 @@ Aparece en **Plugins ▸ De la comunidad**. También se instala a mano:
 4. Escribe:
 
    ```
-   gregorysteventt-source/kino-rpdb-catalog
+   gregortt1/kino-rpdb-catalog
    ```
 
 5. **Agregar** → lee la hoja → **Instalar**.
@@ -175,7 +175,7 @@ así que solo vale la pena si de verdad tienes 4K.
 
 | Lo que ves | Qué hacer |
 | --- | --- |
-| *Este plugin necesita una versión más nueva de Kino* | Tu Kino es anterior a la 0.9.50. Actualízalo. |
+| *Este plugin necesita una versión más nueva de Kino* | Tu Kino es anterior a la 0.9.55 (el plugin usa textos en inglés, que llegaron ahí). Actualízalo. |
 | Los pósters salen sin nota | Revisa **Configurar**: mira la línea de **Diagnóstico**, que dice si la clave vale y qué imágenes sirve el servidor. |
 | En el televisor las tarjetas salen vacías | Desinstala y vuelve a instalar, para partir de ajustes limpios. Con el plugin recién instalado, el fondo se comprueba solo. |
 | No aparecen las filas en Inicio | Ajustes ▸ Plugins ▸ **Actualizar**. Si siguen sin salir, activa **Modo debug** en la pestaña del plugin y mira el **Registro**. |

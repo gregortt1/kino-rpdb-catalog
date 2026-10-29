@@ -148,10 +148,11 @@ test("el manifiesto es el que Kino instala", async () => {
   const r = await validate(root);
   assert.deepEqual(r.problems, []);
   assert.deepEqual(r.drops, []);
-  // 6 = Kino 0.9.50. Se probó a subir a 9 para usar `settingsLayout` (tarjetas), y se volvió atrás: en una
-  // tele las tarjetas se ven recargadas, y la documentación recomienda declarar el número MÁS BAJO que
-  // tenga lo que usas, para que el plugin corra también en Kinos viejos.
-  assert.equal(manifest.apiVersion, 6);
+  // 9 = Kino 0.9.55, y se sube por una cosa: `labelEn`/`hintEn` (1.30.0). Por debajo de 9 se ignoran sin
+  // revisarlos, así que el formulario bilingüe empieza en 9. Se mantiene lo más bajo posible por la regla
+  // de la documentación —el número más bajo que tenga lo que usas, para llegar también a los Kinos viejos—
+  // y por eso NO se sube a 12 (`help`, `devices`), que exigiría 0.9.74.
+  assert.equal(manifest.apiVersion, 9);
   // `catalogOnly` está, y se probó a quitarlo: la 1.27.0 lo quitó y un tercer usuario reportó que Kino
   // trataba el catálogo «como si fuera de transmisión»: el botón de la ficha decía "Reproducir" y llevaba a
   // un "no reproduce nada". Un catálogo no finge ser una fuente.
@@ -225,6 +226,16 @@ test("el manifiesto es el que Kino instala", async () => {
     // Una `section` admite 300; un campo, 80. Pasarse del tope deja el texto cortado a media frase.
     const tope = s.type === "section" ? 300 : 80;
     assert.ok(s.hint.length <= tope, s.key + ": " + s.hint.length + " > " + tope);
+  }
+  // Y el formulario va en los dos idiomas: el plugin ya hablaba inglés en sus textos propios (TEXT.en),
+  // pero los ajustes eran solo español, así que con Kino en inglés salía una mezcla.
+  for (const s of manifest.settings) {
+    assert.ok(s.labelEn, "sin labelEn: " + s.key);
+    assert.ok(s.labelEn.length <= 40, "labelEn largo: " + s.key);
+    if (s.hint) {
+      assert.ok(s.hintEn, "pista sin hintEn: " + s.key);
+      assert.ok(s.hintEn.length <= (s.type === "section" ? 300 : 80), "hintEn largo: " + s.key);
+    }
   }
 });
 
