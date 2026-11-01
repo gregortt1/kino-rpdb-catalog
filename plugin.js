@@ -964,6 +964,87 @@ function scopedSpec(within) {
   return spec;
 }
 
+// --- La pantalla propia (apiVersion 14) -------------------------------------------------------------
+//
+// Un campo de búsqueda y los resultados con sus pósters con nota. Esto es la lupa que Kino no da en la
+// cabecera a un catálogo: en una pantalla nuestra, la búsqueda es nuestra.
+//
+// El modelo de Kino: devolvemos un árbol de nodos y Kino lo dibuja con su aspecto, en el celular y en la TV.
+// El estado vive en Kino y llega en cada llamada; nada de lo que se guarde en una variable sobrevive, porque
+// el entorno se cierra. Un nodo mal formado no rompe la app: se descarta y se anota en el registro.
+//
+// `menuOpens: "both"` en el manifiesto deja el catálogo y esta pantalla como dos entradas distintas.
+const SCREEN_MAX = 60;   // el tope de `titleGrid` cuando se dibuja todo de una vez
+
+export async function screen({ state }) {
+  const es = appLang() !== "en-US";
+  const s = state && typeof state === "object" ? state : {};
+  const q = String((s.inputs && s.inputs.q) || "").trim();
+  const items = Array.isArray(s.results) ? s.results : [];
+
+  const children = [
+    {
+      type: "TextField",
+      key: "q",
+      labelText: "Buscar en el cat\u00e1logo",
+      labelTextEn: "Search the catalogue",
+      onSubmitted: "buscar",
+    },
+  ];
+
+  if (!q) {
+    children.push({
+      type: "Text",
+      text: "Escribe un t\u00edtulo y pulsa Enter. Busca en todo TMDB, no solo en lo que ya est\u00e1 en pantalla.",
+      textEn: "Type a title and press Enter. It searches all of TMDB, not just what is on screen.",
+      style: "caption",
+    });
+  } else if (!items.length) {
+    children.push({
+      type: "Text",
+      text: "Nada con \u00ab" + q + "\u00bb.",
+      textEn: "Nothing for \u00ab" + q + "\u00bb.",
+      style: "caption",
+    });
+  } else {
+    const grid = {
+      type: "titleGrid",
+      columns: { compact: 3, expanded: 6 },
+      items,
+      loadingMore: s.more === true,
+      done: s.more !== true && items.length >= SCREEN_MAX,
+    };
+    if (s.more === true) grid.onEndReached = { event: "mas" };
+    children.push(grid);
+  }
+
+  return { type: "Column", padding: { compact: 16, expanded: 32 }, gap: 12, children };
+}
+
+// Kino manda aquí cada evento de la pantalla; el valor de los campos llega en `state.inputs`, por su key.
+// Devolver `{ state }` lo mezcla y hace que Kino vuelva a llamar a screen(); `{ toast }` solo avisa.
+export async function screenEvent({ name, state }) {
+  if (name !== "buscar" && name !== "mas") return null;
+  const es = appLang() !== "en-US";
+  const s = state && typeof state === "object" ? state : {};
+  const q = String((s.inputs && s.inputs.q) || "").trim();
+  if (!q) return { toast: es ? "Escribe algo para buscar" : "Type something to search" };
+
+  const desde = name === "mas" ? Math.max(1, Number(s.page) || 1) : 0;
+  const acumulado = name === "mas" && Array.isArray(s.results) ? s.results : [];
+
+  try {
+    // Se reutiliza la búsqueda de siempre: mismas sondas, mismos pósters con nota, mismo "Ver más".
+    const r = await search({ q, cursor: desde ? String(desde + 1) : undefined });
+    const found = Array.isArray(r) ? r : (r && r.items) || [];
+    const next = r && !Array.isArray(r) ? r.next : undefined;
+    const results = acumulado.concat(found).slice(0, SCREEN_MAX);
+    return { state: { results, page: desde + 1, more: !!next && results.length < SCREEN_MAX } };
+  } catch (e) {
+    return { toast: (es ? "No pude buscar: " : "Could not search: ") + (e && e.message ? e.message : e) };
+  }
+}
+
 export async function episodes(ref) {
   const id = showRef(parseRef(ref));
   if (!id) return { episodes: [] };

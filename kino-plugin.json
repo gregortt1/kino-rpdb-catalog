@@ -1,8 +1,8 @@
 {
   "id": "rpdb-catalog",
   "name": "PosterX",
-  "version": "1.31.0",
-  "apiVersion": 9,
+  "version": "1.33.0",
+  "apiVersion": 14,
   "entry": "plugin.js",
   "catalogOnly": true,
   "categories": [
@@ -29,7 +29,8 @@
     "scopedSearch",
     "episodes",
     "meta",
-    "resolve"
+    "resolve",
+    "screen"
   ],
   "color": "#F5C518",
   "icon": "icon.png",
@@ -103,7 +104,10 @@
           "label": "Autom\u00e1tico (hasta 3)"
         }
       ],
-      "labelEn": "Which ratings"
+      "labelEn": "Which ratings",
+      "devices": [
+        "tv"
+      ]
     },
     {
       "key": "posterBadgeSize",
@@ -126,7 +130,10 @@
         }
       ],
       "labelEn": "Rating badge size",
-      "hintEn": "Three ratings shrink it by themselves"
+      "hintEn": "Three ratings shrink it by themselves",
+      "devices": [
+        "tv"
+      ]
     },
     {
       "key": "posterTextless",
@@ -187,7 +194,10 @@
         }
       ],
       "labelEn": "Which ratings",
-      "hintEn": "Can differ from the poster's"
+      "hintEn": "Can differ from the poster's",
+      "devices": [
+        "tv"
+      ]
     },
     {
       "key": "backdropBadgeSize",
@@ -208,7 +218,10 @@
           "label": "Medianas"
         }
       ],
-      "labelEn": "Rating badge size"
+      "labelEn": "Rating badge size",
+      "devices": [
+        "tv"
+      ]
     },
     {
       "key": "backdropPosition",
@@ -278,6 +291,29 @@
       "hint": "Aqu\u00ed no hay lupa arriba: Kino solo la muestra a los plugins que reproducen, y este es un cat\u00e1logo. Se busca dentro de cada categor\u00eda: entra en G\u00e9neros, abre un g\u00e9nero y toca \u00abBuscar en esta categor\u00eda\u00bb. Tambi\u00e9n en el \u00abVer m\u00e1s\u00bb de cualquier fila.",
       "labelEn": "How to search",
       "hintEn": "No magnifier up here: Kino only shows it to plugins that play, and this is a catalogue. Search inside a category: open Genres, pick one and tap \u00abSearch in this category\u00bb. Also in the \u00abSee more\u00bb of any row."
+    },
+    {
+      "key": "ayuda",
+      "label": "C\u00f3mo se usa",
+      "labelEn": "How to use",
+      "type": "help",
+      "title": "C\u00f3mo usar PosterX",
+      "titleEn": "How to use PosterX",
+      "body": "Qu\u00e9 hace: a\u00f1ade a Kino un cat\u00e1logo de TMDB (pel\u00edculas, series, anime, documentales, infantil, doramas y g\u00e9neros) con la nota incrustada en el p\u00f3ster, el fondo y el fotograma de cap\u00edtulo.\n\nC\u00f3mo se configura: no hace falta nada, el servidor y la clave gratuita ya vienen puestos.\n\u2022 Servidor de im\u00e1genes: OpenPosterDB (gratis) o RatingPosterDB (con tu clave).\n\u2022 Qu\u00e9 notas y Tama\u00f1o de la nota: cu\u00e1ntas salen y de qu\u00e9 tama\u00f1o. Con tres notas el p\u00f3ster se encoge solo para que quepan en una fila.\n\u2022 P\u00f3ster sin el t\u00edtulo: quita el texto del arte, para que las notas no tapen el t\u00edtulo impreso.\n\u2022 D\u00f3nde va la nota: solo afecta al fondo. Centrada a la derecha es la m\u00e1s limpia.\n\nD\u00f3nde se busca: Kino no pone lupa en la cabecera de un cat\u00e1logo, solo se la da a los plugins que reproducen. Se busca dentro de cada categor\u00eda: entra en G\u00e9neros, abre uno y toca \u00abBuscar en esta categor\u00eda\u00bb. Tambi\u00e9n en el \u00abVer m\u00e1s\u00bb de cualquier fila. Y busca en todo TMDB, no solo en lo que ya est\u00e1 en pantalla.\n\nEl diagn\u00f3stico: la l\u00ednea \u00abQu\u00e9 funciona\u00bb dice si la clave vale y qu\u00e9 im\u00e1genes sirve el servidor. Si algo no se ve, \u00abProbar el servidor\u00bb lo comprueba de cero.\n\nLo que no hace: no reproduce. El bot\u00f3n de la ficha dice \u00abBuscar d\u00f3nde verlo\u00bb y manda el t\u00edtulo a tus otras fuentes.",
+      "bodyEn": "What it does: adds a TMDB catalogue to Kino (movies, series, anime, documentaries, kids, k-dramas and genres) with the rating baked into the poster, the backdrop and the episode still.\n\nHow to set it up: nothing to do, the server and the free key come already set.\n\u2022 Image server: OpenPosterDB (free) or RatingPosterDB (with your key).\n\u2022 Which ratings and Rating badge size: how many appear and how big. With three ratings the poster shrinks by itself so they fit on one line.\n\u2022 Poster without its title: removes the printed title, so the ratings do not cover it.\n\u2022 Where the rating goes: backdrop only. Centred on the right is the cleanest.\n\nWhere to search: Kino shows no magnifier in the header of a catalogue, only to plugins that play. Search inside a category: open Genres, pick one and tap \u00abSearch in this category\u00bb. Also in the \u00abSee more\u00bb of any row. It searches all of TMDB, not just what is on screen.\n\nDiagnostics: the \u00abWhat works\u00bb line says whether the key is good and which images the server serves. If something is missing, \u00abTest the server\u00bb checks it from scratch.\n\nWhat it does not do: it does not play. The title's button says \u00abFind where to watch it\u00bb and sends the title to your other sources."
+    },
+    {
+      "key": "clavePropia",
+      "label": "Sacar una clave propia",
+      "labelEn": "Get your own key",
+      "type": "link",
+      "url": "https://openposterdb.com"
     }
-  ]
+  ],
+  "screen": {
+    "label": "Buscar",
+    "labelEn": "Search",
+    "icon": "search",
+    "menuOpens": "both"
+  }
 }

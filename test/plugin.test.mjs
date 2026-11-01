@@ -148,11 +148,10 @@ test("el manifiesto es el que Kino instala", async () => {
   const r = await validate(root);
   assert.deepEqual(r.problems, []);
   assert.deepEqual(r.drops, []);
-  // 9 = Kino 0.9.55, y se sube por una cosa: `labelEn`/`hintEn` (1.30.0). Por debajo de 9 se ignoran sin
-  // revisarlos, así que el formulario bilingüe empieza en 9. Se mantiene lo más bajo posible por la regla
-  // de la documentación —el número más bajo que tenga lo que usas, para llegar también a los Kinos viejos—
-  // y por eso NO se sube a 12 (`help`, `devices`), que exigiría 0.9.74.
-  assert.equal(manifest.apiVersion, 9);
+  // 14 = Kino 0.9.74. Regla de trabajo desde el 29/10/2026: se asume que todo el mundo tiene la app al día,
+  // así que no se sacrifican funciones por llegar a Kinos viejos. Con 12 llegaron el botón "Ayuda", `devices`
+  // y `link`; con 14, la pantalla propia —la lupa que Kino no da en la cabecera de un catálogo—.
+  assert.equal(manifest.apiVersion, 14);
   // `catalogOnly` está, y se probó a quitarlo: la 1.27.0 lo quitó y un tercer usuario reportó que Kino
   // trataba el catálogo «como si fuera de transmisión»: el botón de la ficha decía "Reproducir" y llevaba a
   // un "no reproduce nada". Un catálogo no finge ser una fuente.
@@ -162,7 +161,9 @@ test("el manifiesto es el que Kino instala", async () => {
   // búsqueda dentro de un "Ver más") su catálogo se recorre y se busca como siempre». Eso es `scopedSearch`
   // (1.26.0), que sigue declarado. Buscar se busca en cada categoría; lo que no hay es el atajo de arriba.
   assert.equal(manifest.catalogOnly, true);
-  assert.deepEqual(manifest.capabilities.sort(), ["browse", "episodes", "home", "meta", "resolve", "scopedSearch", "search"]);
+  assert.deepEqual(manifest.capabilities.sort(), ["browse", "episodes", "home", "meta", "resolve", "scopedSearch", "screen", "search"]);
+  // La pantalla: propia, en el menú además de la sección, y con su búsqueda.
+  assert.deepEqual(manifest.screen, { label: "Buscar", labelEn: "Search", icon: "search", menuOpens: "both" });
   // Un solo host: TMDB va por kino.tmdb, que no necesita declararlo.
   // Los dos servidores van declarados: así la persona los elige de una lista y ninguno necesita un
   // ajuste de tipo `url` escrito a mano.
@@ -182,7 +183,7 @@ test("el manifiesto es el que Kino instala", async () => {
     manifest.settings.map((s) => s.key),
     ["servidor", "service", "key", "posterSec", "posterRatings", "posterBadgeSize", "posterTextless", "posterType",
      "backdropSec", "backdropRatings", "backdropBadgeSize", "backdropPosition", "diag", "serverStatus", "testServer",
-     "comoBuscar"]
+     "comoBuscar", "ayuda", "clavePropia"]
   );
   // El último encabezado explica dónde está la búsqueda, porque Kino no da lupa de cabecera a un catálogo y la
   // gente la busca ahí. Es la única forma de texto libre que tiene un formulario en apiVersion 6: el `hint` de
@@ -201,8 +202,8 @@ test("el manifiesto es el que Kino instala", async () => {
   assert.ok(!posterOptions.includes("all"), "el póster no ofrece todas");
   assert.ok(backdropOptions.includes("all"), "el fondo sí");
   assert.deepEqual(
-    manifest.settings.filter((s) => ["section", "status", "action"].includes(s.type)).map((s) => s.type),
-    ["section", "section", "section", "section", "status", "action", "section"]
+    manifest.settings.filter((s) => ["section", "status", "action", "help", "link"].includes(s.type)).map((s) => s.type),
+    ["section", "section", "section", "section", "status", "action", "section", "help", "link"]
   );
   assert.equal(manifest.settings[1].type, "select");
   // La clave va como TEXTO, no como contraseña: es una clave pública y gratuita la que viene puesta, y
@@ -589,6 +590,34 @@ test("resolve() falla con not_found y una frase en el idioma de la persona", asy
   plugin = await freshPlugin();
   setKino({ config: {}, lang: "en-US" });
   await assert.rejects(() => plugin.resolve("x"), (e) => e.code === "not_found" && /plays nothing/.test(e.userMessage));
+});
+
+test("la pantalla propia busca y dibuja la rejilla de pósters", async () => {
+  const plugin = await freshPlugin();
+  setKino({ config: { key: KEY, service: "openposterdb" }, device: "tv", fetchImpl: okFetch });
+
+  // El evento trae los resultados; el estado de Kino conserva los inputs, así que la pantalla ve la consulta.
+  const ev = await plugin.screenEvent({ name: "buscar", state: { inputs: { q: "matrix" } }, lang: "es" });
+  assert.ok(ev && ev.state && ev.state.results.length, "el evento devuelve estado con resultados");
+  assert.equal(ev.state.page, 1);
+
+  const tree = await plugin.screen({ state: Object.assign({ inputs: { q: "matrix" } }, ev.state), lang: "es" });
+  assert.equal(tree.type, "Column");
+  const grid = tree.children.find((c) => c.type === "titleGrid");
+  assert.ok(grid, "la rejilla tiene que estar");
+  assert.equal(grid.items.length, ev.state.results.length);
+  assert.deepEqual(grid.columns, { compact: 3, expanded: 6 });
+  // Todos con póster del servidor: la pantalla no es un buscador pelado, es el catálogo con sus notas.
+  assert.ok(grid.items.every((i) => /^https:\/\/openposterdb\.com\//.test(i.poster)));
+
+  // Sin texto: el campo y la ayuda, nada más.
+  const vacia = await plugin.screen({ state: {} });
+  assert.deepEqual(vacia.children.map((c) => c.type), ["TextField", "Text"]);
+  // El evento reservado `open` (el primero de una sesión real) no hace nada.
+  assert.equal(await plugin.screenEvent({ name: "open", state: {} }), null);
+  // Y "mas" sin resultados previos se comporta como la primera página, sin romperse.
+  const mas = await plugin.screenEvent({ name: "mas", state: { inputs: { q: "matrix" } } });
+  assert.ok(mas && mas.state, "«mas» devuelve estado");
 });
 
 test("con respuestas REALES de TMDB los títulos salen completos", async () => {

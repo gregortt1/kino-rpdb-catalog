@@ -138,6 +138,50 @@ Hmm. Anotado para cuando salga: con el vocabulario abierto se abren filas temát
 versión publicada — validar contra lo que la gente tiene, no contra lo que viene. Copia del anterior en
 `kino/tmp/contract-apiVersion-9-backup.json`. Sigue en verde: `✓ Kino would accept this plugin`, 38 pruebas.
 
+### Kino 0.9.77 = apiVersion 15: las pantallas ya están (29/10/2026, tarde)
+
+Los contratos de las plantillas (`archive`, `own-server`) están en **apiVersion 15** y el kit ya se
+actualizó a ese número, así que la app de juandrexter (0.9.77) tiene todo hasta ahí:
+
+| apiVersion | Qué trae | ¿Para nosotros? |
+| --- | --- | --- |
+| 13 | `catalog` (base SQLite local), `imageSource`, `bytes`, `sockets`, `qr` | No |
+| **14** | **pantallas propias** (`screen`), `rooms`, `jobs`, `library` | **Sí: es la modernización que falta** |
+| 15 | `identity`, notificaciones, tiendas de plugins | No |
+
+**El lote sigue en 1.32.0 / apiVersion 12 y sigue sin publicar** (botón "Ayuda", `devices` y `link`). No se
+sube a 15 todavía: el apiVersion se sube cuando se estrena la función, no antes.
+
+**Lo siguiente, y es un trabajo aparte: la pantalla.** Con `screen` (apiVersion 14) el plugin dibuja una
+pantalla propia, con **su propio campo de búsqueda**, y se acaba el problema de la lupa. No es un retoque:
+son ~175 KB de documentación nueva (`screens` 82 KB, `screen-components` 93 KB, `screen-forms` 60 KB) y
+necesita una pasada en limpio, con la documentación leída entera antes de escribir la primera línea.
+
+### Reglas de trabajo (29/10/2026), y el lote pendiente de publicar
+
+Dos reglas que valen de aquí en adelante. La segunda es la que más cambia el día a día:
+
+1. **La app está al día.** No se baja el apiVersion para llegar a Kinos viejos: se usa el más nuevo que tenga
+   lo que el plugin necesita. (Antes se hacía al revés, siguiendo la recomendación de la documentación, y
+   eso costó renunciar a `help` y `devices` durante dos versiones.)
+2. **Se publica por lotes.** Nada de una publicación por cambio: cada actualización le sale a todo el mundo
+   al abrir Kino, y una versión diaria es ruido. Se acumulan las mejoras y **se publica todo de una**, cuando
+   se pida. Mientras haya trabajo sin publicar, `kino/explore/estado-final.mjs` lo dirá: comparar lo
+   publicado con lo local tiene que dar **5 de 5 idénticos** solo después de publicar.
+
+**El lote pendiente: 1.32.0, sin publicar.**
+
+| Cambio | Qué hace |
+| --- | --- |
+| apiVersion 9 → **12** (Kino 0.9.74) | Lo que habilita las tres siguientes |
+| **Botón "Ayuda"** (`help`) | Una ventana de **2.000 caracteres** con el manual: qué hace, cómo se configura, dónde se busca, el diagnóstico y lo que no hace. En español (1.253) y en inglés (1.211). Es el sitio definitivo de la explicación que vivía en un `hint` de 300 |
+| **`devices: ["tv"]`** | Los cuatro ajustes que solo actúan en la tele (qué notas y tamaño, del póster y del fondo) **dejan de dibujarse en el celular** |
+| **`link`** | Un botón a openposterdb.com, para quien quiera sacar su propia clave |
+| Contrato del kit a **14** | Lo que el ecosistema ya asume. Con el 11 no se podía validar un manifiesto de apiVersion 12: «Este plugin necesita una versión más nueva de Kino» |
+
+Para publicarlo: `node kino/explore/subir-todo.mjs` (con `GH_TOKEN`), y después comprobar con
+`estado-final.mjs`.
+
 ### Kino 0.9.74 y el formulario bilingüe (1.30.0)
 
 **El estado de Kino, comprobado el 29/10/2026.** Cambiaron **48 de 54 páginas** y hay seis nuevas. Lo
