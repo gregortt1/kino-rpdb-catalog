@@ -138,6 +138,26 @@ Hmm. Anotado para cuando salga: con el vocabulario abierto se abren filas temát
 versión publicada — validar contra lo que la gente tiene, no contra lo que viene. Copia del anterior en
 `kino/tmp/contract-apiVersion-9-backup.json`. Sigue en verde: `✓ Kino would accept this plugin`, 38 pruebas.
 
+### Kino 0.9.81 = apiVersion 20 (03/11/2026)
+
+Los contratos de las plantillas están en **apiVersion 20** y la app de juandrexter ya está en 0.9.81. Ojo:
+la página de novedades dice «Kino 0.9.81, todavía sin publicar» — va con retraso, como pasó con 0.9.74. Se
+hace caso a la app y a los contratos.
+
+Lo que hay entre la 15 y la 20, y por qué no cambia el plugin:
+
+| apiVersion | Qué trae | Para PosterX |
+| --- | --- | --- |
+| 16 | monedas de Kino, kino.sync | No |
+| 17 | trabajos por perfil, **más componentes de pantalla** | No urgente: el campo de texto y 	itleGrid ya hacen el trabajo |
+| 18 | temas de la app | No |
+| 19 | letras, go.installPlugin | No |
+| 20 | **provides/consumes** (plugins que se usan entre sí), isualBrowser | No: el catálogo descubre, y «Buscar dónde verlo» ya es de Kino |
+
+**El plugin se queda en apiVersion 14**, que es lo que usa. El número se sube cuando se estrena una función,
+no para ir a la par. **Publicado: 1.33.0.** Pendiente en el próximo lote: las etiquetas de las opciones en
+inglés («English texts: 24 of 54»).
+
 ### Kino 0.9.77 = apiVersion 15: las pantallas ya están (29/10/2026, tarde)
 
 Los contratos de las plantillas (`archive`, `own-server`) están en **apiVersion 15** y el kit ya se

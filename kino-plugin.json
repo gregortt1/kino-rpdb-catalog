@@ -1,7 +1,7 @@
 {
   "id": "rpdb-catalog",
   "name": "PosterX",
-  "version": "1.33.0",
+  "version": "1.35.0",
   "apiVersion": 14,
   "entry": "plugin.js",
   "catalogOnly": true,
@@ -10,7 +10,8 @@
     "series"
   ],
   "section": {
-    "label": "PosterX"
+    "label": "PosterX",
+    "labelEn": "PosterX"
   },
   "theme": {
     "highlight": "#F5C518"
@@ -49,11 +50,13 @@
       "options": [
         {
           "value": "openposterdb",
-          "label": "OpenPosterDB (gratis)"
+          "label": "OpenPosterDB (gratis)",
+          "labelEn": "OpenPosterDB (free)"
         },
         {
           "value": "rpdb",
-          "label": "RatingPosterDB"
+          "label": "RatingPosterDB",
+          "labelEn": "RatingPosterDB"
         }
       ],
       "labelEn": "Image server"
@@ -81,27 +84,33 @@
       "options": [
         {
           "value": "imdb",
-          "label": "Solo IMDb (estricto)"
+          "label": "Solo IMDb (estricto)",
+          "labelEn": "IMDb only (strict)"
         },
         {
           "value": "imdbRt",
-          "label": "IMDb y Rotten Tomatoes"
+          "label": "IMDb y Rotten Tomatoes",
+          "labelEn": "IMDb and Rotten Tomatoes"
         },
         {
           "value": "imdbRtMal",
-          "label": "IMDb y RT (+ MAL en anime)"
+          "label": "IMDb y RT (+ MAL en anime)",
+          "labelEn": "IMDb and RT (+ MAL on anime)"
         },
         {
           "value": "imdbRtMc",
-          "label": "IMDb, RT y Metacritic"
+          "label": "IMDb, RT y Metacritic",
+          "labelEn": "IMDb, RT and Metacritic"
         },
         {
           "value": "imdbFallback",
-          "label": "IMDb y si no hay, TMDB"
+          "label": "IMDb y si no hay, TMDB",
+          "labelEn": "IMDb, or TMDB if missing"
         },
         {
           "value": "auto",
-          "label": "Autom\u00e1tico (hasta 3)"
+          "label": "Autom\u00e1tico (hasta 3)",
+          "labelEn": "Automatic (up to 3)"
         }
       ],
       "labelEn": "Which ratings",
@@ -118,15 +127,18 @@
       "options": [
         {
           "value": "sharp",
-          "label": "Grandes (recomendado)"
+          "label": "Grandes (recomendado)",
+          "labelEn": "Large (recommended)"
         },
         {
           "value": "max",
-          "label": "Muy grandes"
+          "label": "Muy grandes",
+          "labelEn": "Extra large"
         },
         {
           "value": "normal",
-          "label": "Medianas"
+          "label": "Medianas",
+          "labelEn": "Medium"
         }
       ],
       "labelEn": "Rating badge size",
@@ -166,31 +178,38 @@
       "options": [
         {
           "value": "imdb",
-          "label": "Solo IMDb (estricto)"
+          "label": "Solo IMDb (estricto)",
+          "labelEn": "IMDb only (strict)"
         },
         {
           "value": "imdbRt",
-          "label": "IMDb y Rotten Tomatoes"
+          "label": "IMDb y Rotten Tomatoes",
+          "labelEn": "IMDb and Rotten Tomatoes"
         },
         {
           "value": "imdbRtMal",
-          "label": "IMDb y RT (+ MAL en anime)"
+          "label": "IMDb y RT (+ MAL en anime)",
+          "labelEn": "IMDb and RT (+ MAL on anime)"
         },
         {
           "value": "imdbRtMc",
-          "label": "IMDb, RT y Metacritic"
+          "label": "IMDb, RT y Metacritic",
+          "labelEn": "IMDb, RT and Metacritic"
         },
         {
           "value": "all",
-          "label": "Todas las que haya (hasta 8)"
+          "label": "Todas las que haya (hasta 8)",
+          "labelEn": "All available (up to 8)"
         },
         {
           "value": "imdbFallback",
-          "label": "IMDb y si no hay, TMDB"
+          "label": "IMDb y si no hay, TMDB",
+          "labelEn": "IMDb, or TMDB if missing"
         },
         {
           "value": "auto",
-          "label": "Autom\u00e1tico (hasta 3)"
+          "label": "Autom\u00e1tico (hasta 3)",
+          "labelEn": "Automatic (up to 3)"
         }
       ],
       "labelEn": "Which ratings",
@@ -207,15 +226,18 @@
       "options": [
         {
           "value": "sharp",
-          "label": "Grandes (recomendado)"
+          "label": "Grandes (recomendado)",
+          "labelEn": "Large (recommended)"
         },
         {
           "value": "max",
-          "label": "Muy grandes (imagen 4K, pesada)"
+          "label": "Muy grandes (imagen 4K, pesada)",
+          "labelEn": "Extra large (4K image, heavy)"
         },
         {
           "value": "normal",
-          "label": "Medianas"
+          "label": "Medianas",
+          "labelEn": "Medium"
         }
       ],
       "labelEn": "Rating badge size",
@@ -232,35 +254,43 @@
       "options": [
         {
           "value": "r",
-          "label": "Centrada a la derecha (recomendado)"
+          "label": "Centrada a la derecha (recomendado)",
+          "labelEn": "Centred on the right (recommended)"
         },
         {
           "value": "l",
-          "label": "Centrada a la izquierda"
+          "label": "Centrada a la izquierda",
+          "labelEn": "Centred on the left"
         },
         {
           "value": "bc",
-          "label": "Abajo, centrada"
+          "label": "Abajo, centrada",
+          "labelEn": "Bottom, centred"
         },
         {
           "value": "tc",
-          "label": "Arriba, centrada"
+          "label": "Arriba, centrada",
+          "labelEn": "Top, centred"
         },
         {
           "value": "bl",
-          "label": "Esquina abajo izquierda"
+          "label": "Esquina abajo izquierda",
+          "labelEn": "Bottom-left corner"
         },
         {
           "value": "br",
-          "label": "Esquina abajo derecha"
+          "label": "Esquina abajo derecha",
+          "labelEn": "Bottom-right corner"
         },
         {
           "value": "tl",
-          "label": "Esquina arriba izquierda"
+          "label": "Esquina arriba izquierda",
+          "labelEn": "Top-left corner"
         },
         {
           "value": "tr",
-          "label": "Esquina arriba derecha"
+          "label": "Esquina arriba derecha",
+          "labelEn": "Top-right corner"
         }
       ],
       "labelEn": "Where the rating goes",
@@ -314,6 +344,9 @@
     "label": "Buscar",
     "labelEn": "Search",
     "icon": "search",
-    "menuOpens": "both"
+    "menuOpens": "section",
+    "opensFrom": [
+      "settings"
+    ]
   }
 }

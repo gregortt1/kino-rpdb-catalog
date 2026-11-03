@@ -163,7 +163,10 @@ test("el manifiesto es el que Kino instala", async () => {
   assert.equal(manifest.catalogOnly, true);
   assert.deepEqual(manifest.capabilities.sort(), ["browse", "episodes", "home", "meta", "resolve", "scopedSearch", "screen", "search"]);
   // La pantalla: propia, en el menú además de la sección, y con su búsqueda.
-  assert.deepEqual(manifest.screen, { label: "Buscar", labelEn: "Search", icon: "search", menuOpens: "both" });
+  // La entrada del plugin abre el CATALOGO (la seccion), no la pantalla: el icono de la rejilla de plugins tiene
+// que llevar a las filas con sus pestanas, como el de cualquier otra fuente. Se probo con "both" y abria la
+  // busqueda, dejando el catalogo sin entrada (reporte con capturas). La pantalla se abre desde los ajustes.
+  assert.deepEqual(manifest.screen, { label: "Buscar", labelEn: "Search", icon: "search", menuOpens: "section", opensFrom: ["settings"] });
   // Un solo host: TMDB va por kino.tmdb, que no necesita declararlo.
   // Los dos servidores van declarados: así la persona los elige de una lista y ninguno necesita un
   // ajuste de tipo `url` escrito a mano.
