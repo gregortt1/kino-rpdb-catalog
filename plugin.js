@@ -1018,7 +1018,21 @@ export async function screen({ state }) {
     children.push(grid);
   }
 
-  return { type: "Column", padding: { compact: 16, expanded: 32 }, gap: 12, children };
+  // Una sola barra: la de Kino y la nuestra fundidas (`mergeWithKinoBar`, apiVersion 19), con `dense` para
+  // que en un celular ocupe 56 dp en vez de 150. El titulo va donde estaba el nombre del plugin y la salida
+  // en el `leading`, que es donde estaba Cerrar: asi la pantalla se ve como la de cualquier otra fuente.
+  return {
+    type: "Scaffold",
+    appBar: {
+      type: "AppBar",
+      mergeWithKinoBar: true,
+      dense: true,
+      title: "PosterX",
+      titleEn: "PosterX",
+      leading: { type: "IconButton", icon: "close", labelText: "Cerrar", labelTextEn: "Close", onPressed: { close: true } },
+    },
+    body: { type: "Column", padding: { compact: 16, expanded: 32 }, gap: 12, children },
+  };
 }
 
 // Kino manda aquí cada evento de la pantalla; el valor de los campos llega en `state.inputs`, por su key.

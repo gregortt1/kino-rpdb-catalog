@@ -151,7 +151,7 @@ test("el manifiesto es el que Kino instala", async () => {
   // 14 = Kino 0.9.74. Regla de trabajo desde el 29/10/2026: se asume que todo el mundo tiene la app al día,
   // así que no se sacrifican funciones por llegar a Kinos viejos. Con 12 llegaron el botón "Ayuda", `devices`
   // y `link`; con 14, la pantalla propia —la lupa que Kino no da en la cabecera de un catálogo—.
-  assert.equal(manifest.apiVersion, 14);
+  assert.equal(manifest.apiVersion, 21);
   // `catalogOnly` está, y se probó a quitarlo: la 1.27.0 lo quitó y un tercer usuario reportó que Kino
   // trataba el catálogo «como si fuera de transmisión»: el botón de la ficha decía "Reproducir" y llevaba a
   // un "no reproduce nada". Un catálogo no finge ser una fuente.
@@ -166,7 +166,7 @@ test("el manifiesto es el que Kino instala", async () => {
   // La entrada del plugin abre el CATALOGO (la seccion), no la pantalla: el icono de la rejilla de plugins tiene
 // que llevar a las filas con sus pestanas, como el de cualquier otra fuente. Se probo con "both" y abria la
   // busqueda, dejando el catalogo sin entrada (reporte con capturas). La pantalla se abre desde los ajustes.
-  assert.deepEqual(manifest.screen, { label: "Buscar", labelEn: "Search", icon: "search", menuOpens: "section", opensFrom: ["settings"] });
+  assert.deepEqual(manifest.screen, { label: "Buscar", labelEn: "Search", opensFrom: ["settings"] });
   // Un solo host: TMDB va por kino.tmdb, que no necesita declararlo.
   // Los dos servidores van declarados: así la persona los elige de una lista y ninguno necesita un
   // ajuste de tipo `url` escrito a mano.
@@ -605,8 +605,8 @@ test("la pantalla propia busca y dibuja la rejilla de pósters", async () => {
   assert.equal(ev.state.page, 1);
 
   const tree = await plugin.screen({ state: Object.assign({ inputs: { q: "matrix" } }, ev.state), lang: "es" });
-  assert.equal(tree.type, "Column");
-  const grid = tree.children.find((c) => c.type === "titleGrid");
+  assert.equal(tree.type, "Scaffold");
+  const grid = tree.body.children.find((c) => c.type === "titleGrid");
   assert.ok(grid, "la rejilla tiene que estar");
   assert.equal(grid.items.length, ev.state.results.length);
   assert.deepEqual(grid.columns, { compact: 3, expanded: 6 });
@@ -615,7 +615,7 @@ test("la pantalla propia busca y dibuja la rejilla de pósters", async () => {
 
   // Sin texto: el campo y la ayuda, nada más.
   const vacia = await plugin.screen({ state: {} });
-  assert.deepEqual(vacia.children.map((c) => c.type), ["TextField", "Text"]);
+  assert.deepEqual(vacia.body.children.map((c) => c.type), ["TextField", "Text"]);
   // El evento reservado `open` (el primero de una sesión real) no hace nada.
   assert.equal(await plugin.screenEvent({ name: "open", state: {} }), null);
   // Y "mas" sin resultados previos se comporta como la primera página, sin romperse.

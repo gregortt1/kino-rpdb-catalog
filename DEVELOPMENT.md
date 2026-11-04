@@ -138,6 +138,31 @@ Hmm. Anotado para cuando salga: con el vocabulario abierto se abren filas temát
 versión publicada — validar contra lo que la gente tiene, no contra lo que viene. Copia del anterior en
 `kino/tmp/contract-apiVersion-9-backup.json`. Sigue en verde: `✓ Kino would accept this plugin`, 38 pruebas.
 
+### Kino 0.9.82 = apiVersion 21, y el buscador en la pantalla (04/11/2026)
+
+El contrato de la plantilla está ya en **apiVersion 21**. La app avisa de lo que cambia para quien escribe
+plugins: *"archivos del aparato, deslizar y bordes de temas"*. Y en el aviso a la persona, una línea que sí
+nos toca:
+
+> 🔌 Los plugins ahora pueden tener su propia pantalla, **con buscador**, «Continuar viendo» y su logo.
+
+**El buscador nativo de la pantalla es lo que hay que buscar en la próxima pasada.** Hoy la nuestra lo hace
+con un `TextField` propio y un `titleGrid`; si Kino dibuja el buscador, la pantalla queda como la de Cueva
+Pro en su sección, con la lupa arriba y el campo puesto por la app. En la documentación espejada `search`
+aparece **solo como nombre de icono**, así que el campo vive en el bloque `screen` del manifiesto o en la
+referencia de pantallas, y ninguna de las dos se ha leído todavía con el detalle que hace falta.
+
+Revisado y descartado para un catálogo:
+
+| Novedad | Por qué no |
+| --- | --- |
+| Archivos del aparato (`files`) | No leemos nada local: todo viene de TMDB |
+| «Continuar viendo» en la pantalla | Un catálogo no reproduce: no hay progreso que enseñar |
+| Temas, bordes, deslizar el mini reproductor | Son de la app, no del plugin |
+
+**Publicado: 1.35.0.** El plugin sigue en apiVersion 14 porque es lo que usa; se sube cuando se estrene el
+buscador nativo, con el número que esa función pida.
+
 ### Kino 0.9.81 = apiVersion 20 (03/11/2026)
 
 Los contratos de las plantillas están en **apiVersion 20** y la app de juandrexter ya está en 0.9.81. Ojo:

@@ -1,7 +1,7 @@
 {
-  "$comment": "Kino plugin contract, apiVersion 1 to 14. The single source of truth for every number and rule a plugin meets. The app checks each value against its own code, and a test in the app pins this file to it; sdk/validate.mjs, sdk/run.mjs and the guide's tables read this file. apiVersion 12 (sync providers), 13 and 14 (plugin screens: screen, library, playerPanelTab, playerControl, room, schedule, ai, shared, enhancements) all arrive in Kino 0.9.74, the next release (not published yet); a Kino before 0.9.74 refuses all three.",
-  "apiVersion": 15,
-  "maxApiVersion": 15,
+  "$comment": "Kino plugin contract, apiVersion 1 to 21. The single source of truth for every number and rule a plugin meets. The app checks each value against its own code, and a test in the app pins this file to it; sdk/validate.mjs, sdk/run.mjs and the guide's tables read this file. apiVersion 12 (sync providers), 13 and 14 (plugin screens: screen, library, playerPanelTab, playerControl, room, schedule, ai, shared, enhancements) all arrive in Kino 0.9.74, the next release (not published yet); a Kino before 0.9.74 refuses all three. apiVersion 16 (coins) arrives in Kino 0.9.78; apiVersion 17 (kino.library.stats, Tu mes en Kino) in a Kino not numbered yet (TBD). apiVersion 18 (appThemes, a plugin's whole-app looks) arrives in Kino 0.9.81. apiVersion 19 (lyrics, the screen additions) and apiVersion 20 (visualBrowser, a web window the person drives; the plugin protocol: provides, consumes, kino.plugins.call) also arrive in Kino 0.9.81.",
+  "apiVersion": 21,
+  "maxApiVersion": 21,
   "apiVersionFromApp": {
     "6": "0.9.50",
     "7": "0.9.51",
@@ -12,7 +12,13 @@
     "12": "0.9.74",
     "13": "0.9.74",
     "14": "0.9.74",
-    "15": "TBD"
+    "15": "0.9.77",
+    "16": "0.9.78",
+    "17": "TBD",
+    "18": "0.9.81",
+    "19": "0.9.81",
+    "20": "0.9.81",
+    "21": "0.9.82"
   },
   "additiveFromApp": {
     "kino.meta": "0.9.53",
@@ -29,7 +35,14 @@
     "kino.sync.remoteChanged": "0.9.74",
     "action.link": "0.9.74",
     "action.setSettings": "0.9.74",
-    "kino.library.episode": "TBD"
+    "kino.library.episode": "0.9.77",
+    "kino.sync.setActive": "0.9.78",
+    "recommends": "0.9.81",
+    "screen.installed": "0.9.81",
+    "scaffold.onBack": "0.9.81",
+    "appBar.mergeWithKinoBar": "0.9.81",
+    "visualBrowser": "0.9.81",
+    "kino.visualBrowser.available": "0.9.81"
   },
   "capabilities": {
     "$comment": "standaloneSupplements (apiVersion 13; room, schedule, ai and shared from apiVersion 14): a capabilities set with at least one standalone capability and nothing else but these runtime capabilities (all declarative but schedule, which exports job) is still standalone (needs neither required nor atLeastOneOf). Alone, with no standalone capability, they get the usual rule. playerControl (Task 8t) is a supplement only beside a panel object (its own player panel, or panel.contributes with playerPanelTab): a standalone set with playerControl and no panel is refused with playerControlNeedsPanelMessage.",
@@ -48,6 +61,7 @@
       "subtitles",
       "tracking",
       "segments",
+      "lyrics",
       "playlists",
       "externalResolve",
       "nuvio",
@@ -67,7 +81,10 @@
       "ai",
       "shared",
       "identity",
-      "notifications"
+      "notifications",
+      "coins",
+      "pluginStore",
+      "files"
     ],
     "required": [
       "resolve"
@@ -80,10 +97,12 @@
       "subtitles",
       "tracking",
       "segments",
+      "lyrics",
       "syncProvider",
       "screen",
       "library",
-      "playerPanelTab"
+      "playerPanelTab",
+      "pluginStore"
     ],
     "standaloneSupplements": [
       "socket",
@@ -96,7 +115,9 @@
       "shared",
       "playerControl",
       "identity",
-      "notifications"
+      "notifications",
+      "coins",
+      "files"
     ],
     "playerControlNeedsPanelMessage": "The \"playerControl\" capability needs a \"panel\" (its own player panel, or \"panel\": { \"contributes\": true }) in a plugin that plays nothing",
     "anyPluginExports": [
@@ -118,7 +139,9 @@
       "ai",
       "shared",
       "identity",
-      "notifications"
+      "notifications",
+      "coins",
+      "files"
     ],
     "apiVersions": {
       "download": 2,
@@ -129,6 +152,7 @@
       "meta": 6,
       "tracking": 7,
       "segments": 7,
+      "lyrics": 19,
       "playlists": 10,
       "externalResolve": 11,
       "nuvio": 11,
@@ -148,7 +172,10 @@
       "ai": 14,
       "shared": 14,
       "identity": 15,
-      "notifications": 15
+      "notifications": 15,
+      "coins": 16,
+      "pluginStore": 15,
+      "files": 21
     },
     "requires": {
       "scopedSearch": "search"
@@ -169,7 +196,9 @@
       "schedule",
       "ai",
       "identity",
-      "notifications"
+      "notifications",
+      "coins",
+      "pluginStore"
     ],
     "exports": {
       "channels": [
@@ -199,6 +228,9 @@
       ],
       "schedule": [
         "job"
+      ],
+      "pluginStore": [
+        "storeSync"
       ]
     },
     "optionalExports": {
@@ -280,9 +312,11 @@
         "radio",
         "subtitles",
         "utilities",
+        "themes",
         "adult"
       ],
-      "message": "The \"categories\" field must be a list without repeats of: movies, series, anime, live, radio, subtitles, utilities, adult"
+      "pattern": "^[a-z][a-z0-9-]{1,23}$",
+      "message": "The \"categories\" field must be a list without repeats of: movies, series, anime, live, radio, subtitles, utilities, themes, adult, or a new type (2 to 24 lowercase letters, digits and hyphens, starting with a letter)"
     },
     "catalogOnly": {
       "$comment": "\"catalogOnly\": true (Kino 0.9.54, additive: no apiVersion, valid at every one, an older Kino ignores the field). The plugin lists and describes titles and plays none: resolve is not required, one of atLeastOneOf is, forbiddenCapabilities and forbiddenFields (streamHosts, and browser only as true: \"pages\" reads pages for the catalog) are refused. Kino never calls its resolve, never lists it as a source of a title (search, Ver en otros plugins, Buscar dónde verlo, the player's Servidor) and sends its titles to the person's other sources. For Kino 0.9.53 and older also declare and export resolve (throwing not_found) and search or home.",
@@ -317,6 +351,13 @@
         "compatibleNote": "catalogOnly existe desde Kino {fromApp}: un Kino anterior ignora el campo y lo instala como un plugin normal, así que tu resolve debe fallar con kino.error(\"not_found\", …) y un mensaje para la persona",
         "refusedNote": "catalogOnly existe desde Kino {fromApp}: un Kino anterior ignora el campo y rechaza este plugin porque le falta \"{missing}\". Para que también se instale ahí, declara y exporta resolve (que falle con not_found) y search o home"
       }
+    },
+    "recommends": {
+      "$comment": "\"recommends\": [\"owner/name\", ...] (Kino 0.9.81, additive: no apiVersion, valid at every one, an older Kino ignores the field). The plugins this one works better with, each a plain GitHub owner/name as written (case kept; PluginAddress.bareRepoOf: at most maxRepoChars, no ://, no URL, no sub-path, no @ref), at most max of them; a repeat (case-insensitive) collapses, keeping the first. Anything else (not an array, more than max, a bad entry) makes the manifest invalid on field recommends. The plugin's screen and screenEvent receive installed, { \"<repo as written>\": true | false }, one key per entry (so {} when it declares none): whether that plugin is installed now on this device, never anything else. Kino calls screen again whenever it changes.",
+      "max": 8,
+      "maxRepoChars": 100,
+      "badMessage": "The \"recommends\" field must be a list of at most 8 plain GitHub owner/name repositories",
+      "screenArgument": "installed"
     },
     "debug": {
       "apiVersion": 6,
@@ -371,7 +412,10 @@
         "screen",
         "settings",
         "panel",
-        "jobs"
+        "jobs",
+        "provides",
+        "consumes",
+        "visualBrowser"
       ],
       "capabilities": [
         "screen",
@@ -381,7 +425,8 @@
         "room",
         "schedule",
         "shared",
-        "ai"
+        "ai",
+        "files"
       ],
       "keyPattern": "^[1-9][0-9]{0,3}$",
       "dropped": {
@@ -393,9 +438,9 @@
         "replacesNeedsCategories": "\"screen.replaces\" needs the plugin's categories, which need its own apiVersion to be {min} or more",
         "missingExports": "needs the exports {exports}",
         "blockNotObject": "must be an object",
-        "badField": "\"{field}\" can't be enhanced (only capabilities, screen, settings, panel and jobs)",
+        "badField": "\"{field}\" can't be enhanced (only capabilities, screen, settings, panel, jobs and visualBrowser)",
         "capabilitiesNotList": "\"capabilities\" must be a list",
-        "badCapability": "the \"{capability}\" capability can't be added by an enhancement (only screen, library, playerPanelTab, playerControl, room, schedule, shared and ai)",
+        "badCapability": "the \"{capability}\" capability can't be added by an enhancement (only screen, library, playerPanelTab, playerControl, room, schedule, shared, ai and files)",
         "panelTabNeedsPanel": "\"playerPanelTab\" and \"panel.contributes\" must come together in the same enhancement",
         "sectionChanges": "\"section\" is read at apiVersion {key} but not at the plugin's apiVersion"
       }
@@ -465,6 +510,39 @@
         "maxTitleChars": 120,
         "scrubPattern": "[\\u0000-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]"
       },
+      "textStyleHero": {
+        "$comment": "apiVersion 17 (Tu mes en Kino): Text.style \"hero\", one step above h1, for a big number: 72 sp with a 72 sp line on the phone, x1.25 (90 sp) on the TV, bold; 56 sp in a TV panel. display stays an alias of h1. An older Kino does not know it and reads it as p (an unknown style is p, logged), so a plugin that needs the size on an older one checks apiVersion first."
+      },
+      "pagesNode": {
+        "$comment": "apiVersion 17 (Tu mes en Kino): { type: \"pages\", key, children, onPageChanged? }, full-screen pages, Kino's own node (no Flutter name: PageView stays the carousel, with dots). minChildren to maxChildren children (else the whole node is dropped, logged) and a key of its own (required). Swiped on a phone and a desktop; on a TV Left and Right move a page once nothing more is focusable that way inside it, Up and Down stay in it, focus goes into the new page, a page with nothing focusable still turns; on the first page Left is left alone (the plugin's area never hands it on: Back and Kino's close leave). Kino draws the progress bar above the pages, one segment a page; the plugin neither draws nor hides it. No autoplay: notTaken are ignored, logged. The page reached lives in state.inputs.<key> as a number from 0, though pages is no input (no label, no form rules): the state, an answer's state or a ui set move it (out of range: clamped); onPageChanged's event carries the settled index as value. Never inside a sideways scroll, a table cell or another pages (dropped, logged). Additive, no new apiVersion: reverse (true: right to left, page 0 at the right, for manga) and progress (segments, the default, up to maxChildren pages; bar, a single thin bar, or none, up to longMaxChildren pages: a chapter, not a story). An older Kino ignores both and keeps the 8-page limit. An older Kino drops the node: read kino.screen.widgets.",
+        "minChildren": 2,
+        "maxChildren": 8,
+        "notTaken": [
+          "autoPlayMs",
+          "initialPage",
+          "viewportFraction",
+          "padEnds"
+        ],
+        "longMaxChildren": 250,
+        "progress": [
+          "segments",
+          "bar",
+          "none"
+        ],
+        "fromApiVersion": 17
+      },
+      "goSearch": {
+        "$comment": "apiVersion 17 (Tu mes en Kino): { search: { q, scope? } }. Without scope, Kino's search opens with q and ONLY this plugin as the source (the plugin must be searchable). scope \"all\" opens Kino's normal search on every source the person has (no source, so no plugin is narrowed to), needs no search ability of the plugin, and the 18+ gate works as in Kino's search. The plugin learns nothing: no results and no list of sources come back. Honoured only from the person's own tap or submit (dropped, logged, from open, a timer, a load-more or a change), and only for a plugin of apiVersion 17 or later (a lower one is refused, logged). Any other scope value drops the go, logged.",
+        "fields": [
+          "q",
+          "scope"
+        ],
+        "scopes": [
+          "all"
+        ],
+        "scopeAllApiVersion": 17,
+        "needsApiLog": "needs_api_17"
+      },
       "goUrl": {
         "fields": [
           "href",
@@ -524,6 +602,39 @@
           "press",
           "submit"
         ]
+      },
+      "goSyncProvider": {
+        "$comment": "{ syncProvider: true } opens Kino's sync-provider settings (Ajustes > Conectar > Proveedor), where the person picks THIS plugin as the provider. It carries nothing and changes no choice by itself. Honoured only for a plugin that declares the syncProvider capability (else dropped, logged notSyncProviderLog) and only after the person's own press or submit (fromTriggers, as url and copy).",
+        "value": true,
+        "needsCapability": "syncProvider",
+        "notSyncProviderLog": "not_sync_provider",
+        "fromTriggers": [
+          "press",
+          "submit"
+        ]
+      },
+      "goSetExperience": {
+        "$comment": "apiVersion 18: { setExperience: \"light\" | \"full\" } asks for the light experience (no shadows, no effects, square corners) or the full one of the whole app: the same two presets as Ajustes > Experiencia visual. Only from the person's own press or submit on the plugin's own screen, never a panel or a notice. Kino asks the person first, in its own words, naming the plugin, and changes nothing without their yes; when the app already has that experience nothing is asked. A theme may also suggest one with its `experience` field, asked the same way when the theme is turned on.",
+        "words": [
+          "light",
+          "full"
+        ],
+        "apiVersion": 18
+      },
+      "goInstallPlugin": {
+        "$comment": "apiVersion 19: { installPlugin: { repo: \"owner/name\" } } opens Kino's own install sheet for that repo (the same preview and consent sheet as Agregar un plugin: what it connects to, Instalar or Cancelar). Nothing installs without the person's own Instalar there. The sheet opens over the plugin's own screen (no navigation to Plugins). When that plugin is already installed Kino opens nothing and shows its own toast (Ese plugin ya está instalado / That plugin is already installed); read installed (the screen argument, from the manifest's recommends) to offer a tile only for what is missing. repo is a plain GitHub owner/name, kept as written (case untouched): a URL (anything with ://), a sub-path or an @ref is dropped. Only from the person's own press or submit on the plugin's own screen (fromTriggers, as url and copy), never a panel, a notice, open, a timer or a change.",
+        "fields": [
+          "repo"
+        ],
+        "maxRepoChars": 100,
+        "apiVersion": 19
+      },
+      "goUseTheme": {
+        "$comment": "apiVersion 18: { useTheme: { theme } } turns on one of the plugin's own appThemes ids, exactly as Apariencia's button, or with theme null goes back to Kino's theme while one of the plugin's own is active. Only from the person's own press or submit on the plugin's own screen, never a panel or a notice; refused, logged, when Apariencia does not list that theme as this plugin's. Kino shows its own toast and calls screen again with the new activeTheme, the id of this plugin's active theme or null, which screen and screenEvent receive.",
+        "fields": [
+          "theme"
+        ],
+        "apiVersion": 18
       },
       "goLiveChannel": {
         "$comment": "Task 11, apiVersion 14: { liveChannel: { provider, code } } tunes to the channel code of the En vivo provider plugin provider. Honoured only for a plugin whose approved contributing panel declares \"live\" in manifest.panel.contributes.kinds (else dropped, logged needsLiveTabLog), only after the person's own press or submit (fromTriggers, as url and copy), for an installed, usable provider with live channels (never a reservedProviders id; an 18+ provider only while the 18+ code is unlocked). An 18+ channel fails closed through the module's own open (locked: not found). From the player panel while a module channel plays the channel changes in place (the panel and its pin stay); from anywhere else the panel or screen closes and the player opens the channel, as go.play does.",
@@ -703,6 +814,22 @@
         "$comment": "Task 18 (G10, apiVersion stays 14): enabledAt (epoch ms, a whole number 0 to textTime.maxMs; not per size) on a pressable (sharedProps.pressableWidgets: a button, a FloatingActionButton, a card or a ListTile with an onTap; elsewhere ignored, logged): drawn off (no press, no TV focus stop) until that time on the device's clock, then on by itself, with no plugin call (Kino keeps one timer for it while it is drawn). A Text's timeFormat countdown (with a time) writes the wait left until its time, «0:42», «1:02:03» (whole seconds rounded up, at most textTime.maxCountdownMs), rewritten every textTime.countdownRefreshMs while it runs and «0:00» once reached: the «Reenviar en 0:42» beside a button with the same enabledAt. A bad time is ignored, logged.",
         "field": "enabledAt"
       },
+      "swipe": {
+        "$comment": "Additive, no new apiVersion (Kino 0.9.82; an older Kino ignores both): onSwipeLeft and onSwipeRight on any node, one action each (the same shapes as onTap). A drag sideways of at least minDp sends the action for the direction the finger went (left: the next page). On the TV they answer Right (onSwipeLeft) and Left (onSwipeRight) once focus has nowhere further to go that way. Not per size.",
+        "leftField": "onSwipeLeft",
+        "rightField": "onSwipeRight",
+        "minDp": 64
+      },
+      "dataImage": {
+        "$comment": "Additive, no new apiVersion (Kino 0.9.82; an older Kino draws the fallback): an image's url may be data:image/<format>;base64,<bytes> (a picture the plugin holds, such as a book's cover read from its file), at most maxChars characters in all; svg is never taken.",
+        "formats": [
+          "png",
+          "jpeg",
+          "webp",
+          "gif"
+        ],
+        "maxChars": 200000
+      },
       "canRequestFocus": {
         "$comment": "Task 22 (apiVersion stays 14): canRequestFocus (Flutter's name; true or false, default false; not per size) on any node. On the TV a node that takes no focus of its own (a status Card, a Text, a Row, a Column, a DataTable, a MaterialBanner without an action...) becomes a D-pad stop: Kino's row look while focused (a tonal tint and a 3 dp accent underline, never the white ring), no press (OK does nothing), its content read by a screen reader, in the normal Up/Down/Left/Right traversal and the Scaffold rules. Ignored on a node that already takes focus (an input, a button, a node with an onTap or onLongPress) and on the phone. A non-boolean is ignored, logged. Without it a non-focusable block is read by paging: the TV scrolls a body by 80% of its height before focus moves past what has not shown yet.",
         "field": "canRequestFocus"
@@ -827,13 +954,16 @@
         "viewportFractionMin": 0.3
       },
       "scaffold": {
-        "$comment": "Task 17 item G: Scaffold { appBar?, body (required), floatingActionButton?, bottomNavigationBar? } only as the root of a screen result (a screen's or a player panel's root; anywhere else, or in an answer's pop-up, dropped, logged), read slot by slot (slotTypes: the node each holds; body any node); a result whose root is a Scaffold is drawn in layout fill (a layout given other than fill is ignored, logged). Its AppBar is pinned at the top of the plugin's area, BELOW Kino's own title bar (the plugin's name and Close, always drawn by Kino, never replaced or covered); its body takes the bounded height left (a ListView or a scroll in it scrolls itself, the bars stay; the keyboard shrinks the body); its FloatingActionButton (or one in the body) sits above its NavigationBar. AppBar { title? (a string, read as a heading for a screen reader, with its titleEn twin; or, Flutter's way, any node: a TabBar, a Row of buttons, an Image..., read as any child, at most maxAppBarTitleNodes nodes, else dropped, logged; it takes the room left of the actions, a TabBar there scrolls sideways, a Text node is the heading; on the TV its focusables are part of the row, Left/Right across them then to the actions), leading? (an IconButton), actions? (at most maxAppBarActions IconButtons, the rest dropped, logged; each needs a labelText), bottom? (a TabBar), centerTitle, backgroundColor? (a colour role), elevation }: only a Scaffold's appBar; appBarDp tall, appBarPanelDp in a player panel. NavigationBar { items: [{ key, icon, label, labelEn?, badge? }] (minNavItems to maxNavItems, the rest dropped; fewer drops the bar; logged), value (an item's key) or selectedIndex, onChanged (its event's value: the item's key; not in state.inputs) }: only a Scaffold's bottomNavigationBar; Material's bar on a phone, a bottom row of focusable items with Kino's ring on a TV. TV D-pad: the AppBar's leading and actions, the body, the bottom bar, the button (Compose's geometry; Up from the body's first stop reaches the bar); Back closes or pops as everywhere.",
+        "$comment": "Task 17 item G: Scaffold { appBar?, body (required), floatingActionButton?, bottomNavigationBar? } only as the root of a screen result (a screen's or a player panel's root; anywhere else, or in an answer's pop-up, dropped, logged), read slot by slot (slotTypes: the node each holds; body any node); a result whose root is a Scaffold is drawn in layout fill (a layout given other than fill is ignored, logged). Its AppBar is pinned at the top of the plugin's area, BELOW Kino's own title bar (the plugin's name and Close, drawn by Kino and never covered; the one exception is AppBar.mergeWithKinoBar, below); its body takes the bounded height left (a ListView or a scroll in it scrolls itself, the bars stay; the keyboard shrinks the body); its FloatingActionButton (or one in the body) sits above its NavigationBar. AppBar { title? (a string, read as a heading for a screen reader, with its titleEn twin; or, Flutter's way, any node: a TabBar, a Row of buttons, an Image..., read as any child, at most maxAppBarTitleNodes nodes, else dropped, logged; it takes the room left of the actions, a TabBar there scrolls sideways, a Text node is the heading; on the TV its focusables are part of the row, Left/Right across them then to the actions), leading? (an IconButton), actions? (at most maxAppBarActions IconButtons, the rest dropped, logged; each needs a labelText), bottom? (a TabBar), centerTitle, backgroundColor? (a colour role), elevation }: only a Scaffold's appBar; appBarDp tall, appBarPanelDp in a player panel. Scaffold.onBack (apiVersion 19, Flutter's PopScope with canPop false; below 19 dropped, logged): an action, same shapes as onPressed ('event', { event, arg } or { ui: [...], event }), never a go (a go in it is dropped, logged; one alone drops the whole onBack); only on a Scaffold root. While the root on screen declares it, the system Back (the phone's, the TV remote's) does NOT close the screen or pop a route: Kino sends that action as the person's press and the plugin answers as usual (its next tree simply no longer declares onBack when the next Back should leave). A pop-up open at the time closes first, Back never reaching the plugin; a pushed route whose root declares onBack gets it instead of popping. Never a trap: when the onBack call fails, times out or is refused the screen closes by itself, and a second Back while the first onBack call is still in flight closes the screen; Kino's own Close, a failed screen and the reserved open event are unaffected. A player panel has no Back to hold: ignored there, logged. AppBar.mergeWithKinoBar (apiVersion 19, boolean true, opt-in; below 19 dropped, logged): with a leading IconButton, Kino draws ONE bar over the screen: the leading takes Kino's Close button's place (its press is the plugin's action; its labelText is what a screen reader says), the AppBar's title (string, titleEn) takes the plugin's name's place, the AppBar's actions stay at the end followed by Kino's own buttons (the bell); the plugin's name stays the bar's accessibility label. Without a leading the flag is ignored, logged, and both bars show as before; without the flag nothing changes. The person's ways out are then the plugin's leading and the system Back (which closes the screen when onBack is absent or fails). On the TV the same, the leading first in D-pad order. Only on the root Scaffold's appBar; ignored in a player panel, logged. NavigationBar { items: [{ key, icon, label, labelEn?, badge? }] (minNavItems to maxNavItems, the rest dropped; fewer drops the bar; logged), value (an item's key) or selectedIndex, onChanged (its event's value: the item's key; not in state.inputs) }: only a Scaffold's bottomNavigationBar; Material's bar on a phone, a bottom row of focusable items with Kino's ring on a TV. TV D-pad: the AppBar's leading and actions, the body, the bottom bar, the button (Compose's geometry; Up from the body's first stop reaches the bar); Back closes or pops as everywhere.",
         "slots": [
           "appBar",
           "body",
           "floatingActionButton",
           "bottomNavigationBar"
         ],
+        "onBackField": "onBack",
+        "mergeField": "mergeWithKinoBar",
+        "backApiVersion": 19,
         "slotTypes": {
           "appBar": "appBar",
           "floatingActionButton": "fab",
@@ -897,7 +1027,11 @@
         "titleByIds",
         "url",
         "copy",
-        "liveChannel"
+        "liveChannel",
+        "syncProvider",
+        "useTheme",
+        "setExperience",
+        "installPlugin"
       ],
       "widgets": [
         "col",
@@ -947,7 +1081,8 @@
         "scaffold",
         "appBar",
         "navigationBar",
-        "steps"
+        "steps",
+        "pages"
       ],
       "tableParts": [
         "tr",
@@ -1004,8 +1139,22 @@
         "close",
         "focus",
         "config",
-        "ui"
+        "ui",
+        "share",
+        "enableJob"
       ],
+      "shareAnswer": {
+        "$comment": "apiVersion 17 (Tu mes en Kino): an answer's share: { key } draws the node with that key the person can see now, in the current tree or an open pop-up's body (when the answer also asks for a new tree, on that tree; a hidden node, one under a closed pop-up or accordion item, one on another page of pages, or a key naming a pop-up is dropped, logged), with every 18+ title taken out even while unlocked (nothing left: dropped, logged), to a PNG of widthPx by heightPx at widthDp, font scale 1, in the screen's theme, with Kino's own line naming the plugin under it, and opens the system share sheet (read-only content Uri, only a title naming the plugin, no text added to the person's message). Only the answer to the person's own tap or submit, at most maxAnswerAgeMs after it: dropped, logged, from open, a tick, a load-more, a change and an onClose; dropped inside a panel. Images wait imageWaitMs at most, then Kino's placeholder. One at a time. A TV refuses it, logged, with no toast (hide the button by device); so does a plugin below fromApiVersion. No permission line: the person taps and picks the target in the system sheet.",
+        "fromApiVersion": 17,
+        "fields": [
+          "key"
+        ],
+        "widthPx": 1080,
+        "heightPx": 1350,
+        "widthDp": 360,
+        "imageWaitMs": 3000,
+        "maxAnswerAgeMs": 5000
+      },
       "declaredPopups": {
         "$comment": "Task 7i-2, apiVersion 14: an answer's ui is a list of the same ui operations as a node's action (at most maxUiOps), run as the answer is applied; the deferredOps among them wait for the tree the answer's state change asks for (when it asks for one) and run on it, so a declared pop-up opens with its new body, never the last one's; a timer's answer drops ui, logged; Back before that tree arrives cancels them. A popup node's onClose (an event name with the node's arg, or { ui?, event?, arg? }) runs after the person dismissed that open pop-up (Back, Kino's close, a tap outside): its ui operations, then its event; never when a pop-up button, a menu item, an answer's ui or a new pop-up closed it; a go and any dismissDroppedOps in it are dropped, logged. Back always closes: the onClose event is no press (no kino.qr.scan, no go.titleByIds) and its answer drops dismissDroppedFields and the dismissDroppedOps of its ui, logged. The deferredOps also wait for a route the answer moves; only the newest held one is kept; a newer pop-up, a failed or invalid render, Try again and the error state drop them. A blank title is no title: no empty row is drawn, Kino's close (an X alone, Task 7k) starts the bottom row and the pop-up's own buttons sit together at its end; with a title the X ends the title's row.",
         "answerField": "ui",
@@ -1028,7 +1177,9 @@
           "menu",
           "focus",
           "go",
-          "route"
+          "route",
+          "share",
+          "enableJob"
         ],
         "anchor": {
           "$comment": "Task 15: a popup node's anchor (a node's key): drawn next to that node (above it when there is more room above, else below), sized to its content and at most the area's width, over the content with no scrim, taking no layout space; ui open and close, Back and a tap outside work as for any pop-up; it has no close button of its own; TV focus goes into it and stays there, and Back gives it back to the anchor. Without an anchor, or when the anchor is not on screen or there is no room above or below it, the kind's own placement (logged once). A screen-format player panel draws a popup only with an anchor.",
@@ -1292,7 +1443,8 @@
           "flush"
         ],
         "scroll": [
-          "direction"
+          "direction",
+          "zoom"
         ],
         "grid": [
           "columns"
@@ -1307,7 +1459,9 @@
           "bold"
         ],
         "image": [
-          "aspect"
+          "aspect",
+          "fit",
+          "focus"
         ],
         "button": [
           "variant"
@@ -1520,7 +1674,8 @@
           "Scaffold",
           "AppBar",
           "NavigationBar",
-          "steps"
+          "steps",
+          "pages"
         ]
       }
     },
@@ -1747,6 +1902,231 @@
       "maxSurfaceLuminance": 0.12,
       "minSurfaceContrast": 1.05,
       "minBrandDeltaE": 25
+    },
+    "appThemes": {
+      "$comment": "apiVersion 18, plugin app themes (phase 1): a plugin offers whole-app looks, declared as data. Below apiVersion 18 the field is ignored. Format is checked at parse (id, names, known token paths, types; a wrong type or unknown token refuses the manifest); a value outside its range does not refuse it: the resolver drops it with a warning, so a theme stays usable. A manifest with appThemes may declare no capabilities (it plays nothing). background.image is refused until a later version (imageArrivesLater); background.dim is an unknown token until then. tv and phone take the same groups as the theme itself. Resolution order (low to high): Kino's defaults, the theme, its tv/phone block, the person's adjustments clamped to adjustable and to ranges. The legibility pairs (text on the background, surface and surfaceHigh; accent and focus on the background; onAccent and onFocus on theirs) reuse manifest.theme's minTextContrast and minUiContrast and read the effective values, Kino's where the theme changed only one side: a pair that fails falls back on the side the theme set; the dark-background limit (manifest.theme.maxBackgroundLuminance) stays until light themes arrive, and the near-Kino-red rule does not apply to appThemes.",
+      "apiVersion": 18,
+      "maxThemes": 8,
+      "maxAdjustable": 48,
+      "idPattern": "^[a-z0-9][a-z0-9-]{1,39}$",
+      "nameMaxChars": 40,
+      "groups": [
+        "colors",
+        "shape",
+        "typography",
+        "elevation",
+        "motion",
+        "player"
+      ],
+      "backgroundTypes": [
+        "solid",
+        "gradient"
+      ],
+      "backgroundMaxColors": 8,
+      "backgroundDefaultAngle": 180,
+      "pluginColors": [
+        "respect",
+        "override"
+      ],
+      "pluginColorsDefault": "respect",
+      "experience": [
+        "light",
+        "full"
+      ],
+      "price": {
+        "$comment": "A theme with no price is free. A price is `{ kinos, payTo }`: Kino asks the person to buy the theme before turning it on, shows the price and their balance, enables Comprar only when the balance covers it, and pays `kinos` to the coins account `payTo` (the author's). One purchase per theme and account, valid on every device of the person. The price and the account come from this public manifest, so they are what Kino enforces for the person and pays the author, not a lock on the files.",
+        "fields": [
+          "kinos",
+          "payTo"
+        ],
+        "minKinos": 1,
+        "maxKinos": 1000,
+        "accountPattern": "^[0-9a-f]{64}$"
+      },
+      "logo": {
+        "$comment": "A theme may draw its own logo in the side menu, the TV rail and the header, in place of Kino's. Vector only (no image file, no network): `{ wordmark?, mark? }`, each `{ size: [w, h], paths: [{ d, fill }] }`. The wordmark is the long logo (phone menu and header, the TV's open rail); the mark is the square one (the TV's collapsed rail). `decor` is `{ paths }` drawn OVER Kino's own logo (wordmark and mark) in the space of its \"o\": origin at its centre, y down, ring outer radius 100 (decorUnits); a hat on the \"o\" is y < -100, the dot of the \"i\" is near (-353, -132). What a theme leaves out stays Kino's. Kino's decision screens, the splash and the gate always show Kino's own logo.",
+        "shapes": [
+          "wordmark",
+          "mark"
+        ],
+        "decorUnits": 100,
+        "maxPaths": 8,
+        "maxPathChars": 2000,
+        "maxCanvas": 1000,
+        "maxAspect": 8,
+        "fillTokens": [
+          "accent",
+          "onAccent",
+          "textPrimary",
+          "textSecondary"
+        ],
+        "pathPattern": "^[MmLlHhVvCcSsQqTtAaZz0-9eE.,\\s+-]+$"
+      },
+      "imageArrivesLater": "background.image arrives in a later version of Kino; remove it from this theme",
+      "tokens": {
+        "colors.accent": "color",
+        "colors.onAccent": "color",
+        "colors.background": "color",
+        "colors.surface": "color",
+        "colors.surfaceHigh": "color",
+        "colors.textPrimary": "color",
+        "colors.textSecondary": "color",
+        "colors.outline": "color",
+        "colors.focus": "color",
+        "colors.onFocus": "color",
+        "colors.railPanel": "color",
+        "colors.placeholderTop": "color",
+        "colors.placeholderBottom": "color",
+        "colors.success": "color",
+        "colors.warning": "color",
+        "colors.error": "color",
+        "colors.favorite": "color",
+        "colors.scrim": "color",
+        "colors.border": "color",
+        "background": "background",
+        "shape.cardRadius": "number",
+        "shape.channelRadius": "number",
+        "shape.buttonRadius": "number",
+        "shape.chipRadius": "number",
+        "shape.dialogRadius": "number",
+        "shape.inputRadius": "number",
+        "shape.dialogBorder": "number",
+        "shape.menuBorder": "number",
+        "shape.headerBorder": "number",
+        "shape.cardBorder": "number",
+        "shape.panelBorder": "number",
+        "typography.scale": "number",
+        "typography.titleScale": "number",
+        "typography.bodyScale": "number",
+        "elevation.cardShadow": "number",
+        "elevation.heroScrim": "number",
+        "elevation.dialogShadow": "number",
+        "motion.focusZoom": "number",
+        "motion.crossfadeMs": "number",
+        "motion.heroDrift": "word",
+        "player.buttonScale": "number",
+        "player.playButtonScale": "number",
+        "player.seekBarScale": "number",
+        "player.labelScale": "number",
+        "player.buttonShape": "word"
+      },
+      "ranges": {
+        "shape.cardRadius": [
+          0,
+          32
+        ],
+        "shape.channelRadius": [
+          0,
+          32
+        ],
+        "shape.buttonRadius": [
+          0,
+          32
+        ],
+        "shape.chipRadius": [
+          0,
+          32
+        ],
+        "shape.dialogRadius": [
+          0,
+          32
+        ],
+        "shape.inputRadius": [
+          0,
+          32
+        ],
+        "shape.dialogBorder": [
+          0,
+          4
+        ],
+        "shape.menuBorder": [
+          0,
+          4
+        ],
+        "shape.headerBorder": [
+          0,
+          4
+        ],
+        "shape.cardBorder": [
+          0,
+          4
+        ],
+        "shape.panelBorder": [
+          0,
+          4
+        ],
+        "typography.scale": [
+          0.85,
+          1.3
+        ],
+        "typography.titleScale": [
+          0.85,
+          1.3
+        ],
+        "typography.bodyScale": [
+          0.85,
+          1.3
+        ],
+        "elevation.cardShadow": [
+          0,
+          1
+        ],
+        "elevation.heroScrim": [
+          0.3,
+          1
+        ],
+        "elevation.dialogShadow": [
+          0,
+          1
+        ],
+        "motion.focusZoom": [
+          1,
+          1.15
+        ],
+        "motion.crossfadeMs": [
+          0,
+          800
+        ],
+        "player.buttonScale": [
+          0.8,
+          1.4
+        ],
+        "player.playButtonScale": [
+          0.8,
+          1.6
+        ],
+        "player.seekBarScale": [
+          0.8,
+          2
+        ],
+        "player.labelScale": [
+          0.85,
+          1.3
+        ]
+      },
+      "words": {
+        "motion.heroDrift": [
+          "on",
+          "off"
+        ],
+        "player.buttonShape": [
+          "circle",
+          "rounded",
+          "square"
+        ]
+      },
+      "defaults": {
+        "colors.accent": "#E50914",
+        "colors.onAccent": "#FFFFFF",
+        "colors.surface": "#181818",
+        "colors.surfaceHigh": "#242424",
+        "colors.textPrimary": "#F5F5F5",
+        "colors.textSecondary": "#B3B3B3",
+        "colors.focus": "#FFFFFF",
+        "colors.onFocus": "#000000",
+        "background": "#0E0E0E",
+        "accentText": "#FF6B6B"
+      }
     },
     "secrets": {
       "apiVersion": 4,
@@ -2144,7 +2524,9 @@
           "dialog",
           "sheet",
           "menu",
-          "route"
+          "route",
+          "share",
+          "enableJob"
         ],
         "legacyAnswerFields": [
           "patch",
@@ -2380,6 +2762,13 @@
       "podcast"
     ],
     "maxArtistChars": 200,
+    "audioIdsApiVersion": 19,
+    "audioIdKeys": [
+      "isrc",
+      "musicbrainz",
+      "youtube"
+    ],
+    "maxAudioIdChars": 64,
     "adultApiVersion": 6,
     "homeLiveApiVersion": 6
   },
@@ -2485,6 +2874,7 @@
     "subtitles": 10000,
     "track": 10000,
     "segments": 8000,
+    "lyrics": 10000,
     "meta": 6000
   },
   "runtime": {
@@ -2637,7 +3027,8 @@
         "episodes",
         "details",
         "section",
-        "resolve"
+        "resolve",
+        "lyrics"
       ],
       "onlyWhen": "the person is using the app: their own search, Home, list, title or play (a resolve also for a download they started); never a background call (prewarm, the live zap's resolve ahead, sync, update checks), and a list's read only with the app in front. Never clicks, taps, types or scrolls: only a check that completes with no input passes",
       "defaultTimeoutMs": 15000,
@@ -2758,6 +3149,74 @@
     "durationBucketMs": 10000,
     "failureRetryMs": 120000
   },
+  "files": {
+    "$comment": "apiVersion 21: the files capability. A plugin that declares it works with files on the person's device: kino.files.pick / pickFolder open the system picker from a press (settings action, panelAction or a screenEvent that follows a tap or submit: the same rule as qr.fromFunctions) and answer opaque handles, never an address; list, folders, info, read, readText, forget and url need no press, because a handle exists only for what the person picked. `copy: true` imports the bytes into the plugin's own store; the default keeps a reference (a persisted grant). A stream or an audio track may be `kino-file:<id>` (the id of one of the plugin's own handles); the host rules do not apply to it. Nothing is uploaded or sent. Additive pieces and new errors never move SUPPORTED_API by themselves; this block did, once, to 21.",
+    "apiVersion": 21,
+    "capability": "files",
+    "consentLine": "Podrá guardar y leer los archivos que tú elijas de este aparato, o una carpeta entera si la eliges",
+    "consentLineEn": "Can keep and read the files you pick from this device, or a whole folder if you pick one",
+    "kinds": [
+      "video",
+      "audio",
+      "book",
+      "image",
+      "subtitle",
+      "other"
+    ],
+    "operations": [
+      "pick",
+      "pickFolder",
+      "list",
+      "info",
+      "read",
+      "forget"
+    ],
+    "fromFunctions": [
+      "action",
+      "panelAction",
+      "screenEvent"
+    ],
+    "maxReadBytes": 2000000,
+    "maxHandles": 500,
+    "maxFolders": 20,
+    "maxFolderFiles": 5000,
+    "maxPickAtOnce": 50,
+    "defaultImportBytes": 64000000,
+    "maxCopiesBytes": 1000000000,
+    "pickTimeoutMs": 180000,
+    "urlScheme": "kino-file:",
+    "errorCodes": [
+      "unavailable",
+      "not_allowed",
+      "busy",
+      "timeout",
+      "invalid_request",
+      "gone",
+      "too_large",
+      "denied",
+      "quota"
+    ]
+  },
+  "lyrics": {
+    "$comment": "apiVersion 19: the lyrics provider capability. A plugin that declares it (alone is enough) exports lyrics({ title, artist, album?, durationMs?, ids? }) and answers { synced?: [{ ms, text }], plain?, label?, instrumental?, matchDurationMs? }; Kino asks it only while the person has the lyrics overlay on, never for 18+ items, and shows synced lines only when they plausibly fit the track (plausibleSlackMs, endSlackMs).",
+    "apiVersion": 19,
+    "capability": "lyrics",
+    "export": "lyrics",
+    "consentLine": "Recibirá el título y el artista de lo que escuchas para buscar la letra",
+    "idKeys": [
+      "isrc",
+      "musicbrainz",
+      "youtube"
+    ],
+    "maxPlainChars": 20000,
+    "maxSyncedLines": 800,
+    "maxLineChars": 300,
+    "maxAnswerChars": 102400,
+    "plausibleSlackMs": 3000,
+    "endSlackMs": 5000,
+    "negativeCacheMs": 600000,
+    "positiveCacheMs": 604800000
+  },
   "kinoDevice": {
     "$comment": "kino.device (Kino 0.9.55, every apiVersion): the UI Kino shows on this device, \"tv\" or \"phone\" (a tablet gets whatever Kino shows it, usually \"phone\"). Undefined on an older Kino. The Node kit says \"phone\" unless run.mjs gets --device tv or the environment has KINO_DEVICE=tv.",
     "values": [
@@ -2767,6 +3226,24 @@
     "default": "phone",
     "kitEnv": "KINO_DEVICE",
     "kitFlag": "--device"
+  },
+  "kinoSyncSwitch": {
+    "$comment": "kino.sync.active() and kino.sync.setActive(on) (Kino 0.9.78, additive, capability syncProvider): a sync provider reads and changes whether it is THIS device's provider (Kino keeps one at a time: on turns the current one off, off returns to Kino's local sync). Both resolve with a boolean, whether the plugin is the provider now. setActive(true) asks the person first in Kino's own dialog (the installed plugin's name, Kino's words): a decline resolves false and nothing changes; setActive(false) asks nothing and only acts when this plugin is the one on. Both changes only run from a call the person started with a tap (fromFunctions, and a screen's call only after their own press): the same rule as kino.qr.scan; active() may be read in any call. Never from a job. Not an apiVersion: feature-detect with typeof kino.sync.setActive === \"function\".",
+    "fromApp": "0.9.78",
+    "capability": "syncProvider",
+    "errorCodes": [
+      "busy",
+      "timeout",
+      "unavailable",
+      "invalid_request",
+      "not_allowed"
+    ],
+    "timeoutMs": 120000,
+    "fromFunctions": [
+      "action",
+      "panelAction",
+      "screenEvent"
+    ]
   },
   "kinoSeed": {
     "$comment": "kino.seed(session) (Kino 0.9.55, every apiVersion): a plugin shares ONE anonymous, free guest session of its source so people in regions that cannot log in have live sessions to seed from. Best-effort and synchronous: it answers nothing and never throws into the plugin. Kino keeps only the allowed keys (each a short string or a finite number), drops the whole thing unless the three required ones are present and non-blank, and sends it to Kino's error board only when the plugin's telemetry consent is on. Absent on an older Kino: feature-detect with typeof kino.seed === \"function\". The Node kit has it, sends nothing and logs which keys Kino would keep.",
@@ -2972,7 +3449,8 @@
     "featureDetect": "typeof kino.library === \"object\"",
     "functions": [
       "watched",
-      "saved"
+      "saved",
+      "stats"
     ],
     "kinds": [
       "movie",
@@ -3012,12 +3490,53 @@
       "bad_request"
     ],
     "consentLine": {
-      "es": "Podrá leer lo que has visto y guardado en Kino, y enviarlo a sus servicios",
-      "en": "Can read what you have watched and saved in Kino, and send it to its services"
+      "es": "Podrá leer lo que has visto y guardado en Kino, cuánto lo ves y a qué hora, y enviarlo a sus servicios",
+      "en": "Can read what you have watched and saved in Kino, how much and at what time of day, and send it to its services"
     },
     "switchLabel": {
       "es": "Dejar que lea lo que he visto y guardado",
       "en": "Let it read what I watched and saved"
+    },
+    "stats": {
+      "$comment": "apiVersion 17 (Tu mes en Kino), same capability and the same switch: kino.library.stats({ month? }) answers one month's aggregates of the ACTIVE profile with every device of the person summed: { month, estimated, seconds, secondsByKind: { movie, series, live }, secondsByBand: { morning, afternoon, night, lateNight } | null, titles, episodes, activeDays, longestStreakDays, top: [{ title, year?, kind, ids: { tmdb?, imdb? }, poster?, genres?, seconds }] }. Nothing finer than the month: no per-day series and no timestamps. month is 'yyyy-mm' (a real month; the current one when left out); no other option exists. A plugin that declares a lower apiVersion never gets kino.library.stats (the function is not there), and an update that raises a library plugin to this apiVersion asks the person again because the consent line grew. Never 18+: a title KNOWN to be 18+ at read time leaves the totals and the list; a title Kino merely cannot place now (its plugin is gone) stays in the totals but not in top (sourceIsAdult stays fail-closed for the names). Live channels are in the totals and never named. top holds at most topMax titles by seconds; poster and genres are only what Kino already holds for the item (no network call), each left out when Kino has none. A month before the counter existed is estimated from the play history (estimated: true, secondsByBand: null); the month of release mixes both (secondsByBand covers the counted part only). Shares the rate limit of watched and saved, answers from the same exports, jobs included.",
+      "apiVersion": 17,
+      "featureDetect": "typeof kino.library.stats === \"function\"",
+      "monthPattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+      "defaultMonth": "current",
+      "topMax": 20,
+      "kinds": [
+        "movie",
+        "series",
+        "live"
+      ],
+      "bands": [
+        "morning",
+        "afternoon",
+        "night",
+        "lateNight"
+      ],
+      "answerFields": [
+        "month",
+        "estimated",
+        "seconds",
+        "secondsByKind",
+        "secondsByBand",
+        "titles",
+        "episodes",
+        "activeDays",
+        "longestStreakDays",
+        "top"
+      ],
+      "topFields": [
+        "title",
+        "year",
+        "kind",
+        "ids",
+        "poster",
+        "genres",
+        "seconds"
+      ],
+      "badRequestMessage": "kino.library.stats: month is \"yyyy-mm\" (the current month when left out); nothing else is an option"
     }
   },
   "kinoLivePanel": {
@@ -3235,7 +3754,7 @@
     }
   },
   "kinoJobs": {
-    "$comment": "apiVersion 14, capability \"schedule\" (Task 8q): Kino's job scheduler, the kernel of a plugin's background work (owner 2026-10-26: \"planificador en la app, tipo cron de Laravel\"). The manifest lists jobs (manifest): 1 to maxJobs, each { id (idPattern), label: { es, en? } (1 to labelMaxChars each once control and bidirectional characters are scrubbed), everyMin (one of everyOptions), everyOptions (1 to maxOptions different whole minutes from minEveryMin, WorkManager's floor, to maxEveryMin), runOn? (runOnValues, default runOnDefault; badRunOn otherwise) }; other keys of a job are ignored. The capability and the jobs need each other; the plugin exports job(ctx) with ctx = { id, reason: scheduled|manual, lastRunMs (null before the first run), attempt (1 + the failures in a row) }. The answer is never read (outputIgnored): what the plugin wants kept goes to kino.storage, which its screens read when they open (stale-while-revalidate). Kino shows nothing of a job by itself. A job may use availableApis and read readOnly only: an allow-list, every other API (forbiddenApis and any added later) answers not_allowed (logged), and no UI, screen, panel, go, toast, player control or room can come out of a job (nothing it returns is read). kino.library answers a job only with the plugin's own library approval (the same 18+ rule, rounding and rate); kino.ai.ask (Task 8r) only with its own ai approval, each ask one of the run's maxFetches requests. One run: at most runTimeoutMs; maxFetches requests (the next answers rate_limited), made one at a time; maxResponseBytes of answer bodies, each body read with a cap of what is left (an answer that would cross it is refused with too_large, never handed over); maxStorageWriteBytes written to kino.storage (UTF-8 bytes of keys and values; the next set throws too_large); a cap crossed cuts the run and counts as a failure. A failure is worded by Kino only: network only when kino.fetch itself failed to reach a site in that run. Per plugin at most maxRunsPerDay runs a day (UTC), all its jobs together. A failure waits backoffBaseMin, doubling up to backoffMaxMin, before the next scheduled run; failuresToPause in a row pause the job until the person switches it off and on, or a manual run succeeds. A run never starts while the plugin's own screen, panel or catalog call is in progress (it waits up to foregroundWaitMs, then gives way). Approval: consentLine in red at install and on the update that adds it, never auto-approved, unticked in a kit import; revocable from the plugin's tab in Ajustes (switchLabel, device-wide and synced): off cancels its work at once and refuses even a manual run. Each job starts OFF (opt-in) at everyMin, and OFF again after any gap in its approval on the device (uninstalled, an update without schedule or without that job, a reinstall); an update never makes a switched-on job run more often than before: the person's choice while it is an option, else the nearest option at least as slow as both the new everyMin and the period it ran at; when no option is that slow the job is switched OFF (stamped, so it syncs) and its row asks the person to choose again. Once a run is over (it answered or was cut), every API refuses whatever its evaluation still tries; Kino's own rows in the plugin's tab: the job's switch, its frequency (only everyOptions), \"Solo con Wi-Fi\" (per plugin, on by default: an unmetered network), the last run and \"Ejecutar ahora\" (reason manual, the same caps). Works also need a network and the battery not low, and stop with the plugin disabled, removed or updated (a new work then), the job switched off or paused, and the owner's screens kill switch (screensEnabled is the one shared switch for plugin screens, rooms and jobs). fetch keeps the plugin's declared hosts and every fetch rule and quota; sealed values keep their rules. The person's choices (on, frequency, Wi-Fi only) sync between their devices. runOn \"any\" (the default): each device that has the plugin runs its own job, for its own kino.storage. runOn \"preferPhone\" (Task 8q-2, owner: the phone does the work and what syncs is the result): ONE of the person's linked devices runs it, and the plugin shares the result with kino.shared (kinoShared). Each device decides by itself from a synced record of the person's devices (election): a device is a candidate when the job is approved, on, not paused and not switched off there, and its last SUCCESSFUL run of the job is within freshPeriods times the job's period (being seen is not enough: a phone whose work never fires, on mobile data with \"Solo con Wi-Fi\" or force-stopped, loses the job; a time more than maxSkewMs ahead of the reader's clock is not believed); the person's choice whereLabel (\"Este aparato\" names one device; default: the phone if linked) first, then a candidate phone (the smallest device id), else the smallest id of the others (in practice: the TV that has the plugin runs it itself). A TV never runs it while a fresh phone can. A firing on a device that is not the runner skips at once (no runtime, no network, never a failure) and keeps its work, so the TV takes over when the phone stops (no linked phone, no successful run on the phone for freshPeriods periods, its job paused or switched off there); a rare overlap runs it twice, harmless with last-writer-wins results. \"Ejecutar ahora\" runs on the device where it is pressed. A plugin may read kino.device (\"tv\" or \"phone\", readOnly) to pick a lighter batch on a TV (Kino enforces nothing extra; the job caps apply). Kino's rows for such a job add whereLabel with its two choices and the device that ran it last (lastRunLabel). Task 18 (G2, apiVersion stays 14): kino.seed is among availableApis, under exactly its gate everywhere (sent only while the plugin's telemetry consent is on, cleaned to the anonymous-seed allow-list, capped per process; contract.kinoSeed). A job may say enabledBy (enabledByField): the key of one of the plugin's own toggle settings (else badEnabledBy refuses the manifest, or drops an enhancement's block). That setting, in the profile in use with its default, is the person's on/off for the job: on while the setting is on and the job's row in Ajustes holds no OFF of the person's (the row may still switch it off, and its OFF wins until the person switches the row on again); the setting off is always off. Kino's row says which setting drives it (followsSettingLabel). Everything else is unchanged: the consent line, the schedule switch, the frequency, Solo con Wi-Fi, the caps, the pause after failures, the kill switch.",
+    "$comment": "apiVersion 14, capability \"schedule\" (Task 8q): Kino's job scheduler, the kernel of a plugin's background work (owner 2026-10-26: \"planificador en la app, tipo cron de Laravel\"). The manifest lists jobs (manifest): 1 to maxJobs, each { id (idPattern), label: { es, en? } (1 to labelMaxChars each once control and bidirectional characters are scrubbed), everyMin (one of everyOptions), everyOptions (1 to maxOptions different whole minutes from minEveryMin, WorkManager's floor, to maxEveryMin), runOn? (runOnValues, default runOnDefault; badRunOn otherwise) }; other keys of a job are ignored. The capability and the jobs need each other; the plugin exports job(ctx) with ctx = { id, reason: scheduled|manual, lastRunMs (null before the first run), attempt (1 + the failures in a row) }. The answer is never read (outputIgnored): what the plugin wants kept goes to kino.storage, which its screens read when they open (stale-while-revalidate). Kino shows nothing of a job by itself. A job may use availableApis and read readOnly only: an allow-list, every other API (forbiddenApis and any added later) answers not_allowed (logged), and no UI, screen, panel, go, toast, player control or room can come out of a job (nothing it returns is read). kino.library answers a job only with the plugin's own library approval (the same 18+ rule, rounding and rate); kino.ai.ask (Task 8r) only with its own ai approval, each ask one of the run's maxFetches requests. One run: at most runTimeoutMs; maxFetches requests (the next answers rate_limited), made one at a time; maxResponseBytes of answer bodies, each body read with a cap of what is left (an answer that would cross it is refused with too_large, never handed over); maxStorageWriteBytes written to kino.storage (UTF-8 bytes of keys and values; the next set throws too_large); a cap crossed cuts the run and counts as a failure. A failure is worded by Kino only: network only when kino.fetch itself failed to reach a site in that run. Per plugin at most maxRunsPerDay runs a day (UTC), all its jobs together. A failure waits backoffBaseMin, doubling up to backoffMaxMin, before the next scheduled run; failuresToPause in a row pause the job until the person switches it off and on, or a manual run succeeds. A run never starts while the plugin's own screen, panel or catalog call is in progress (it waits up to foregroundWaitMs, then gives way). Approval: consentLine in red at install and on the update that adds it, never auto-approved, unticked in a kit import; revocable from the plugin's tab in Ajustes (switchLabel, device-wide and synced): off cancels its work at once and refuses even a manual run. Each job starts OFF (opt-in) at everyMin, and OFF again after any gap in its approval on the device (uninstalled, an update without schedule or without that job, a reinstall); an update never makes a switched-on job run more often than before: the person's choice while it is an option, else the nearest option at least as slow as both the new everyMin and the period it ran at; when no option is that slow the job is switched OFF (stamped, so it syncs) and its row asks the person to choose again. Once a run is over (it answered or was cut), every API refuses whatever its evaluation still tries; Kino's own rows in the plugin's tab: the job's switch, its frequency (only everyOptions), \"Solo con Wi-Fi\" (per plugin, on by default: an unmetered network), the last run and \"Ejecutar ahora\" (reason manual, the same caps). Works also need a network and the battery not low, and stop with the plugin disabled, removed or updated (a new work then), the job switched off or paused, and the owner's screens kill switch (screensEnabled is the one shared switch for plugin screens, rooms and jobs). fetch keeps the plugin's declared hosts and every fetch rule and quota; sealed values keep their rules. The person's choices (on, frequency, Wi-Fi only) sync between their devices. runOn \"any\" (the default): each device that has the plugin runs its own job, for its own kino.storage. runOn \"preferPhone\" (Task 8q-2, owner: the phone does the work and what syncs is the result): ONE of the person's linked devices runs it, and the plugin shares the result with kino.shared (kinoShared). Each device decides by itself from a synced record of the person's devices (election): a device is a candidate when the job is approved, on, not paused and not switched off there, and its last SUCCESSFUL run of the job is within freshPeriods times the job's period (being seen is not enough: a phone whose work never fires, on mobile data with \"Solo con Wi-Fi\" or force-stopped, loses the job; a time more than maxSkewMs ahead of the reader's clock is not believed); the person's choice whereLabel (\"Este aparato\" names one device; default: the phone if linked) first, then a candidate phone (the smallest device id), else the smallest id of the others (in practice: the TV that has the plugin runs it itself). A TV never runs it while a fresh phone can. A firing on a device that is not the runner skips at once (no runtime, no network, never a failure) and keeps its work, so the TV takes over when the phone stops (no linked phone, no successful run on the phone for freshPeriods periods, its job paused or switched off there); a rare overlap runs it twice, harmless with last-writer-wins results. \"Ejecutar ahora\" runs on the device where it is pressed. A plugin may read kino.device (\"tv\" or \"phone\", readOnly) to pick a lighter batch on a TV (Kino enforces nothing extra; the job caps apply). Kino's rows for such a job add whereLabel with its two choices and the device that ran it last (lastRunLabel). Task 18 (G2, apiVersion stays 14): kino.seed is among availableApis, under exactly its gate everywhere (sent only while the plugin's telemetry consent is on, cleaned to the anonymous-seed allow-list, capped per process; contract.kinoSeed). A job may say enabledBy (enabledByField): the key of one of the plugin's own toggle settings (else badEnabledBy refuses the manifest, or drops an enhancement's block). That setting, in the profile in use with its default, is the person's on/off for the job: on while the setting is on and the job's row in Ajustes holds no OFF of the person's (the row may still switch it off, and its OFF wins until the person switches the row on again); the setting off is always off. Kino's row says which setting drives it (followsSettingLabel). Everything else is unchanged: the consent line, the schedule switch, the frequency, Solo con Wi-Fi, the caps, the pause after failures, the kill switch. apiVersion 17 (Tu mes en Kino): kino.tmdb is among availableApis, each call one of the run's requests. A run of a plugin at apiVersion 17 or later whose ai capability is approved and switched on gets aiRunTimeoutMs and aiMaxRequests instead of runTimeoutMs and maxFetches; every other cap, the runs a day and WorkManager's limits stand. A job may say perProfile: true (perProfileField, apiVersion 17, always with runOn any; else perProfileNeedsAny, perProfileApi or badPerProfile refuses the manifest): Kino then runs job(ctx) once for each profile of the device with the plugin enabled, each as its own run: its own caps, its own lastRunMs, attempt, backoff and pause, one of maxRunsPerDay, oldest result first, one profile at a time, a person using the plugin first (each turn has the usual wait, then gives way). What does not fit the worker's window (perProfileWindowMs) continues next period. A failure pauses that profile's turn, not the others'. Such a job may not declare enabledBy (perProfileEnabledBy): consent is Kino's own device-wide job row, off by default and synced, which covers every profile of the device and linked devices. A screen turns it on with the answer enableJob: \"<jobId>\" (enableJobField, enableJobApiVersion), only after a person's tap (dropped from open, ticks, onClose, a load-more, a change and panels, and more than 5 s after the tap), only for a job of that plugin without enabledBy with its approvals in place; no answer turns it off, and a row the person switched off themselves stays off (dropped, logged, Kino's own toast points to the plugin's tab). kino.jobOn(\"<jobId>\") answers a boolean in a screen or screenEvent call, so the plugin knows whether to ask; it is in forbiddenApis for a job. Each profile has Kino's own row includeProfileLabel, on by default, kept per profile and synced on its own clock: a left-out profile gets no turn and its database is not opened; each key has its own clock, a tie stays left out; a restore may add to the left-out set, never remove from it. Ejecutar ahora runs the profile in use even when it is left out. ctx is unchanged: the plugin gets no profile id or name. The active profile never changes. In a turn of a profile that is not the one in use, the runtime is opened for that turn alone and closed after it (nothing in memory crosses): kino.library, kino.shared, kino.storage, kino.config and kino.cookies, kino.fetch's cookie jar included, are that profile's; kino.secret is the plugin's sealed values, nobody's; kino.ai and kino.tmdb hold no person's data; perProfileRefusedApis have no per-profile home and answer not_allowed; kino.log stays in logcat, out of the plugin's Registro, reports and telemetry; kino.tmdb uses Kino's key only; kino.lang and typed servers are that profile's; outside its call such a runtime only reads. A profile deleted during a turn refuses every API and leaves no record. Ejecutar ahora runs the profile in use only. Approval: consentLinePerProfile replaces consentLine, and an update that adds perProfile asks again.",
     "capability": "schedule",
     "apiVersion": 14,
     "export": "job",
@@ -3262,7 +3781,15 @@
       "runOnDefault": "any",
       "badRunOn": "Each job's \"runOn\" must be \"any\" or \"preferPhone\"",
       "enabledByField": "enabledBy",
-      "badEnabledBy": "Each job's \"enabledBy\" must name one of the plugin's toggle settings"
+      "badEnabledBy": "Each job's \"enabledBy\" must name one of the plugin's toggle settings",
+      "perProfileField": "perProfile",
+      "perProfileApiVersion": 17,
+      "perProfileNeedsAny": "A \"perProfile\" job must use \"runOn\": \"any\"",
+      "perProfileApi": "A job's \"perProfile\" needs apiVersion 17",
+      "badPerProfile": "Each job's \"perProfile\" must be true or false",
+      "perProfileEnabledBy": "A \"perProfile\" job can't use \"enabledBy\": Kino's own row is its consent",
+      "enableJobField": "enableJob",
+      "enableJobApiVersion": 17
     },
     "election": {
       "freshPeriods": 2,
@@ -3318,7 +3845,14 @@
       "kino.ai",
       "kino.shared",
       "kino.seed",
-      "kino.notifications"
+      "kino.notifications",
+      "kino.coins",
+      "kino.tmdb"
+    ],
+    "perProfileRefusedApis": [
+      "kino.notifications",
+      "kino.coins",
+      "kino.seed"
     ],
     "readOnly": [
       "kino.apiVersion",
@@ -3334,12 +3868,14 @@
       "kino.browser",
       "kino.ws",
       "kino.meta",
-      "kino.tmdb",
       "kino.nuvio",
       "kino.catalog",
       "kino.sync",
       "kino.cloudstream",
-      "kino.identity"
+      "kino.identity",
+      "kino.jobOn",
+      "kino.plugins",
+      "kino.visualBrowser"
     ],
     "limits": {
       "runTimeoutMs": 20000,
@@ -3350,7 +3886,11 @@
       "failuresToPause": 3,
       "backoffBaseMin": 15,
       "backoffMaxMin": 360,
-      "foregroundWaitMs": 30000
+      "foregroundWaitMs": 30000,
+      "aiRunTimeoutMs": 60000,
+      "aiMaxRequests": 20,
+      "aiApiVersion": 17,
+      "perProfileWindowMs": 540000
     },
     "failureCodes": [
       "timeout",
@@ -3367,6 +3907,14 @@
     "consentLine": {
       "es": "Podrá ejecutarse en segundo plano cada cierto tiempo para actualizar sus datos, usando internet y batería",
       "en": "Can run in the background every so often to refresh its data, using your internet and battery"
+    },
+    "includeProfileLabel": {
+      "es": "Incluir este perfil",
+      "en": "Include this profile"
+    },
+    "consentLinePerProfile": {
+      "es": "Podrá ejecutarse en segundo plano cada cierto tiempo, para cada perfil de este aparato y de tus aparatos vinculados que tenga el plugin activado, usando internet y batería",
+      "en": "Can run in the background every so often, for every profile on this device and your linked devices with the plugin turned on, using your internet and battery"
     },
     "switchLabel": {
       "es": "Dejar que trabaje en segundo plano",
@@ -3519,6 +4067,168 @@
       "en": "Show its notices in the bell"
     }
   },
+  "kinoCoins": {
+    "$comment": "apiVersion 16, capability \"coins\" (Kino coins, Kino 0.9.78), declarative (no export), never on its own, not enhanceable (the plugin declares apiVersion 16 itself). Kino coins are a free currency shared by all of Kino: the person earns them by watching (1 coin every 10 minutes, at most 20 a UTC day) and gives them one at a time. kino.coins.balance() answers { balance, earnedToday, capToday } (balanceFields); kino.coins.give({ to, postId }) gives ONE coin to the account to (1 to maxToChars characters: the coins service's id of the recipient, which a plugin learns from its own server, e.g. Kino Social's coinsAccount) for the post postId (1 to maxPostIdChars characters) and answers { balance, postTotal } (giveFields: the balance left and the coins the post holds now). Both reject with errorCodes: permission_denied (not approved, the plugin disabled, the wrong origin), not_available (the coins service is unreachable or slow, or this device was never validated with a Telegram account), rate_limited (perMinute calls a minute per plugin, both functions together, or the service's own limit), bad_request (not an object, an unknown key, a field out of range), disabled (the person switched Kinos off in Kino's Ajustes, the profile's switch, on by default; message disabledMessage; the service is never asked: show nothing of coins, no button, no balance, no notice), and the service's own refusals of a gift passed on as they are (serviceCodes): no_balance (no coin to give), self_gift (to yourself), unknown_account (no such recipient). Kino's own client talks to the coins service (signed in with the device's gate token and a device key of Kino's own): the plugin never learns the service's address nor its session. Calls: give only inside a call the person started from giveFromFunctions (a screen's open and events, a panel's action), never a screen timer's tick nor a job; balance from balanceFromFunctions, a screen timer's tick included, and the plugin's scheduled job (where kino.coins is on the job allow-list: a daily balance notice). Approval: consentLine in red at install and on the update that adds it, never auto-approved, unticked in a kit import; no switch of its own: the person revokes it by disabling or removing the plugin. Feature-detect with typeof kino.coins === \"object\" (an older Kino has no kino.coins: hide the coin button).",
+    "capability": "coins",
+    "apiVersion": 16,
+    "featureDetect": "typeof kino.coins === \"object\"",
+    "functions": [
+      "balance",
+      "give"
+    ],
+    "balanceFields": [
+      "balance",
+      "earnedToday",
+      "capToday"
+    ],
+    "giveFields": [
+      "balance",
+      "postTotal"
+    ],
+    "giveFromFunctions": [
+      "screen",
+      "screenEvent",
+      "panelAction"
+    ],
+    "balanceFromFunctions": [
+      "screen",
+      "screenEvent",
+      "panelAction",
+      "job"
+    ],
+    "perMinute": 30,
+    "maxRequestChars": 512,
+    "maxToChars": 128,
+    "maxPostIdChars": 64,
+    "badRequestMessage": "kino.coins.give takes { to: 1 to 128 characters, postId: 1 to 64 characters }",
+    "errorCodes": [
+      "permission_denied",
+      "not_available",
+      "rate_limited",
+      "bad_request",
+      "disabled",
+      "no_balance",
+      "self_gift",
+      "unknown_account"
+    ],
+    "disabledMessage": "kino.coins is switched off in Kino's settings",
+    "serviceCodes": [
+      "no_balance",
+      "self_gift",
+      "unknown_account"
+    ],
+    "consentLine": {
+      "es": "Podrá ver tu saldo de kinos y regalar tus kinos",
+      "en": "Can see your Kinos balance and give your Kinos away"
+    }
+  },
+  "kinoStore": {
+    "$comment": "apiVersion 15, capability \"pluginStore\" (plugin stores), not declarative (it exports storeSync), may be declared alone (standalone), not enhanceable, needsApproval. The plugin is a SOURCE of plugins for Kino's store: Kino paints the store from one local index (cards, search, categories, pagination, the owner's blocklist, install) and the plugin only hands over entries; it is never asked anything while the person browses unless it is a live store. The manifest block \"pluginStore\": { \"mode\"?: \"local\" | \"live\", \"name\"?: 1 to maxNameChars characters } is optional (the capability alone is a local store, mode local); the block without the capability is refused. Every store exports storeSync({ reason: \"schedule\" | \"reload\", since?: number (ms, when this store last synced), state?: object }) -> { full: boolean, entries: StoreEntry[], removed?: address[], state?: object }: full true means entries is the whole list (Kino replaces the store's rows), false means upserts plus removed (the addresses that left); state (at most maxStateBytes of JSON) is handed back on the next call. A live store (mode \"live\") also exports storeList({ category?, sort: \"popular\" | \"recent\", cursor? }) -> { entries, next?: cursor } and storeSearch({ q, category?, cursor? }) -> { entries, next?: cursor }, answered while the person browses, at most liveTimeoutMs per call and livePerMinute calls a minute (past either the call adds nothing), cached by Kino for liveCacheTtlMs; a live page keeps its first maxEntriesPerLivePage valid entries (the rest are dropped). storeSync runs in the background at the person's interval and on reload, at most syncTimeoutMs and syncMaxRequests kino.fetch requests (not the scheduled job's budget). An answer over maxSyncBytes of JSON is refused; entries beyond maxEntriesPerSync are dropped; an entry with no address and no stremio, no id (idPattern) or no name is dropped; texts are cut to the limits. StoreEntry fields (entryFields): address (owner/repo[/path][@ref] or url:https://.../kino-plugin.json), id, name, description, longDescription, categories (MarketCategory ids), tags, icon (https URL on a public host: never an IP literal, localhost, a single-label name or a hostRules.privateSuffixes name; Kino's image loader fetches it), screenshots (https URLs, the same host rule), version, author, popularity (number), updatedAt (ms), recommended (honoured only from Kino Plugins), stremio (a Stremio manifest URL; then address may be absent), requires (capabilities), needsSetup, signed (a hint that its author signs it: the card says Firmado), authorKey (a hint of that author key, 64 lowercase hex, authorKeyPattern: an installed plugin of the same id pinned to it reads as installed). Hints only: Kino re-checks everything at install. Approval: consentLine as a plain line at install and on the update that adds it, and consentLineLive in red for a live store. The kit checks the answers like this and prints them: node sdk/run.mjs <folder> storeSync [--since n] / storeList [popular|recent] [category] / storeSearch \"q\".",
+    "capability": "pluginStore",
+    "apiVersion": 15,
+    "field": "pluginStore",
+    "modes": [
+      "local",
+      "live"
+    ],
+    "defaultMode": "local",
+    "exports": [
+      "storeSync"
+    ],
+    "liveExports": [
+      "storeList",
+      "storeSearch"
+    ],
+    "syncReasons": [
+      "schedule",
+      "reload"
+    ],
+    "sorts": [
+      "popular",
+      "recent"
+    ],
+    "answerFields": {
+      "storeSync": [
+        "full",
+        "entries",
+        "removed",
+        "state"
+      ],
+      "live": [
+        "entries",
+        "next"
+      ]
+    },
+    "entryFields": [
+      "address",
+      "id",
+      "name",
+      "description",
+      "longDescription",
+      "categories",
+      "tags",
+      "icon",
+      "screenshots",
+      "version",
+      "author",
+      "popularity",
+      "updatedAt",
+      "recommended",
+      "stremio",
+      "requires",
+      "needsSetup",
+      "signed",
+      "authorKey"
+    ],
+    "authorKeyPattern": "^[0-9a-f]{64}$",
+    "idPattern": "^[a-z0-9][a-z0-9-]{1,39}$",
+    "addressPattern": "^(?:url:https://[^\\s/]+/\\S*kino-plugin\\.json|[A-Za-z0-9][A-Za-z0-9-]{0,38}/[A-Za-z0-9._-]{1,100}(?:/(?!\\.{1,2}(?:/|@|$))[A-Za-z0-9._-]+)*(?:@[A-Za-z0-9._/-]+)?)$",
+    "categories": [
+      "movies",
+      "series",
+      "anime",
+      "live",
+      "radio",
+      "subtitles",
+      "utilities",
+      "themes",
+      "adult"
+    ],
+    "categoryPattern": "^[a-z][a-z0-9-]{1,23}$",
+    "keepRule": "At most maxEntriesPerSync entries are kept, counting only the valid ones: an invalid entry never uses a slot, and the first maxEntriesPerSync valid ones (a repeat of an address already kept is skipped, not counted) win.",
+    "needsCapabilityMessage": "The \"pluginStore\" field needs the \"pluginStore\" capability",
+    "badMessage": "The \"pluginStore\" field must be an object: { \"mode\": \"local\" or \"live\", \"name\": 1 to 60 characters }",
+    "limits": {
+      "maxEntriesPerSync": 5000,
+      "maxSyncBytes": 4194304,
+      "maxStateBytes": 16384,
+      "liveTimeoutMs": 5000,
+      "livePerMinute": 20,
+      "liveCacheTtlMs": 1800000,
+      "maxEntriesPerLivePage": 50,
+      "syncTimeoutMs": 60000,
+      "syncMaxRequests": 40,
+      "syncMaxDownloadBytes": 8388608,
+      "maxNameChars": 60,
+      "maxDescriptionChars": 300,
+      "maxLongDescriptionChars": 4000,
+      "maxTags": 10,
+      "maxTagChars": 30,
+      "maxScreenshots": 8,
+      "maxVersionChars": 40,
+      "maxAuthorChars": 60,
+      "maxRequires": 20,
+      "maxRequireChars": 40
+    },
+    "consentLine": {
+      "es": "Agrega plugins de sus servidores a tu tienda",
+      "en": "Adds plugins from its servers to your store"
+    },
+    "consentLineLive": {
+      "es": "Lo que busques en la tienda llegará a sus servidores",
+      "en": "What you search in the store will reach its servers"
+    }
+  },
   "kinoShared": {
     "$comment": "apiVersion 14, capability \"shared\" (Task 8q-2), declarative (no export), never on its own, NOT an approval capability: the consent sheet shows consentLine as a plain line (not red), marked new on the update that adds it (it is the person's own data on the person's own devices, bounded); an update that adds only \"shared\" applies without a sheet, by design. Per profile: each profile's values sync only as that profile's row, so a TV that carries several people's profiles never hands one person's values to another person's phone; a scheduled job (device-wide) writes to the profile in use. kino.shared.get(key) -> the value or null (never throws for a stored value: one this engine cannot read answers null), and kino.shared.set(key, value) -> true when stored, false when the value was already that one (nothing written, nothing sent); set(key, null) removes the key. Synchronous, like kino.storage; usable from screens, panels, settings and scheduled jobs (on the job allow-list; not bounded by the job's storage budget but by these limits). Values are JSON only: the plugin's JSON.stringify text of any JSON value, at most maxValueBytes UTF-8 bytes, strict JSON (RFC 8259: no leading zeros, no lone . or sign, no empty or trailing elements; checked on write, on arrival and on read) at most maxDepth levels deep, one value; a plugin keeps at most maxKeys keys and maxPluginBytes bytes of values; a key matches keyPattern. Secrets never go here (a value is copied to every linked device): a key is split into words (wordPattern, after splitting at _ . -; lowercased) and refused when a word is one of secretKeyTokens or its plural, or two words in a row make apikey (authToken, api_key, sessions refused; author kept), and so is a value that holds one of the plugin's sealed values or markers; never put tokens, passwords, cookies or sessions in it (keep those in kino.storage or your settings). The values sync between the person's own linked devices, both ways, over the existing sync channel (sealed with each peer's pairing key), last writer wins per key by a clock Kino assigns when the value is written; a key's new value travels at most once per syncEveryMs, and at most tripsPerMinute of a plugin's keys travel in any syncEveryMs (renaming keys gains nothing; the newest value written meanwhile goes; reads on this device see it at once). A plugin keeps at most maxRemovals removals (its own oldest go); a removal is forgotten after tombstoneMs, so a device offline longer may bring an old value back. Never sent anywhere else, never shown, logged or parsed by Kino beyond these checks; removed (on every linked device) when the plugin is removed. Each plugin reaches only its own keys. What a peer sends is checked again on arrival (key, size, depth, strict JSON, caps); past a cap the oldest values are dropped. Treat what get answers as untrusted input: another device wrote it (maybe an older or newer version of your plugin), so validate its shape, sizes and every field before you use it. At most writesPerMinute writes a minute per plugin (rate_limited). Errors (thrown as kino errors): not_allowed (no \"shared\" capability, the plugin off, a sealed value), bad_request (a key, a value that is not JSON, a secret-like key), too_large (a value, the plugin's keys or bytes), rate_limited. On the wire the store holds at most maxRowEntries keys of all plugins and maxRowBytes of values. A device not linked to any other keeps them as an ordinary local store. Shared cases: plugins/sdk/test/shared-cases.json.",
     "capability": "shared",
@@ -3566,6 +4276,85 @@
       "es": "Guarda unos pocos resultados que se sincronizan entre tus aparatos vinculados",
       "en": "Keeps a few small results that sync between your linked devices"
     }
+  },
+  "protocol": {
+    "$comment": "apiVersion 20 (Kino 0.9.81), the plugin protocol: a provider plugin opens named doors (\"provides\") and a consumer uses them through Kino (\"consumes\" and kino.plugins.call); no plugin ever calls another directly. Neither block is a capability: a plugin keeps the capabilities of the kind it is (a provider is an ordinary plugin with exports named proto_<door>_<name>). Both blocks are also valid in enhancements[\"20\"], so an older Kino ignores them without refusing the plugin; below apiVersion 20 a plain top-level block is refused (\"The \\\"provides\\\" block needs apiVersion 20\"). A consumer names its provider by repository (owner/name, normalised like recommends: a fork does not stand in) and the door; the key of the entry is a local alias. Types are a closed language scoped to the door: string, number, boolean, T? (optional), T[] (array), a named object type declared by the door (capitalised), or an inline object of field to type. A request is validated strictly (an extra field is bad_input, a missing required one too; a call with no argument to an input whose fields are all optional reads as {}, at the top level only: a null nested in the argument is never {}); a response is validated loosely (extra fields dropped, a wrong or missing type is bad_output, no coercion). Request and response are JSON, at most maxPayloadBytes UTF-8 bytes. A provider can only expose what it declared; Kino re-checks the consumer's list at every call (a call the provider no longer declares answers not_declared) and never when the provider updates. The consent sheet of a consumer carries one plain line per door (consentLine, with the provider's name and the door's summary), at install and on an update that adds it (also in the notice of an update applied without asking); no per-call prompt, and removing a provider just makes its doors answer provider_missing. The line does not say that the consumer's arguments reach the provider, which may send them to its own hosts (or to any host with fetchHosts \"any\"): a consumer must not pass in an argument what it would not hand to the provider's author. An 18+ provider is provider_missing to a consumer that is not 18+; a plugin never reaches its own door (not_declared); an answer holding one of the provider's sealed values or a marker is bad_output. The rate limit (maxCalls per windowMs, and streams.maxPollsPerWindow) is per consumer and provider's door, whatever alias reaches it. Nothing is persisted, so nothing new is synced. kino.plugins is not available in background jobs (not_allowed) nor to sign(); it is available wherever the other kino services are (screen, screenEvent, panel exports...).",
+    "apiVersion": 20,
+    "provides": {
+      "maxDoors": 4,
+      "maxCallsPerDoor": 16,
+      "maxStreamsPerDoor": 8,
+      "summaryMaxChars": 120,
+      "namePattern": "^[A-Za-z][A-Za-z0-9]{0,31}$",
+      "typeNamePattern": "^[A-Z][A-Za-z0-9]{0,31}$",
+      "primitives": [
+        "string",
+        "number",
+        "boolean"
+      ],
+      "callExport": "proto_<door>_<call>",
+      "streamExport": "proto_<door>_<stream>",
+      "streamArgument": "the cursor of the last answer (null the first time)",
+      "streamAnswer": "{ items, cursor }",
+      "streamEverySeconds": {
+        "min": 30,
+        "default": 60,
+        "max": 86400
+      }
+    },
+    "consumes": {
+      "maxEntries": 8,
+      "maxCallsPerEntry": 16,
+      "maxStreamsPerEntry": 8,
+      "fields": [
+        "repo",
+        "door",
+        "calls",
+        "streams"
+      ]
+    },
+    "call": {
+      "function": "kino.plugins.call",
+      "timeoutMs": 10000,
+      "maxCalls": 30,
+      "windowMs": 10000,
+      "maxPayloadBytes": 65536
+    },
+    "errorCodes": [
+      "provider_missing",
+      "not_declared",
+      "bad_input",
+      "bad_output",
+      "rate_limited",
+      "timeout",
+      "provider_failed"
+    ],
+    "streams": {
+      "event": "protocol",
+      "stateKey": "protocol",
+      "maxSubscriptionsPerConsumer": 4,
+      "maxStateFlags": 16,
+      "maxPollsPerWindow": 8,
+      "pollWindowMs": 10000,
+      "argFields": [
+        "alias",
+        "stream",
+        "items"
+      ],
+      "availableIn": "a plugin screen (not a player-panel session)"
+    },
+    "providesOnly": {
+      "apiVersion": 20,
+      "$comment": "A plugin whose only purpose is a non-empty \"provides\" and which declares no capability (the field may be left out) is valid with \"hosts\": [] and without search/home/resolve: it plays nothing, is no source, its consent sheet claims no network or role, and with no host its installed card says it does not connect to the internet. Any capability, setting, or a provides below apiVersion 20 brings back the ordinary rules."
+    },
+    "screenOnlyConsumer": {
+      "apiVersion": 20,
+      "capabilities": [
+        "screen"
+      ],
+      "$comment": "Owner decision: a manifest of apiVersion 20 or later with a non-empty \"consumes\" and capabilities exactly [\"screen\"] (no source capability, nothing else) is valid with \"hosts\": []. With no host its own kino.fetch calls are refused unless it declares fetchHosts \"any\" or has a url setting (alone or as a field of a list), it is no source, and the pictures its screen shows from public https addresses need no host declared, so it declares none rather than a placeholder. With no host and no setting at all its installed card says it does not connect to the internet. Another capability, an empty or missing consumes, or apiVersion 19 (consumes only through enhancements[\"20\"]) bring back the ordinary rules; a screen-only consumer that does declare hosts stays valid."
+    },
+    "consentLine": "Uses data from <provider> (<door summary>)"
   },
   "cookies": {
     "maxPerHost": 50,
@@ -3716,6 +4505,64 @@
       "too_large",
       "limit",
       "unavailable"
+    ]
+  },
+  "visualBrowser": {
+    "$comment": "apiVersion 20, manifest \"visualBrowser\": true (additive key, boolean only, ignored below apiVersion 20; not a capability: nothing is approved at install, Kino asks in its own sheet at every open). kino.visualBrowser.open({ url, title?, doneWhen?, collect?, userAgent?, timeoutMs? }) opens a full-screen web window the PERSON drives (to sign in, solve a challenge, accept terms) on the plugin's declared hosts only (https, default port, never the local network; a blocked navigation is stopped and Kino says so). Android phone, tablet and TV (experimental on a TV: the remote's D-pad drives the page and Kino's bar, and a page with pointer-only controls may be hard to reach): kino.visualBrowser.available is false on the desktop and on a device without a WebView, and kino.visualBrowser is undefined on a Kino without it. It answers { status: done | closed | timeout, finalUrl?, cookies?, html?, stored?, storedNames?, userAgent? }; closed also covers the person saying No to the sheet; cookies and html only with done. Only from the person's own press, the very gate of qr (fromFunctions, screenTriggers); anything else is forbidden. The window starts with the declared hosts' cookies expired and expires them again at the end (the Android cookie jar is the app's one: a cookie scoped to another path survives). No script of the plugin in the page, no pop-up, download, file chooser, camera, microphone, location or prompt. collect.storeAs { setting, format: header | json } makes Kino write the collected cookies into the plugin's own password setting (after its call ends: saving restarts the runtime); the script then only gets stored and storedNames, never a value; a text longer than that setting allows is store_failed. collect.storeAs.spill (optional, apiVersion 20, additive): an array of 1 to 3 DISTINCT names of MORE declared password settings of the same plugin, none equal to setting (else bad_args); Kino cuts the formatted text into pieces of at most the password limit (settings.types.password.maxChars) and fills setting, then each spill setting in order (a surrogate pair is never split; a header text may be cut inside a cookie), so the plugin joins the settings' values in that order with NO separator; settings the text does not reach are written as empty strings, but only when they hold a value now; every piece goes in ONE settings save (sync records one change), all or nothing, and when (1 + spill) x the limit cannot hold the text the answer is store_failed and nothing is stored. The script still never sees a value and stored/storedNames are unchanged. collect.storeAs.thenEvent (optional, a screenEvent name: 1 to 128 of A-Z a-z 0-9 . _ ~ -, never the reserved open; anything else is bad_args) asks Kino to send that event to the plugin's OPEN screen once the setting was written successfully: its arg is { stored: [cookie names] } (names only, never a value) and it has no value. Only when the call came from a screen's screenEvent (from a settings action or a panelAction the option is accepted and nothing is sent); never after a failed write or a window that was not done; dropped silently when that plugin has no screen open then or its event queue is full; at most one per call. It is a follow-up, not a press: a change-like event (its answer's go.url, go.copy, go.titleByIds, go.installPlugin, share and enableJob are dropped) with the normal event time budget. The call's time bound does not run while the window is up: the call's own clock and the screen session's guard against a call that never ends both stop for as long as the window is on screen (from a settings action, a panelAction and a screenEvent alike), the window's own timeoutMs (at most maxTimeoutMs) is the only limit, and once it closes the call has at least afterWindowGraceMs left to run the code after open resolves. doneWhen.urlMatches is a pattern where * matches any run of characters, against the whole address. userAgent \"browser\" is the Chrome-for-Android string below; either way the WebView marker (; wv) is removed and X-Requested-With dropped where the WebView supports it.",
+    "apiVersion": 20,
+    "manifestKey": "visualBrowser",
+    "notBooleanMessage": "The \"visualBrowser\" field must be true or false",
+    "consentLine": "Puede abrir una ventana web donde inicias sesión o terminas un paso en sus sitios",
+    "fromFunctions": [
+      "action",
+      "panelAction",
+      "screenEvent"
+    ],
+    "screenTriggers": [
+      "press",
+      "submit"
+    ],
+    "thenEvent": {
+      "maxChars": 128,
+      "reservedNames": [
+        "open"
+      ],
+      "argKey": "stored",
+      "fromFunctions": [
+        "screenEvent"
+      ]
+    },
+    "maxTimeoutMs": 600000,
+    "minTimeoutMs": 5000,
+    "backgroundCloseMs": 60000,
+    "maxUrlChars": 2048,
+    "maxTitleChars": 60,
+    "maxCookieNames": 32,
+    "maxCookieNameChars": 256,
+    "maxCookies": 64,
+    "maxCookieChars": 16384,
+    "maxHtmlChars": 2000000,
+    "maxUrlMatchChars": 200,
+    "maxUserAgentChars": 300,
+    "userAgentBrowser": "browser",
+    "browserUserAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36",
+    "statuses": [
+      "done",
+      "closed",
+      "timeout"
+    ],
+    "storeFormats": [
+      "header",
+      "json"
+    ],
+    "maxSpill": 3,
+    "afterWindowGraceMs": 10000,
+    "errorCodes": [
+      "bad_args",
+      "forbidden",
+      "unavailable",
+      "busy",
+      "store_failed"
     ]
   },
   "qr": {

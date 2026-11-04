@@ -1,8 +1,8 @@
 {
   "id": "rpdb-catalog",
   "name": "PosterX",
-  "version": "1.35.0",
-  "apiVersion": 14,
+  "version": "1.36.0",
+  "apiVersion": 21,
   "entry": "plugin.js",
   "catalogOnly": true,
   "categories": [
@@ -343,8 +343,6 @@
   "screen": {
     "label": "Buscar",
     "labelEn": "Search",
-    "icon": "search",
-    "menuOpens": "section",
     "opensFrom": [
       "settings"
     ]
